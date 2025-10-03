@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rover - Your Digital DSA Instructor</title>
+    <link rel="stylesheet" href="/static/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-icon">🚀</span>
+                <span class="logo-text">Rover</span>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#templates" class="nav-link">Templates</a>
+                <a href="#stats" class="nav-link">Stats</a>
+                <a href="#about" class="nav-link">About</a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn-secondary" onclick="window.location.href='/dashboard'">Dashboard</button>
+                <button class="btn-primary" onclick="window.location.href='/dashboard'">Get Started</button>
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-background">
+            <div class="gradient-orb orb-1"></div>
+            <div class="gradient-orb orb-2"></div>
+            <div class="gradient-orb orb-3"></div>
+            <div class="grid-overlay"></div>
+        </div>
+        
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="badge-icon">🌟</span>
+                <span>Free & Open Source • Learning by Doing</span>
+            </div>
+            
+            <h1 class="hero-title">
+                Master DSA<br/>
+                <span class="gradient-text">From The Roots Up</span>
+            </h1>
+            
+            <p class="hero-description">
+                Rover is a free, open-source platform where you learn by doing. 
+                Build your understanding from first principles with hands-on templates, 
+                real code examples, and deep-dive explanations. No paywalls, no gimmicks—just pure learning.
+            </p>
+            
+            <div class="hero-cta">
+                <button class="btn-large btn-primary" onclick="window.location.href='/dashboard'">
+                    <span>Start Learning Now</span>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <button class="btn-large btn-outline" onclick="window.open('https://github.com', '_blank')">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M10 2C5.58 2 2 5.58 2 10C2 13.54 4.29 16.53 7.47 17.59C7.87 17.66 8.02 17.42 8.02 17.21C8.02 17.02 8.01 16.39 8.01 15.72C6 16.09 5.48 15.21 5.32 14.79C5.24 14.57 4.84 13.85 4.5 13.66C4.22 13.52 3.82 13.15 4.49 13.14C5.12 13.13 5.57 13.72 5.72 13.96C6.44 15.15 7.59 14.81 8.05 14.6C8.12 14.08 8.33 13.73 8.56 13.53C6.84 13.33 5.04 12.65 5.04 9.53C5.04 8.63 5.24 7.89 5.74 7.31C5.66 7.11 5.38 6.3 5.82 5.23C5.82 5.23 6.49 5.02 8.02 6.07C8.66 5.89 9.34 5.8 10.02 5.8C10.7 5.8 11.38 5.89 12.02 6.07C13.55 5.01 14.22 5.23 14.22 5.23C14.66 6.3 14.38 7.11 14.3 7.31C14.8 7.89 15 8.62 15 9.53C15 12.66 13.19 13.33 11.47 13.53C11.76 13.78 12.01 14.26 12.01 15.01C12.01 16.08 12 16.94 12 17.21C12 17.42 12.15 17.67 12.55 17.59C15.71 16.53 18 13.53 18 10C18 5.58 14.42 2 10 2Z" fill="currentColor"/>
+                    </svg>
+                    <span>View on GitHub</span>
+                </button>
+            </div>
+            
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Free Forever</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">Open</div>
+                    <div class="stat-label">Source</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">∞</div>
+                    <div class="stat-label">Learning Paths</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="scroll-indicator">
+            <div class="mouse">
+                <div class="wheel"></div>
+            </div>
+            <span>Scroll to explore</span>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Why <span class="gradient-text">Rover</span>?</h2>
+                <p class="section-description">
+                    A completely free platform built by an Aspiring Software Engineer, Learner and your buddy, for learners. 
+                    Master data structures and algorithms from the ground up through hands-on practice and deep understanding.
+                    No More Youtube videos and No more Udemy courses. 
+                    Just pure, focused learning built on the principle that the best way to understand something is to 
+                    build it yourself, from first principles.
+                </p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon meta-blue">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <path d="M16 4L4 10L16 16L28 10L16 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M4 22L16 28L28 22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M4 16L16 22L28 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Learn by Doing</h3>
+                    <p class="feature-description">
+                        No passive watching—build understanding through hands-on practice. 
+                        Every concept comes with working code you can run and modify.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon terminal-green">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <path d="M8 12L14 18L8 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M18 24H28" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">From First Principles</h3>
+                    <p class="feature-description">
+                        Start from the roots and build your way up. 
+                        Understand the "why" behind every algorithm, not just the "how."
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon mclaren-orange">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <path d="M16 4V16M16 16L24 8M16 16L8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M6 20C6 24.4183 9.58172 28 14 28H18C22.4183 28 26 24.4183 26 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">100% Free & Open</h3>
+                    <p class="feature-description">
+                        No subscriptions, no hidden costs. Fork it, modify it, contribute back. 
+                        Built by a single guy, for the community.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon ferrari-red">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <circle cx="16" cy="16" r="12" stroke="currentColor" stroke-width="2"/>
+                            <path d="M16 8V16L22 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Deep Understanding</h3>
+                    <p class="feature-description">
+                        Go beyond memorization. Understand time and space complexity, 
+                        trade-offs, and when to use each approach.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon meta-blue">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <path d="M16 28C22.6274 28 28 22.6274 28 16C28 9.37258 22.6274 4 16 4C9.37258 4 4 9.37258 4 16C4 22.6274 9.37258 28 16 28Z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 16L15 19L21 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Real Code Examples</h3>
+                    <p class="feature-description">
+                        Every template includes production-ready code with detailed comments. 
+                        Learn patterns you'll actually use in real projects.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon terminal-green">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <path d="M16 4L20 12L28 13L22 19L24 28L16 24L8 28L10 19L4 13L12 12L16 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Community Driven</h3>
+                    <p class="feature-description">
+                        Contribute templates, fix bugs, suggest improvements. 
+                        This is your platform—help make it better for everyone.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Templates Section -->
+    <section class="templates" id="templates">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Explore <span class="gradient-text">Free Templates</span></h2>
+                <p class="section-description">
+                    Hand-crafted learning modules with real code, detailed explanations, and practical examples. 
+                    All completely free and open-source.
+                </p>
+            </div>
+            
+            <div class="templates-grid">
+                <div class="template-card" onclick="window.location.href='/view/Complexity/timeNspace.html'">
+                    <div class="template-icon">⏱️</div>
+                    <h3 class="template-title">Time & Space Complexity</h3>
+                    <p class="template-description">Master Big O notation and analyze algorithm efficiency</p>
+                    <div class="template-meta">
+                        <span class="difficulty easy">Beginner</span>
+                        <span class="duration">45 min</span>
+                    </div>
+                </div>
+                
+                <div class="template-card" onclick="window.location.href='/view/Sliding%20Window/Fixed%20Window/fixedWindow.html'">
+                    <div class="template-icon">🪟</div>
+                    <h3 class="template-title">Sliding Window Pattern</h3>
+                    <p class="template-description">Fixed and variable window techniques for array problems</p>
+                    <div class="template-meta">
+                        <span class="difficulty medium">Intermediate</span>
+                        <span class="duration">60 min</span>
+                    </div>
+                </div>
+                
+                <div class="template-card" onclick="window.location.href='/view/Problem%20Solving/Pattern_Recognition.html'">
+                    <div class="template-icon">🧩</div>
+                    <h3 class="template-title">Pattern Recognition</h3>
+                    <p class="template-description">Learn to identify common problem patterns instantly</p>
+                    <div class="template-meta">
+                        <span class="difficulty medium">Intermediate</span>
+                        <span class="duration">90 min</span>
+                    </div>
+                </div>
+                
+                <div class="template-card">
+                    <div class="template-icon">🌳</div>
+                    <h3 class="template-title">Trees & Graphs</h3>
+                    <p class="template-description">Master tree traversals and graph algorithms</p>
+                    <div class="template-meta">
+                        <span class="difficulty hard">Advanced</span>
+                        <span class="duration">120 min</span>
+                    </div>
+                </div>
+                
+                <div class="template-card">
+                    <div class="template-icon">🔄</div>
+                    <h3 class="template-title">Dynamic Programming</h3>
+                    <p class="template-description">Break down complex problems with memoization</p>
+                    <div class="template-meta">
+                        <span class="difficulty hard">Advanced</span>
+                        <span class="duration">150 min</span>
+                    </div>
+                </div>
+                
+                <div class="template-card">
+                    <div class="template-icon">🔍</div>
+                    <h3 class="template-title">Binary Search</h3>
+                    <p class="template-description">Master the art of efficient searching algorithms</p>
+                    <div class="template-meta">
+                        <span class="difficulty easy">Beginner</span>
+                        <span class="duration">40 min</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section-cta">
+                <button class="btn-primary" onclick="window.location.href='/dashboard'">
+                    Browse All Templates
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section" id="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon meta-blue">🆓</div>
+                    <div class="stat-value">Forever</div>
+                    <div class="stat-label">Free Access</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon terminal-green">📚</div>
+                    <div class="stat-value" data-target="50">0</div>
+                    <div class="stat-label">Learning Templates</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon mclaren-orange">🔓</div>
+                    <div class="stat-value">Open</div>
+                    <div class="stat-label">Source Project</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon ferrari-red">�</div>
+                    <div class="stat-value">24/7</div>
+                    <div class="stat-label">Available</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About/CTA Section -->
+    <section class="about" id="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2 class="about-title">
+                        Ready to Master DSA<br/>
+                        <span class="gradient-text">From The Ground Up?</span>
+                    </h2>
+                    <p class="about-description">
+                        Rover is completely free and open-source. No accounts, no paywalls, no catch. 
+                        Just pure, focused learning built on the principle that the best way to understand 
+                        something is to build it yourself, from first principles.
+                    </p>
+                    <ul class="about-features">
+                        <li>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="10" stroke="#00FF00" stroke-width="2"/>
+                                <path d="M8 12L11 15L16 9" stroke="#00FF00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>100% free forever—no subscriptions, no hidden costs</span>
+                        </li>
+                        <li>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="10" stroke="#00FF00" stroke-width="2"/>
+                                <path d="M8 12L11 15L16 9" stroke="#00FF00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Open-source—fork it, modify it, make it yours</span>
+                        </li>
+                        <li>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="10" stroke="#00FF00" stroke-width="2"/>
+                                <path d="M8 12L11 15L16 9" stroke="#00FF00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Learn by doing with real, working code examples</span>
+                        </li>
+                        <li>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="10" stroke="#00FF00" stroke-width="2"/>
+                                <path d="M8 12L11 15L16 9" stroke="#00FF00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Built by your buddy, for learners—contribute anytime</span>
+                        </li>
+                    </ul>
+                    <div class="about-cta">
+                        <button class="btn-large btn-primary" onclick="window.location.href='/dashboard'">
+                            <span>Start Learning Now</span>
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <p class="cta-note">No signup required • Access everything instantly</p>
+                    </div>
+                </div>
+                
+                <div class="about-visual">
+                    <div class="achievement-cards">
+                        <div class="achievement-card floating">
+                            <div class="achievement-icon">🎯</div>
+                            <div class="achievement-text">
+                                <div class="achievement-title">First Algorithm</div>
+                                <div class="achievement-progress">Completed!</div>
+                            </div>
+                        </div>
+                        
+                        <div class="achievement-card floating" style="animation-delay: 0.5s;">
+                            <div class="achievement-icon">🔥</div>
+                            <div class="achievement-text">
+                                <div class="achievement-title">7 Day Streak</div>
+                                <div class="achievement-progress">Keep it up!</div>
+                            </div>
+                        </div>
+                        
+                        <div class="achievement-card floating" style="animation-delay: 1s;">
+                            <div class="achievement-icon">⚡</div>
+                            <div class="achievement-text">
+                                <div class="achievement-title">Speed Demon</div>
+                                <div class="achievement-progress">Lightning fast!</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <span class="logo-icon">🚀</span>
+                        <span class="logo-text">Rover</span>
+                    </div>
+                    <p class="footer-tagline">
+                        A free, open-source platform for mastering data structures and algorithms from the roots up. Learn by doing, build from first principles.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    
+                    <div class="footer-column">
+                        <h4 class="footer-title">Community</h4>
+                        <a href="#" class="footer-link">GitHub</a>
+                        <a href="#" class="footer-link">Contribute</a>
+                        <a href="#" class="footer-link">Discussions</a>
+                        <a href="#" class="footer-link">Issues</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Rover. All rights reserved.</p>
+                <div class="footer-bottom-links">
+                    <a href="#">Terms</a>
+                    <a href="#">Privacy</a>
+                    <a href="#">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/static/index.js"></script>
+</body>
+</html>
