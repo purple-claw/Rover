@@ -107,6 +107,13 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 var(--spacing-lg);
+            width: 100%;
+        }
+
+        /* Content wrapper for better reading experience */
+        .content-wrapper {
+            max-width: 100%;
+            margin: 0 auto;
         }
 
         /* Navigation */
@@ -629,126 +636,6 @@
 
         /* Pattern cards - already styled as card class above */
         
-        /* Search Container */
-        .search-container {
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            z-index: 999;
-            animation: slideInRight 0.5s ease;
-        }
-
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .search-box {
-            padding: var(--spacing-sm) var(--spacing-lg);
-            background: var(--secondary-bg);
-            border: 2px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            color: var(--text-primary);
-            font-size: var(--font-size-base);
-            width: 300px;
-            outline: none;
-            transition: var(--transition-base);
-            backdrop-filter: blur(10px);
-        }
-
-        .search-box:focus {
-            border-color: var(--mclaren-orange);
-            box-shadow: 0 0 20px rgba(255, 128, 0, 0.3);
-            transform: scale(1.02);
-        }
-
-        .search-box::placeholder {
-            color: var(--text-secondary);
-        }
-
-        /* Search Highlight */
-        .highlight-match {
-            background: var(--mclaren-orange);
-            color: var(--primary-bg);
-            padding: 2px 4px;
-            border-radius: 3px;
-            font-weight: 600;
-            animation: highlightPulse 1s ease infinite;
-        }
-
-        @keyframes highlightPulse {
-            0%, 100% {
-                box-shadow: 0 0 5px rgba(255, 128, 0, 0.5);
-            }
-            50% {
-                box-shadow: 0 0 15px rgba(255, 128, 0, 0.8);
-            }
-        }
-
-        /* Theme Toggle */
-        .theme-toggle {
-            position: fixed;
-            top: 80px;
-            right: 340px;
-            z-index: 999;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: var(--secondary-bg);
-            border: 2px solid var(--border-color);
-            color: var(--mclaren-orange);
-            font-size: var(--font-size-2xl);
-            cursor: pointer;
-            transition: var(--transition-base);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(10px);
-            animation: slideInRight 0.5s ease 0.2s backwards;
-        }
-
-        .theme-toggle:hover {
-            transform: scale(1.1) rotate(180deg);
-            box-shadow: 0 0 20px rgba(255, 128, 0, 0.5);
-            border-color: var(--mclaren-orange);
-        }
-
-        .theme-toggle:active {
-            transform: scale(0.95);
-        }
-
-        /* Light Theme Variables */
-        body.light-theme {
-            --primary-bg: #ffffff;
-            --secondary-bg: #f5f5f5;
-            --card-bg: #fafafa;
-            --text-primary: #1a1a1a;
-            --text-secondary: #4a5568;
-            --border-color: rgba(255, 128, 0, 0.3);
-        }
-
-        body.light-theme .hero {
-            background: linear-gradient(135deg, #f5f5f5, #fafafa);
-        }
-
-        body.light-theme pre {
-            background: #1e1e1e;
-            color: #d4d4d4;
-        }
-
-        body.light-theme .keyword { color: #C586C0; }
-        body.light-theme .function { color: #DCDCAA; }
-        body.light-theme .string { color: #CE9178; }
-        body.light-theme .comment { color: #6A9955; }
-        body.light-theme .number { color: #B5CEA8; }
-        body.light-theme .variable { color: #9CDCFE; }
-
         /* Lazy Loading Animation */
         .lazy-load {
             opacity: 0;
@@ -994,7 +881,41 @@
             }
         }
 
-        /* Responsive Design - Mobile */
+        /* Responsive Design - Tablet (1024px and below) */
+        @media (max-width: 1024px) {
+            .container {
+                max-width: 90%;
+            }
+
+            .hero {
+                padding: var(--spacing-2xl) var(--spacing-xl);
+            }
+
+            .nav-links li a {
+                padding: var(--spacing-xs) var(--spacing-md);
+                font-size: 0.85rem;
+            }
+
+            .card {
+                padding: var(--spacing-lg);
+            }
+
+            pre {
+                font-size: 0.85rem;
+            }
+
+            /* Optimize grid layouts for tablet */
+            .pattern-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            }
+
+            /* Better sidebar/two-column layouts */
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Responsive Design - Mobile (768px and below) */
         @media (max-width: 768px) {
             body {
                 font-size: 15px;
@@ -1099,88 +1020,151 @@
                 padding: var(--spacing-sm);
             }
 
-            /* Mobile-specific search and toggle */
-            .search-container {
-                top: auto;
-                bottom: 90px;
-                right: 10px;
-                left: 10px;
+            /* Improved mobile spacing and readability */
+            .card {
+                margin-bottom: var(--spacing-lg);
+                border-radius: var(--radius-md);
             }
 
-            .search-box {
-                width: 100%;
-            }
-
-            .theme-toggle {
-                top: auto;
-                bottom: 90px;
-                right: auto;
-                left: 10px;
-                width: 45px;
-                height: 45px;
+            .section {
+                padding: var(--spacing-xl) 0;
             }
 
             .scroll-to-top {
-                width: 40px;
-                height: 40px;
-                bottom: 15px;
-                right: 15px;
+                width: 50px;
+                height: 50px;
+                bottom: 20px;
+                right: 20px;
                 font-size: var(--font-size-xl);
             }
 
-            /* Stack nav vertically on mobile */
+            /* Optimize navigation for mobile */
             .nav-links {
-                display: none; /* Hide or make hamburger menu */
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .nav-links li a {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+                white-space: nowrap;
             }
 
             /* Better touch targets */
             .copy-button {
                 min-width: 44px;
                 min-height: 44px;
+                padding: 8px 16px;
+                font-size: 0.75rem;
             }
 
             .section-header {
                 padding: var(--spacing-md);
                 margin: calc(var(--spacing-md) * -1);
                 margin-bottom: var(--spacing-md);
+                cursor: pointer;
+            }
+
+            /* Improve readability */
+            p, li {
+                line-height: 1.7;
+            }
+
+            /* Better code block display */
+            pre {
+                border-radius: var(--radius-md);
+                margin: var(--spacing-md) 0;
+            }
+
+            /* Optimize tables for mobile */
+            table {
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Stack pattern cards on mobile */
+            .pattern-grid {
+                grid-template-columns: 1fr;
+            }
+
+            /* Improve hero section */
+            .hero {
+                min-height: auto;
+                padding: var(--spacing-xl) var(--spacing-lg);
+            }
+
+            .hero-subtitle {
+                font-size: 0.9rem;
+            }
+
+            /* Better spacing for lists */
+            ul, ol {
+                padding-left: var(--spacing-xl);
             }
         }
 
-        /* Responsive Design - Small Mobile */
+        /* Responsive Design - Small Mobile (Enhanced) */
         @media (max-width: 480px) {
             body {
                 font-size: 14px;
+                padding: 0;
             }
 
             :root {
+                --spacing-sm: 0.5rem;
+                --spacing-md: 0.75rem;
                 --spacing-lg: 1rem;
-                --spacing-xl: 1.5rem;
-                --spacing-2xl: 2rem;
+                --spacing-xl: 1.25rem;
+                --spacing-2xl: 1.5rem;
             }
 
-            .hero {
-                padding: var(--spacing-md);
-            }
-
-            .hero h1 {
-                font-size: 1.5rem;
-            }
-
-            .nav-logo {
-                font-size: var(--font-size-lg);
-            }
-
-            .nav-links li a {
-                font-size: 0.7rem;
-                padding: 4px 8px;
-            }
-
-            .card {
+            .container {
                 padding: var(--spacing-sm);
             }
 
-            pre {
+            .hero {
+                padding: var(--spacing-lg) var(--spacing-sm);
+                margin: var(--spacing-sm);
+                border-radius: var(--radius-md);
+            }
+
+            .hero h1 {
+                font-size: 1.25rem;
+                line-height: 1.3;
+            }
+
+            .hero-subtitle {
+                font-size: 0.8rem;
+            }
+
+            .nav-logo {
+                font-size: var(--font-size-base);
+            }
+
+            .nav-links {
+                gap: 6px;
+            }
+
+            .nav-links li a {
                 font-size: 0.65rem;
+                padding: 6px 10px;
+            }
+
+            .card {
+                padding: var(--spacing-md);
+                margin-bottom: var(--spacing-md);
+                border-radius: var(--radius-sm);
+            }
+
+            .card-header h2, .card-header h3 {
+                font-size: 1rem;
+            }
+
+            pre {
+                font-size: 0.7rem;
+                padding: var(--spacing-sm);
+                border-radius: var(--radius-sm);
                 padding: var(--spacing-xs);
             }
 
@@ -1273,16 +1257,6 @@
         </div>
     </nav>
 
-    <!-- Search Box -->
-    <div class="search-container">
-        <input type="search" class="search-box" id="searchBox" placeholder="🔍 Search patterns & concepts..." autocomplete="off">
-    </div>
-
-    <!-- Theme Toggle -->
-    <button class="theme-toggle" id="themeToggle" title="Toggle Light/Dark Theme" data-tooltip="Toggle Theme">
-        🌙
-    </button>
-
     <!-- Scroll to Top Button -->
     <button class="scroll-to-top" id="scrollToTop" aria-label="Scroll to top">
         ↑
@@ -1308,16 +1282,6 @@
         <span>←</span>
         <span>Back to Dashboard</span>
     </a>
-
-    <!-- Search Box -->
-    <div class="search-container">
-        <input type="search" class="search-box" id="searchBox" placeholder="🔍 Search content...">
-    </div>
-
-    <!-- Theme Toggle -->
-    <button class="theme-toggle" id="themeToggle" title="Toggle theme">
-        🌙
-    </button>
 
     <!-- Main Content -->
     <div class="content-wrapper">
@@ -2676,105 +2640,6 @@ mid > high: stop, [0,0,1,1,2,2]</pre>
         });
 
         // ==========================================
-        // ENHANCED SEARCH FUNCTIONALITY
-        // ==========================================
-        const searchBox = document.getElementById('searchBox');
-        let searchTimeout;
-
-        searchBox.addEventListener('input', (e) => {
-            clearTimeout(searchTimeout);
-            
-            searchTimeout = setTimeout(() => {
-                const searchTerm = e.target.value.toLowerCase().trim();
-                
-                // Remove previous highlights
-                document.querySelectorAll('.highlight-match').forEach(el => {
-                    const parent = el.parentNode;
-                    parent.replaceChild(document.createTextNode(el.textContent), el);
-                    parent.normalize();
-                });
-
-                if (searchTerm === '') {
-                    // Show all content
-                    document.querySelectorAll('.card, .pattern-card, .section').forEach(el => {
-                        el.style.display = '';
-                    });
-                    return;
-                }
-
-                // Search and highlight
-                let foundCount = 0;
-                document.querySelectorAll('.card, .pattern-card').forEach(card => {
-                    const textContent = card.textContent.toLowerCase();
-                    
-                    if (textContent.includes(searchTerm)) {
-                        card.style.display = '';
-                        foundCount++;
-                        
-                        // Highlight matches in text nodes
-                        highlightInElement(card, searchTerm);
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-
-                // Show "no results" message
-                if (foundCount === 0) {
-                    showNoResultsMessage();
-                }
-            }, 300); // Debounce for better performance
-        });
-
-        function highlightInElement(element, searchTerm) {
-            const walker = document.createTreeWalker(
-                element,
-                NodeFilter.SHOW_TEXT,
-                {
-                    acceptNode: function(node) {
-                        // Skip code blocks and already highlighted text
-                        if (node.parentElement.closest('pre') || 
-                            node.parentElement.classList.contains('highlight-match')) {
-                            return NodeFilter.FILTER_REJECT;
-                        }
-                        return node.textContent.toLowerCase().includes(searchTerm) ? 
-                            NodeFilter.FILTER_ACCEPT : 
-                            NodeFilter.FILTER_REJECT;
-                    }
-                }
-            );
-
-            const nodesToHighlight = [];
-            let currentNode;
-            while (currentNode = walker.nextNode()) {
-                nodesToHighlight.push(currentNode);
-            }
-
-            nodesToHighlight.forEach(node => {
-                const text = node.textContent;
-                const regex = new RegExp(`(${escapeRegex(searchTerm)})`, 'gi');
-                const highlightedHTML = text.replace(regex, '<span class="highlight-match">$1</span>');
-                
-                const span = document.createElement('span');
-                span.innerHTML = highlightedHTML;
-                node.parentNode.replaceChild(span, node);
-            });
-        }
-
-        function escapeRegex(string) {
-            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        }
-
-        function showNoResultsMessage() {
-            const existing = document.querySelector('.no-results-message');
-            if (!existing) {
-                const message = document.createElement('div');
-                message.className = 'card no-results-message';
-                message.innerHTML = '<h3 style="color: var(--mclaren-orange);">🔍 No Results Found</h3><p>Try searching with different keywords or patterns.</p>';
-                document.querySelector('.container').appendChild(message);
-            }
-        }
-
-        // ==========================================
         // COLLAPSIBLE SECTIONS
         // ==========================================
         function attachEventListeners() {
@@ -2800,28 +2665,6 @@ mid > high: stop, [0,0,1,1,2,2]</pre>
         // KEYBOARD SHORTCUTS
         // ==========================================
         document.addEventListener('keydown', (e) => {
-            // Ctrl/Cmd + F for search
-            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
-                e.preventDefault();
-                searchBox.focus();
-                searchBox.select();
-            }
-            
-            // Escape to clear search
-            if (e.key === 'Escape') {
-                if (document.activeElement === searchBox) {
-                    searchBox.value = '';
-                    searchBox.dispatchEvent(new Event('input'));
-                    searchBox.blur();
-                }
-            }
-            
-            // Ctrl/Cmd + K for theme toggle
-            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-                e.preventDefault();
-                themeToggle.click();
-            }
-            
             // Home key - scroll to top
             if (e.key === 'Home' && !e.ctrlKey) {
                 e.preventDefault();
