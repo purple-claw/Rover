@@ -11,8 +11,7 @@ from navigation_builder import NavigationBuilder
 app = FastAPI(title="Rover - Digital DSA Instructor", version="1.0.0")
 
 # Configuration
-TEMPLATES_DIR = "templates"  # Your template directory (templates/ in current directory)
-
+TEMPLATES_DIR = "templates"  
 # Initialize components
 content_parser = ContentParser(TEMPLATES_DIR)
 nav_builder = NavigationBuilder(TEMPLATES_DIR)
