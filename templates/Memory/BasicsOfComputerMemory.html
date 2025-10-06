@@ -1,0 +1,2916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Memory Fundamentals | Rover DSA</title>
+    <style>
+        /* CSS Variables for consistent theming */
+        :root {
+            --primary-bg: #0d1117;
+            --secondary-bg: #161b22;
+            --card-bg: rgba(30, 38, 54, 0.7);
+            --text-primary: #f0f6fc;
+            --text-secondary: #c9d1d9;
+            --text-muted: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-purple: #bc8cff;
+            --accent-orange: #f78166;
+            --accent-red: #ff7b72;
+            --accent-yellow: #ffd33d;
+            --border-color: #30363d;
+            --code-bg: #1e1e1e;
+            --code-comment: #6a9955;
+            --code-keyword: #569cd6;
+            --code-string: #ce9178;
+            --code-function: #dcdcaa;
+            --code-variable: #9cdcfe;
+            --code-number: #b5cea8;
+            --gradient-bg: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --navbar-height: 60px;
+            --animation-speed: 0.3s;
+            --container-width: 1200px;
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--gradient-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            padding-bottom: 3rem;
+            /* Prevent horizontal scroll on mobile */
+            max-width: 100vw;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            margin: 1.5rem 0 1rem;
+            color: var(--text-primary);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+            margin-top: 2.5rem;
+        }
+
+        h3 {
+            font-size: 1.35rem;
+            color: var(--accent-blue);
+        }
+
+        p {
+            margin-bottom: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            transition: color var(--animation-speed) ease;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        ul, ol {
+            padding-left: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Container and Layout */
+        .container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--secondary-bg);
+            height: var(--navbar-height);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+            backdrop-filter: blur(8px);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 100%;
+        }
+
+        .nav-logo {
+            font-weight: 700;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-logo span {
+            color: var(--accent-blue);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-links li a {
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: color var(--animation-speed) ease;
+        }
+
+        .nav-links li a:hover, .nav-links li a.active {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        /* Mobile Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: var(--text-secondary);
+            margin: 3px 0;
+            transition: 0.3s;
+            border-radius: 3px;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: var(--navbar-height);
+            left: 0;
+            width: 100%;
+            background: var(--secondary-bg);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 98;
+            backdrop-filter: blur(8px);
+        }
+
+        .mobile-nav.active {
+            display: block;
+        }
+
+        .mobile-nav ul {
+            list-style: none;
+            padding: 1rem;
+            margin: 0;
+        }
+
+        .mobile-nav li {
+            margin-bottom: 0.5rem;
+        }
+
+        .mobile-nav li a {
+            display: block;
+            color: var(--text-secondary);
+            font-weight: 500;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-sm);
+            transition: all var(--animation-speed) ease;
+        }
+
+        .mobile-nav li a:hover, .mobile-nav li a.active {
+            color: var(--accent-blue);
+            background: rgba(88, 166, 255, 0.1);
+            text-decoration: none;
+        }
+
+        /* Progress bar */
+        .progress-container {
+            position: fixed;
+            top: var(--navbar-height);
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--secondary-bg);
+            z-index: 99;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(17, 24, 39, 0.9) 100%);
+            border-radius: var(--radius-lg);
+            padding: 3rem 2rem;
+            margin: 2rem 0;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(88, 166, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(188, 140, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(59, 185, 80, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            background: linear-gradient(to right, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+            font-size: 2.75rem;
+        }
+
+        .hero p {
+            max-width: 800px;
+            margin: 0 auto 1.5rem;
+            font-size: 1.15rem;
+        }
+
+        .hero-features {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .hero-feature {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .feature-bullet {
+            color: var(--accent-green);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* Responsive Layout Classes */
+        .grid-responsive-2 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .grid-responsive-auto {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .flex-responsive {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .visualization-container {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            min-height: 120px;
+            margin: 0 auto;
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .hierarchy-visualization {
+            width: 100%;
+            max-width: 200px;
+            height: 250px;
+            margin: 0 auto;
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+        }
+
+        .memory-block {
+            width: 100%;
+            height: 60px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        /* Touch-Friendly Improvements */
+        .data-type-card, .checkpoint, .hierarchy-level {
+            min-height: 44px;
+            padding: 1rem;
+            touch-action: manipulation; /* Disable double-tap zoom */
+        }
+
+        input, button, select, textarea {
+            min-height: 44px;
+            font-size: 16px; /* Prevents zoom on iOS */
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background: var(--secondary-bg);
+            color: var(--text-primary);
+        }
+
+        /* Improved mobile interactive elements */
+        @media (max-width: 768px) {
+            .data-type-card, .checkpoint, .hierarchy-level {
+                min-height: 48px;
+                padding: 1.25rem;
+            }
+            
+            input, button, select, textarea {
+                min-height: 48px;
+                font-size: 16px;
+                padding: 0.75rem 1rem;
+            }
+            
+            /* Larger tap targets for hierarchy levels */
+            .hierarchy-level {
+                margin: 0.5rem auto;
+                padding: 1rem;
+            }
+        }
+
+        /* Timeline Navigation */
+        .timeline-nav {
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(8px);
+        }
+
+        .timeline-nav h3 {
+            margin-bottom: 1rem;
+            text-align: center;
+            color: var(--accent-green);
+        }
+
+        .checkpoint-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .checkpoint {
+            background: rgba(88, 166, 255, 0.05);
+            border: 1px solid rgba(88, 166, 255, 0.2);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            cursor: pointer;
+            transition: all var(--animation-speed) ease;
+            text-decoration: none;
+            color: var(--text-secondary);
+        }
+
+        .checkpoint:hover {
+            background: rgba(88, 166, 255, 0.1);
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .checkpoint-time {
+            color: var(--accent-blue);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .checkpoint-title {
+            font-weight: 600;
+            margin: 0.5rem 0;
+        }
+
+        /* Cards and Content Sections */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(8px);
+            transition: transform var(--animation-speed) ease, box-shadow var(--animation-speed) ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-header .icon {
+            font-size: 1.5rem;
+            color: var(--accent-blue);
+            background: rgba(88, 166, 255, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-header h3 {
+            margin: 0;
+        }
+
+        /* Interactive Memory Visualizer */
+        .memory-visualizer {
+            background: var(--code-bg);
+            border-radius: var(--radius-md);
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 2px;
+            margin: 1rem 0;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+
+        .memory-cell {
+            background: rgba(88, 166, 255, 0.1);
+            border: 1px solid rgba(88, 166, 255, 0.3);
+            padding: 0.5rem;
+            text-align: center;
+            border-radius: 2px;
+            transition: all var(--animation-speed) ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .memory-cell:hover {
+            background: rgba(88, 166, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .memory-cell.highlighted {
+            background: var(--accent-blue);
+            color: var(--primary-bg);
+            box-shadow: 0 0 10px rgba(88, 166, 255, 0.5);
+        }
+
+        .memory-address {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* Hierarchy Pyramid */
+        .memory-hierarchy {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 2rem 0;
+            gap: 1rem;
+        }
+
+        .hierarchy-level {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 2rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            text-align: center;
+            transition: all var(--animation-speed) ease;
+            cursor: pointer;
+            position: relative;
+            min-width: 200px;
+        }
+
+        .hierarchy-level:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .hierarchy-level.registers {
+            background: linear-gradient(135deg, var(--accent-red), #ff9999);
+            width: 120px;
+        }
+
+        .hierarchy-level.l1-cache {
+            background: linear-gradient(135deg, var(--accent-orange), #ffb366);
+            width: 160px;
+        }
+
+        .hierarchy-level.l2-cache {
+            background: linear-gradient(135deg, var(--accent-yellow), #ffe066);
+            width: 200px;
+            color: var(--primary-bg);
+        }
+
+        .hierarchy-level.l3-cache {
+            background: linear-gradient(135deg, var(--accent-green), #66dd66);
+            width: 240px;
+            color: var(--primary-bg);
+        }
+
+        .hierarchy-level.ram {
+            background: linear-gradient(135deg, var(--accent-blue), #66b3ff);
+            width: 280px;
+        }
+
+        .hierarchy-level.ssd {
+            background: linear-gradient(135deg, var(--accent-purple), #cc99ff);
+            width: 320px;
+        }
+
+        .hierarchy-level.hdd {
+            background: linear-gradient(135deg, #666666, #999999);
+            width: 360px;
+        }
+
+        .hierarchy-arrow {
+            font-size: 2rem;
+            color: var(--accent-blue);
+            margin: 0.5rem 0;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* Interactive Data Type Demo */
+        .data-type-demo {
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .data-type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .data-type-card {
+            background: rgba(59, 185, 80, 0.05);
+            border: 1px solid rgba(59, 185, 80, 0.2);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            text-align: center;
+            transition: all var(--animation-speed) ease;
+            cursor: pointer;
+        }
+
+        .data-type-card:hover {
+            background: rgba(59, 185, 80, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .data-type-name {
+            font-weight: 600;
+            color: var(--accent-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .data-type-size {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .data-type-range {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Binary Converter */
+        .binary-converter {
+            background: var(--code-bg);
+            border-radius: var(--radius-md);
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .converter-input {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .converter-input input {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 0.5rem 1rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            max-width: 150px;
+        }
+
+        .converter-input label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .binary-display {
+            font-family: monospace;
+            font-size: 1.2rem;
+            background: rgba(88, 166, 255, 0.1);
+            border: 1px solid rgba(88, 166, 255, 0.3);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            margin: 1rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bit-position {
+            text-align: center;
+            margin: 0 2px;
+        }
+
+        .bit-value {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--accent-blue);
+        }
+
+        .bit-power {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* Code Blocks */
+        pre {
+            background: var(--code-bg);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            position: relative;
+            border: 1px solid var(--border-color);
+            /* Mobile improvements */
+            max-width: 100%;
+            white-space: pre;
+            word-wrap: normal;
+        }
+
+        /* Mobile code improvements */
+        @media (max-width: 768px) {
+            pre {
+                font-size: 0.8rem;
+                padding: 0.75rem;
+                margin: 1rem 0;
+                /* Better scrolling on mobile */
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .code-title {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.75rem;
+            }
+        }
+
+        pre code {
+            color: var(--text-primary);
+            display: block;
+        }
+
+        .code-title {
+            background: var(--accent-blue);
+            color: var(--primary-bg);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        .code-title + pre {
+            margin-top: 0;
+            border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+        }
+
+        /* Syntax Highlighting */
+        .keyword {
+            color: var(--code-keyword);
+        }
+
+        .function {
+            color: var(--code-function);
+        }
+
+        .string {
+            color: var(--code-string);
+        }
+
+        .comment {
+            color: var(--code-comment);
+        }
+
+        .number {
+            color: var(--code-number);
+        }
+
+        .variable {
+            color: var(--code-variable);
+        }
+
+        /* Callouts and Info Boxes */
+        .callout {
+            border-left: 4px solid var(--accent-blue);
+            background: rgba(88, 166, 255, 0.05);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+
+        .callout-title {
+            font-weight: 600;
+            color: var(--accent-blue);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .callout p {
+            margin-bottom: 0.5rem;
+        }
+
+        .callout p:last-child {
+            margin-bottom: 0;
+        }
+
+        .callout.warning {
+            border-left-color: var(--accent-orange);
+            background: rgba(247, 129, 102, 0.05);
+        }
+
+        .callout.warning .callout-title {
+            color: var(--accent-orange);
+        }
+
+        .callout.success {
+            border-left-color: var(--accent-green);
+            background: rgba(59, 185, 80, 0.05);
+        }
+
+        .callout.success .callout-title {
+            color: var(--accent-green);
+        }
+
+        .callout.danger {
+            border-left-color: var(--accent-red);
+            background: rgba(255, 123, 114, 0.05);
+        }
+
+        .callout.danger .callout-title {
+            color: var(--accent-red);
+        }
+
+        /* Interactive Simulation Steps */
+        .simulation-steps {
+            margin: 2rem 0;
+        }
+
+        .step {
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            transition: all var(--animation-speed) ease;
+        }
+
+        .step-header {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(88, 166, 255, 0.05);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .step-header:hover {
+            background: rgba(88, 166, 255, 0.1);
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            background: var(--accent-blue);
+            color: var(--primary-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .step-title {
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .step-content {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: all var(--animation-speed) ease;
+        }
+
+        .step.active .step-content {
+            max-height: 1000px;
+            padding: 1.5rem;
+        }
+
+        .step-chevron {
+            transition: transform var(--animation-speed) ease;
+        }
+
+        .step.active .step-chevron {
+            transform: rotate(180deg);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--secondary-bg);
+            font-weight: 600;
+            color: var(--accent-blue);
+        }
+
+        tr:hover {
+            background: rgba(88, 166, 255, 0.05);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Mobile-First Responsive Design */
+        
+        /* Base Mobile Styles (320px+) */
+        .container {
+            padding: 0 1rem;
+        }
+        
+        .hero h1 {
+            font-size: 1.75rem;
+            line-height: 1.2;
+        }
+        
+        .hero p {
+            font-size: 1rem;
+        }
+        
+        .nav-links {
+            display: none;
+        }
+
+        .hamburger {
+            display: flex;
+        }
+        
+        .checkpoint-grid {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+        
+        .memory-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .hierarchy-level {
+            width: 95% !important;
+            min-width: unset;
+            margin: 0.25rem auto;
+        }
+        
+        .card {
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .card-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        
+        .data-type-grid {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+        
+        .hero {
+            padding: 2rem 1rem;
+            margin: 1rem 0;
+        }
+        
+        .timeline-nav {
+            padding: 1rem;
+        }
+        
+        h1 {
+            font-size: 1.75rem;
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+        }
+        
+        h3 {
+            font-size: 1.25rem;
+        }
+
+        /* Small Mobile (375px+) */
+        @media (min-width: 375px) {
+            .container {
+                padding: 0 1.25rem;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .memory-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .card {
+                padding: 1.25rem;
+            }
+        }
+
+        /* Large Mobile (480px+) */
+        @media (min-width: 480px) {
+            .hero {
+                padding: 2.5rem 1.5rem;
+            }
+            
+            .hero h1 {
+                font-size: 2.25rem;
+            }
+            
+            .memory-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .data-type-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .checkpoint-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .grid-responsive-auto {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1rem;
+            }
+
+            .visualization-container {
+                max-width: 300px;
+                min-height: 100px;
+            }
+        }
+
+        /* Tablet Portrait (600px+) */
+        @media (min-width: 600px) {
+            .container {
+                padding: 0 1.5rem;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .nav-links {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .hamburger {
+                display: none;
+            }
+            
+            .data-type-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .card {
+                padding: 1.5rem;
+            }
+            
+            .timeline-nav {
+                padding: 1.5rem;
+            }
+
+            .grid-responsive-2 {
+                grid-template-columns: 1fr 1fr;
+                gap: 1.5rem;
+            }
+
+            .visualization-container {
+                max-width: 350px;
+                min-height: 120px;
+            }
+
+            .hierarchy-visualization {
+                max-width: 180px;
+                height: 280px;
+            }
+        }
+
+        /* Tablet Landscape (768px+) */
+        @media (min-width: 768px) {
+            .nav-links {
+                gap: 1.5rem;
+            }
+            
+            .checkpoint-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .data-type-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .memory-grid {
+                grid-template-columns: repeat(6, 1fr);
+            }
+            
+            .hierarchy-level {
+                width: 80% !important;
+            }
+        }
+
+        /* Small Desktop (1024px+) */
+        @media (min-width: 1024px) {
+            .nav-links {
+                gap: 2rem;
+            }
+            
+            .checkpoint-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .memory-grid {
+                grid-template-columns: repeat(8, 1fr);
+            }
+            
+            .hierarchy-level {
+                width: 70% !important;
+            }
+            
+            .hero {
+                padding: 3rem 2rem;
+            }
+            
+            .hero h1 {
+                font-size: 2.75rem;
+            }
+
+            .grid-responsive-2 {
+                grid-template-columns: 1fr 1fr;
+                gap: 2rem;
+            }
+
+            .grid-responsive-auto {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1.5rem;
+            }
+
+            .visualization-container {
+                max-width: 400px;
+                min-height: 120px;
+            }
+
+            .hierarchy-visualization {
+                max-width: 200px;
+                height: 300px;
+            }
+        }
+
+        /* Large Desktop (1200px+) */
+        @media (min-width: 1200px) {
+            .checkpoint-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+            
+            .hierarchy-level {
+                width: 60% !important;
+            }
+
+            .grid-responsive-auto {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 2rem;
+            }
+        }
+
+        /* Ultra Wide (1440px+) */
+        @media (min-width: 1440px) {
+            .container {
+                max-width: 1400px;
+            }
+            
+            .checkpoint-grid {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            margin-top: 3rem;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            cursor: help;
+            border-bottom: 1px dotted var(--accent-blue);
+        }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--secondary-bg);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--animation-speed) ease;
+            z-index: 1000;
+            border: 1px solid var(--border-color);
+            font-size: 0.8rem;
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+    
+    <!-- Navigation -->
+    <nav>
+        <div class="container nav-container">
+            <div class="nav-logo">
+                <span>Memory Fundamentals</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#overview" class="active">Overview</a></li>
+                <li><a href="#fundamentals">Fundamentals</a></li>
+                <li><a href="#hierarchy">Hierarchy</a></li>
+                <li><a href="#stack-heap">Stack vs Heap</a></li>
+                <li><a href="#optimization">Optimization</a></li>
+            </ul>
+            <div class="hamburger" onclick="toggleMobileNav()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Navigation -->
+    <div class="mobile-nav" id="mobileNav">
+        <ul>
+            <li><a href="#overview" class="active" onclick="closeMobileNav()">Overview</a></li>
+            <li><a href="#fundamentals" onclick="closeMobileNav()">Fundamentals</a></li>
+            <li><a href="#hierarchy" onclick="closeMobileNav()">Hierarchy</a></li>
+            <li><a href="#stack-heap" onclick="closeMobileNav()">Stack vs Heap</a></li>
+            <li><a href="#optimization" onclick="closeMobileNav()">Optimization</a></li>
+        </ul>
+    </div>
+    
+    <main class="container">
+        <!-- Hero Section -->
+        <section class="hero" id="overview">
+            <div class="hero-content">
+                <h1>Computer Memory Fundamentals</h1>
+                <p>
+                    Master the complete landscape of computer memory—from CPU registers to hard drives. 
+                    Understand how data flows through the memory hierarchy and learn to write memory-efficient code 
+                    that leverages cache optimization and modern memory architectures.
+                </p>
+                <div class="hero-features">
+                    <div class="hero-feature">
+                        <span class="feature-bullet">•</span>
+                        <span>Complete memory hierarchy explained</span>
+                    </div>
+                    <div class="hero-feature">
+                        <span class="feature-bullet">•</span>
+                        <span>Interactive visualizations & simulations</span>
+                    </div>
+                    <div class="hero-feature">
+                        <span class="feature-bullet">•</span>
+                        <span>Real-world optimization techniques</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Timeline Navigation -->
+        <section class="timeline-nav">
+            <h3>LEARNING CHECKPOINTS</h3>
+            <div class="checkpoint-grid">
+                <a href="#memory-intro" class="checkpoint">
+                    <div class="checkpoint-time">[0-12 min]</div>
+                    <div class="checkpoint-title">What IS Memory?</div>
+                    <div>Building from zero—complete mental models</div>
+                </a>
+                <a href="#hierarchy" class="checkpoint">
+                    <div class="checkpoint-time">[12-24 min]</div>
+                    <div class="checkpoint-title">Memory Hierarchy</div>
+                    <div>From registers to hard disk—the speed pyramid</div>
+                </a>
+                <a href="#stack-heap" class="checkpoint">
+                    <div class="checkpoint-time">[24-36 min]</div>
+                    <div class="checkpoint-title">Stack vs Heap</div>
+                    <div>The two kingdoms of memory allocation</div>
+                </a>
+                <a href="#memory-layout" class="checkpoint">
+                    <div class="checkpoint-time">[36-48 min]</div>
+                    <div class="checkpoint-title">Memory Layout</div>
+                    <div>Programs & data structures in memory</div>
+                </a>
+                <a href="#optimization" class="checkpoint">
+                    <div class="checkpoint-time">[48-60 min]</div>
+                    <div class="checkpoint-title">Cache & Optimization</div>
+                    <div>Memory-efficient programming mastery</div>
+                </a>
+            </div>
+        </section>
+        
+        <!-- Memory Introduction Section -->
+        <section id="memory-intro" class="fade-in-up">
+            <h2>What IS Memory? - Building From Zero</h2>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3>The Library Analogy - Your First Mental Model</h3>
+                </div>
+                
+                <div class="grid-responsive-2">
+                    <div>
+                        <p>Imagine you're in a massive library with millions of books. This is your computer's memory.</p>
+                        
+                        <div style="margin: 1.5rem 0;">
+                            <h4 style="color: var(--accent-blue); margin-bottom: 1rem;">The Memory Library</h4>
+                            <ul style="line-height: 1.8;">
+                                <li><strong>Each shelf has an address</strong> - Like memory addresses (0x7fff5fbff710)</li>
+                                <li><strong>Books are your data</strong> - Numbers, text, images stored as bytes</li>
+                                <li><strong>Librarian is the CPU</strong> - Fetches and processes information</li>
+                                <li><strong>Your desk notes are registers</strong> - Fastest access for current work</li>
+                                <li><strong>Closer shelves = faster access</strong> - Cache memory principle</li>
+                            </ul>
+                        </div>
+                        
+                        <div style="margin-top: 1rem; padding: 1rem; background: rgba(188, 140, 255, 0.1); border-radius: var(--radius-md);">
+                            <p style="font-size: 0.9rem; color: var(--accent-purple);">
+                                <strong>Memory Insight:</strong> Just like you keep frequently used books closer to your desk, 
+                                computers keep frequently accessed data in faster, closer memory (cache).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-type-demo">
+                    <h4>Interactive Memory Metaphors</h4>
+                    <div class="data-type-grid">
+                        <div class="data-type-card" onclick="highlightMemoryComponent('shelf')">
+                            <div class="data-type-name">Each shelf location</div>
+                            <div class="data-type-size">Memory Address</div>
+                            <div class="data-type-range">Like 0x7fff5fbff710</div>
+                        </div>
+                        <div class="data-type-card" onclick="highlightMemoryComponent('book')">
+                            <div class="data-type-name">Each book</div>
+                            <div class="data-type-size">A piece of data</div>
+                            <div class="data-type-range">Number, character, etc.</div>
+                        </div>
+                        <div class="data-type-card" onclick="highlightMemoryComponent('librarian')">
+                            <div class="data-type-name">The librarian</div>
+                            <div class="data-type-size">The CPU</div>
+                            <div class="data-type-range">Processes data</div>
+                        </div>
+                        <div class="data-type-card" onclick="highlightMemoryComponent('notes')">
+                            <div class="data-type-name">Your notes</div>
+                            <div class="data-type-size">Registers</div>
+                            <div class="data-type-range">Fastest access</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3>What Exactly IS Memory?</h3>
+                </div>
+                
+                <div class="simulation-steps">
+                    <div class="step" onclick="toggleStep(this)">
+                        <div class="step-header">
+                            <div class="step-number">1</div>
+                            <div class="step-title">5-Year-Old Explanation</div>
+                            <div class="step-chevron"></div>
+                        </div>
+                        <div class="step-content">
+                            <p>Memory is like a giant box of numbered drawers. Each drawer has a number (address), and you can put one toy (data) in each drawer. When you want a toy, you tell the computer the drawer number, and it gets it for you instantly.</p>
+                            
+                            <div class="memory-visualizer">
+                                <h4>Interactive Drawer Model</h4>
+                                <div class="memory-grid" id="drawerGrid">
+                                    <!-- JavaScript will populate this -->
+                                </div>
+                                <p><em>Click on any drawer to see how data is stored!</em></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step" onclick="toggleStep(this)">
+                        <div class="step-header">
+                            <div class="step-number">2</div>
+                            <div class="step-title">Programmer Explanation</div>
+                            <div class="step-chevron"></div>
+                        </div>
+                        <div class="step-content">
+                            <p>Memory is a large array of bytes, where each byte has a unique address. When you create a variable, you're asking the operating system to reserve one or more bytes at a specific address to store your data.</p>
+                            
+                            <div class="callout">
+                                <div class="callout-title">Key Insight</div>
+                                <p>Every piece of data in your program—from a single character to a massive array—lives at specific memory addresses. Understanding this is fundamental to efficient programming.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    
+                    <h3>The Fundamental Unit: The Byte</h3>
+                </div>
+                
+                <div class="grid-responsive-2">
+                    <div>
+                        <p>A byte is 8 bits. A bit is either 0 or 1.</p>
+                        
+                        <div class="callout success">
+                            <div class="callout-title"> Interactive Calculation</div>
+                            <ul>
+                                <li><strong>1 Bit</strong> = 0 or 1</li>
+                                <li><strong>1 Byte</strong> = 8 bits = can hold values 0 to 255 (2^8 possibilities)</li>
+                                <li><strong>1 Kilobyte (KB)</strong> = 1,024 bytes</li>
+                                <li><strong>1 Megabyte (MB)</strong> = 1,024 KB = 1,048,576 bytes</li>
+                                <li><strong>1 Gigabyte (GB)</strong> = 1,024 MB = ~1 billion bytes</li>
+                            </ul>
+                        </div>
+                        
+                        <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(63, 185, 80, 0.1); border-radius: var(--radius-md);">
+                            <h4 style="color: var(--accent-green); margin-bottom: 0.5rem;"> Why Binary?</h4>
+                            <p style="font-size: 0.9rem; line-height: 1.6;">
+                                Computers use binary because transistors (the building blocks of computer chips) 
+                                can only be in two states: ON (1) or OFF (0). It's like a light switch - 
+                                simple, reliable, and billions of them can fit on a single chip!
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <div style="margin-top: 1rem; padding: 0.8rem; background: rgba(255, 210, 61, 0.1); border-radius: var(--radius-md);">
+                            <h5 style="color: var(--accent-yellow); margin-bottom: 0.3rem;">Modern CPU Facts</h5>
+                            <ul style="font-size: 0.8rem; text-align: left; line-height: 1.5;">
+                                <li>Intel i9: ~19.2 billion transistors</li>
+                                <li>Apple M1: ~16 billion transistors</li>
+                                <li>Each transistor: ~7 nanometers wide</li>
+                                <li>That's 1000x smaller than bacteria!</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="binary-converter">
+                    <h4>Interactive Binary Converter</h4>
+                    <div class="converter-input">
+                        <label for="decimalInput">Decimal Value:</label>
+                        <input type="number" id="decimalInput" placeholder="245" min="0" max="255" onchange="convertToBinary()">
+                        <button onclick="generateRandomByte()" style="background: var(--accent-blue); color: white; border: none; padding: 0.5rem 1rem; border-radius: var(--radius-sm); cursor: pointer;">Random</button>
+                    </div>
+                    
+                    <div class="binary-display" id="binaryDisplay">
+                        <!-- JavaScript will populate this -->
+                    </div>
+                    
+                    <div class="grid-responsive-auto">
+                        <div style="padding: 1rem; background: rgba(88, 166, 255, 0.05); border-radius: var(--radius-sm);">
+                            <h5 style="color: var(--accent-blue);">Decimal (Base 10)</h5>
+                            <p style="font-size: 0.9rem;">Uses digits 0-9. What humans naturally use.</p>
+                        </div>
+                        <div style="padding: 1rem; background: rgba(188, 140, 255, 0.05); border-radius: var(--radius-sm);">
+                            <h5 style="color: var(--accent-purple);">Binary (Base 2)</h5>
+                            <p style="font-size: 0.9rem;">Uses only 0 and 1. What computers use internally.</p>
+                        </div>
+                        <div style="padding: 1rem; background: rgba(63, 185, 80, 0.05); border-radius: var(--radius-sm);">
+                            <h5 style="color: var(--accent-green);">Hexadecimal (Base 16)</h5>
+                            <p style="font-size: 0.9rem;">Uses 0-9,A-F. Compact way to write binary.</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 1rem;">
+                        <p><em>Try different values to see how decimal numbers are represented in binary!</em></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3>How Data Types Use Bytes</h3>
+                </div>
+                
+                <p>Different data types need different amounts of memory:</p>
+                
+                <div class="data-type-demo">
+                    <h4>Interactive Data Type Explorer</h4>
+                    <div class="data-type-grid">
+                        <div class="data-type-card" onclick="showDataTypeDetails('bool')">
+                            <div class="data-type-name">bool</div>
+                            <div class="data-type-size">1 byte</div>
+                            <div class="data-type-range">True/False</div>
+                        </div>
+                        <div class="data-type-card" onclick="showDataTypeDetails('char')">
+                            <div class="data-type-name">char</div>
+                            <div class="data-type-size">1 byte</div>
+                            <div class="data-type-range">'A', 'B', etc.</div>
+                        </div>
+                        <div class="data-type-card" onclick="showDataTypeDetails('int')">
+                            <div class="data-type-name">int</div>
+                            <div class="data-type-size">4 bytes</div>
+                            <div class="data-type-range">-2,147,483,648 to 2,147,483,647</div>
+                        </div>
+                        <div class="data-type-card" onclick="showDataTypeDetails('float')">
+                            <div class="data-type-name">float</div>
+                            <div class="data-type-size">4 bytes</div>
+                            <div class="data-type-range">Decimal numbers</div>
+                        </div>
+                        <div class="data-type-card" onclick="showDataTypeDetails('long')">
+                            <div class="data-type-name">long</div>
+                            <div class="data-type-size">8 bytes</div>
+                            <div class="data-type-range">Larger integers</div>
+                        </div>
+                        <div class="data-type-card" onclick="showDataTypeDetails('double')">
+                            <div class="data-type-name">double</div>
+                            <div class="data-type-size">8 bytes</div>
+                            <div class="data-type-range">Larger decimals</div>
+                        </div>
+                        <div class="data-type-card" onclick="showDataTypeDetails('pointer')">
+                            <div class="data-type-name">pointer</div>
+                            <div class="data-type-size">8 bytes</div>
+                            <div class="data-type-range">On 64-bit systems</div>
+                        </div>
+                    </div>
+                    
+                    <div id="dataTypeExplanation" style="margin-top: 1rem; padding: 1rem; background: rgba(88, 166, 255, 0.05); border-radius: var(--radius-sm); display: none;">
+                        <!-- Dynamic content will appear here -->
+                    </div>
+                </div>
+                
+                <div class="callout warning">
+                    <div class="callout-title">🤔 Why does int need 4 bytes?</div>
+                    <ul>
+                        <li>4 bytes = 32 bits</li>
+                        <li>32 bits can represent 2^32 different values = 4,294,967,296 different numbers</li>
+                        <li>Since we want negative numbers too, we split it:
+                            <ul>
+                                <li>Half for negative: -2,147,483,648 to -1</li>
+                                <li>Half for positive: 0 to 2,147,483,647</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3>Memory Addresses - The GPS of Your Computer</h3>
+                </div>
+                
+                <p>Every byte in memory has an address. Think of it like house numbers on a street.</p>
+                
+                <div class="memory-visualizer">
+                    <h4> Memory Address Visualization</h4>
+                    <table style="font-family: monospace; width: 100%; margin: 1rem 0;">
+                        <thead>
+                            <tr>
+                                <th>Address</th>
+                                <th>Data</th>
+                                <th>What it represents</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr onclick="highlightRow(this)">
+                                <td>0x1000</td>
+                                <td>00000101</td>
+                                <td>int x (byte 1/4)</td>
+                            </tr>
+                            <tr onclick="highlightRow(this)">
+                                <td>0x1001</td>
+                                <td>00000000</td>
+                                <td>int x (byte 2/4)</td>
+                            </tr>
+                            <tr onclick="highlightRow(this)">
+                                <td>0x1002</td>
+                                <td>00000000</td>
+                                <td>int x (byte 3/4)</td>
+                            </tr>
+                            <tr onclick="highlightRow(this)">
+                                <td>0x1003</td>
+                                <td>00000000</td>
+                                <td>int x (byte 4/4)</td>
+                            </tr>
+                            <tr onclick="highlightRow(this)">
+                                <td>0x1004</td>
+                                <td>01000001</td>
+                                <td>char y = 'A'</td>
+                            </tr>
+                            <tr onclick="highlightRow(this)">
+                                <td>0x1005</td>
+                                <td>00001010</td>
+                                <td>char z = '\n'</td>
+                            </tr>
+                            <tr onclick="highlightRow(this)">
+                                <td>0x1006</td>
+                                <td>????????</td>
+                                <td>Unallocated</td>
+                            </tr>
+                            <tr onclick="highlightRow(this)">
+                                <td>0x1007</td>
+                                <td>????????</td>
+                                <td>Unallocated</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p><em>Click on any row to highlight it!</em></p>
+                </div>
+                
+                <div class="simulation-steps">
+                    <div class="step" onclick="toggleStep(this)">
+                        <div class="step-header">
+                            <div class="step-number">📋</div>
+                            <div class="step-title">What happens when you write: int x = 5;</div>
+                            <div class="step-chevron"></div>
+                        </div>
+                        <div class="step-content">
+                            <ol>
+                                <li><strong>Compiler sees "int"</strong>  "I need 4 consecutive bytes"</li>
+                                <li><strong>Operating System allocates</strong>  "Here, use addresses 0x1000-0x1003"</li>
+                                <li><strong>CPU stores value 5</strong>  Converts 5 to binary (00000000 00000000 00000000 00000101)</li>
+                                <li><strong>Memory updated</strong>  Those 4 bytes now contain the binary representation</li>
+                            </ol>
+                            
+                            <div class="callout success">
+                                <div class="callout-title">✨ The Magic</div>
+                                <p>Your simple <code>int x = 5;</code> statement involves the compiler, operating system, and CPU working together to find space in memory and store your data!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Memory Hierarchy Section -->
+        <section id="hierarchy" class="fade-in-up">
+            <h2>Memory Hierarchy - The Speed Pyramid</h2>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3>The Complete Hierarchy</h3>
+                </div>
+                
+                <div class="grid-responsive-2">
+                    <div>
+                        <h4 style="margin-bottom: 1rem; color: var(--accent-blue);">Interactive Memory Pyramid</h4>
+                        <div class="memory-hierarchy">
+                            <div class="hierarchy-level registers" onclick="showHierarchyDetails('registers')">
+                                <div>
+                                    <div>Registers</div>
+                                    <div style="font-size: 0.8rem; opacity: 0.8;">~1 KB | ~1 ns</div>
+                                </div>
+                            </div>
+                            <div class="hierarchy-arrow"></div>
+                            
+                            <div class="hierarchy-level l1-cache" onclick="showHierarchyDetails('l1')">
+                                <div>
+                                    <div>L1 Cache</div>
+                                    <div style="font-size: 0.8rem; opacity: 0.8;">~64 KB | ~2 ns</div>
+                                </div>
+                            </div>
+                            <div class="hierarchy-arrow"></div>
+                            
+                            <div class="hierarchy-level l2-cache" onclick="showHierarchyDetails('l2')">
+                                <div>
+                                    <div>L2 Cache</div>
+                                    <div style="font-size: 0.8rem; opacity: 0.8;">~256 KB | ~10 ns</div>
+                                </div>
+                            </div>
+                            <div class="hierarchy-arrow"></div>
+                            
+                            <div class="hierarchy-level l3-cache" onclick="showHierarchyDetails('l3')">
+                                <div>
+                                    <div>L3 Cache</div>
+                                    <div style="font-size: 0.8rem; opacity: 0.8;">~8 MB | ~40 ns</div>
+                                </div>
+                            </div>
+                            <div class="hierarchy-arrow"></div>
+                            
+                            <div class="hierarchy-level ram" onclick="showHierarchyDetails('ram')">
+                                <div>
+                                    <div>Main RAM</div>
+                                    <div style="font-size: 0.8rem; opacity: 0.8;">8-64 GB | ~100 ns</div>
+                                </div>
+                            </div>
+                            <div class="hierarchy-arrow"></div>
+                            
+                            <div class="hierarchy-level ssd" onclick="showHierarchyDetails('ssd')">
+                                <div>
+                                    <div>SSD</div>
+                                    <div style="font-size: 0.8rem; opacity: 0.8;">256GB-2TB | ~100 μs</div>
+                                </div>
+                            </div>
+                            <div class="hierarchy-arrow"></div>
+                            
+                            <div class="hierarchy-level hdd" onclick="showHierarchyDetails('hdd')">
+                                <div>
+                                    <div>Hard Disk</div>
+                                    <div style="font-size: 0.8rem; opacity: 0.8;">1-10 TB | ~10 ms</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 style="margin-bottom: 1rem; color: var(--accent-blue);">Real CPU Architecture</h4>
+                        <div style="margin-top: 1.5rem;">
+                            <h5 style="color: var(--accent-green); margin-bottom: 0.5rem;">Key Insights:</h5>
+                            <ul style="font-size: 0.9rem; line-height: 1.6;">
+                                <li><strong>Locality Principle:</strong> Programs access data in predictable patterns</li>
+                                <li><strong>Cache Hit Rate:</strong> Modern CPUs achieve 95%+ cache hit rates</li>
+                                <li><strong>Bandwidth Trade-off:</strong> Faster = smaller = more expensive</li>
+                                <li><strong>Automatic Management:</strong> Hardware handles most cache operations</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="hierarchyDetails" style="margin-top: 2rem; padding: 1.5rem; background: rgba(88, 166, 255, 0.05); border-radius: var(--radius-md); display: none;">
+                    <!-- Dynamic content will appear here -->
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3>Real Hardware Components</h3>
+                </div>
+                
+                <div class="grid-responsive-auto">
+                    <div style="text-align: center; padding: 1.5rem; background: rgba(88, 166, 255, 0.1); border-radius: var(--radius-md);">
+                        <h4 style="margin-bottom: 0.5rem; color: var(--accent-blue);">CPU Die</h4>
+                        <p style="font-size: 0.9rem; color: var(--text-muted);">Billions of microscopic transistors forming the processing core</p>
+                    </div>
+                    
+                    <div style="text-align: center; padding: 1.5rem; background: rgba(63, 185, 80, 0.1); border-radius: var(--radius-md);">
+                        <h4 style="margin-bottom: 0.5rem; color: var(--accent-green);">RAM Module</h4>
+                        <p style="font-size: 0.9rem; color: var(--text-muted);">Capacitors storing electric charge as data bits</p>
+                    </div>
+                    
+                    <div style="text-align: center; padding: 1.5rem; background: rgba(247, 129, 102, 0.1); border-radius: var(--radius-md);">
+                        <h4 style="margin-bottom: 0.5rem; color: var(--accent-orange);">Storage Drive</h4>
+                        <p style="font-size: 0.9rem; color: var(--text-muted);">Persistent data storage for long-term retention</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3>Speed Comparison - Human Time Scale</h3>
+                </div>
+                
+                <p>If register access took 1 second in human time, here's how long other operations would take:</p>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Memory Type</th>
+                            <th>Actual Time</th>
+                            <th>Human Scale</th>
+                            <th>Analogy</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr onclick="highlightRow(this)">
+                            <td>Registers</td>
+                            <td>1 ns</td>
+                            <td>1 second</td>
+                            <td> Instant thought</td>
+                        </tr>
+                        <tr onclick="highlightRow(this)">
+                            <td>L1 Cache</td>
+                            <td>2 ns</td>
+                            <td>2 seconds</td>
+                            <td> Quick note</td>
+                        </tr>
+                        <tr onclick="highlightRow(this)">
+                            <td>L2 Cache</td>
+                            <td>10 ns</td>
+                            <td>10 seconds</td>
+                            <td>🔍 Brief search</td>
+                        </tr>
+                        <tr onclick="highlightRow(this)">
+                            <td>L3 Cache</td>
+                            <td>40 ns</td>
+                            <td>40 seconds</td>
+                            <td>☕ Making coffee</td>
+                        </tr>
+                        <tr onclick="highlightRow(this)">
+                            <td>RAM</td>
+                            <td>100 ns</td>
+                            <td>1.5 minutes</td>
+                            <td>🚶‍♂️ Short walk</td>
+                        </tr>
+                        <tr onclick="highlightRow(this)">
+                            <td>SSD</td>
+                            <td>100 μs</td>
+                            <td>~1 day</td>
+                            <td> Reading a book</td>
+                        </tr>
+                        <tr onclick="highlightRow(this)">
+                            <td>HDD</td>
+                            <td>10 ms</td>
+                            <td>~4 months</td>
+                            <td>🏠 Building a house</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    
+                    <h3>Cache Optimization - Why It Matters for DSA</h3>
+                </div>
+                
+                <p>Understanding cache behavior is crucial for writing efficient algorithms. Here's a practical comparison:</p>
+                
+                <div class="simulation-steps">
+                    <div class="step" onclick="toggleStep(this)">
+                        <div class="step-header">
+                            <div class="step-number"></div>
+                            <div class="step-title">Cache-Friendly: Sequential Array Access</div>
+                            <div class="step-chevron"></div>
+                        </div>
+                        <div class="step-content">
+                            <div class="code-title">Sequential Access (FAST)</div>
+                            <pre><code><span class="comment">// Array: Elements are contiguous</span>
+<span class="keyword">int</span> arr[<span class="number">1000</span>];
+
+<span class="comment">// Access pattern 1: Sequential (FAST)</span>
+<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">1000</span>; i++) {
+    sum += arr[i];  <span class="comment">// Each cache line loads 16 ints at once</span>
+}
+<span class="comment">// Cache hits: ~95%+</span>
+<span class="comment">// Time: Fast</span></code></pre>
+                            
+                            <div class="callout success">
+                                <div class="callout-title"> Why It's Fast</div>
+                                <p>When you access arr[0], the CPU loads arr[0] through arr[15] into cache (64-byte cache line). Subsequent accesses to arr[1], arr[2], etc. are cache hits!</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step" onclick="toggleStep(this)">
+                        <div class="step-header">
+                            <div class="step-number"></div>
+                            <div class="step-title">Cache-Unfriendly: Random Access</div>
+                            <div class="step-chevron"></div>
+                        </div>
+                        <div class="step-content">
+                            <div class="code-title">Random Access (SLOW)</div>
+                            <pre><code><span class="comment">// Access pattern 2: Random (SLOW)</span>
+<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">1000</span>; i++) {
+    sum += arr[<span class="function">rand</span>() % <span class="number">1000</span>];  <span class="comment">// Random access</span>
+}
+<span class="comment">// Cache hits: ~20%</span>
+<span class="comment">// Time: 4-5x slower</span></code></pre>
+                            
+                            <div class="callout danger">
+                                <div class="callout-title">🐌 Why It's Slow</div>
+                                <p>Random access patterns cause cache misses. Each miss requires going to slower memory levels, drastically reducing performance.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Stack vs Heap Section -->
+        <section id="stack-heap" class="fade-in-up">
+            <h2>Stack vs Heap - The Two Kingdoms</h2>
+            
+            <div class="card">
+                <div class="card-header">
+                    
+                    <h3>The Tale of Two Memory Regions</h3>
+                </div>
+                
+                <div class="grid-responsive-2">
+                    <div>
+                        <p>Every program has two main areas for storing data: the Stack and the Heap. Each serves different purposes and has unique characteristics.</p>
+                        
+                        <div style="margin-top: 1.5rem;">
+                            <h4 style="color: var(--accent-blue); margin-bottom: 1rem;"> Mental Models</h4>
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                <div style="padding: 1rem; border-left: 4px solid var(--accent-green); background: rgba(63, 185, 80, 0.05);">
+                                    <h5 style="color: var(--accent-green); margin-bottom: 0.5rem;">🥞 Stack = Cafeteria Tray Stack</h5>
+                                    <p style="font-size: 0.9rem;">Last tray in, first tray out. Fast, organized, automatic cleanup.</p>
+                                </div>
+                                <div style="padding: 1rem; border-left: 4px solid var(--accent-orange); background: rgba(247, 129, 102, 0.05);">
+                                    <h5 style="color: var(--accent-orange); margin-bottom: 0.5rem;">🌍 Heap = City with Addresses</h5>
+                                    <p style="font-size: 0.9rem;">You find empty lots, build what you need, remember the address.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <div class="hierarchy-visualization" style="background: linear-gradient(180deg, var(--accent-green), var(--accent-orange));">
+                            <div style="font-weight: bold;">🥞 Stack</div>
+                            <div style="font-size: 1.5rem;">⬇️</div>
+                            <div style="font-weight: bold;">🌍 Heap</div>
+                            <div style="font-size: 1.5rem;">⬆️</div>
+                            <div style="font-weight: bold;"> Code</div>
+                        </div>
+                        <p style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">Program Memory Layout</p>
+                        
+                        <div style="margin-top: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.8rem;">
+                            <div style="padding: 0.5rem; background: rgba(63, 185, 80, 0.1); border-radius: var(--radius-sm);">
+                                <strong style="color: var(--accent-green);">Stack</strong><br>
+                                <span style="color: var(--text-muted);">Grows downward</span>
+                            </div>
+                            <div style="padding: 0.5rem; background: rgba(247, 129, 102, 0.1); border-radius: var(--radius-sm);">
+                                <strong style="color: var(--accent-orange);">Heap</strong><br>
+                                <span style="color: var(--text-muted);">Grows upward</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-type-demo">
+                    <h4>Interactive Comparison</h4>
+                    <div class="data-type-grid">
+                        <div class="data-type-card" onclick="showStackHeapDetails('stack')" style="border-color: var(--accent-green);">
+                            <div class="data-type-name" style="color: var(--accent-green);">🥞 THE STACK</div>
+                            <div class="data-type-size">Fast & Organized</div>
+                            <div class="data-type-range">Local variables, function calls</div>
+                        </div>
+                        <div class="data-type-card" onclick="showStackHeapDetails('heap')" style="border-color: var(--accent-orange);">
+                            <div class="data-type-name" style="color: var(--accent-orange);">🌍 THE HEAP</div>
+                            <div class="data-type-size">Flexible & Dynamic</div>
+                            <div class="data-type-range">Dynamic allocation, large objects</div>
+                        </div>
+                    </div>
+                    
+                    <div id="stackHeapExplanation" style="margin-top: 1rem; padding: 1rem; background: rgba(88, 166, 255, 0.05); border-radius: var(--radius-sm); display: none;">
+                        <!-- Dynamic content will appear here -->
+                    </div>
+                </div>
+                
+                <div style="margin-top: 2rem;">
+                    <h4 style="color: var(--accent-blue); margin-bottom: 1rem;"> Detailed Battle Comparison</h4>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; background: var(--card-bg); border-radius: var(--radius-md);">
+                            <thead>
+                                <tr style="background: rgba(88, 166, 255, 0.1);">
+                                    <th style="padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color);">Aspect</th>
+                                    <th style="padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); color: var(--accent-green);">🥞 Stack</th>
+                                    <th style="padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); color: var(--accent-orange);">🌍 Heap</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 1rem; border-bottom: 1px solid var(--border-color);"><strong>Speed</strong></td>
+                                    <td style="padding: 1rem; border-bottom: 1px solid var(--border-color);"> Very Fast (1-2 CPU cycles)</td>
+                                    <td style="padding: 1rem; border-bottom: 1px solid var(--border-color);">🐌 Slower (search for free space)</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 1rem; border-bottom: 1px solid var(--border-color);"><strong>Size Limit</strong></td>
+                                    <td style="padding: 1rem; border-bottom: 1px solid var(--border-color);">📏 Limited (~8MB typical)</td>
+                                    <td style="padding: 1rem; border-bottom: 1px solid var(--border-color);">🌊 Large (GBs available)</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 1rem; border-bottom: 1px solid var(--border-color);"><strong>Management</strong></td>
+                                    <td style="padding: 1rem; border-bottom: 1px solid var(--border-color);">🤖 Automatic</td>
+                                    <td style="padding: 1rem; border-bottom: 1px solid var(--border-color);">👤 Manual (you must free)</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 1rem; border-bottom: 1px solid var(--border-color);"><strong>Access Pattern</strong></td>
+                                    <td style="padding: 1rem; border-bottom: 1px solid var(--border-color);"> LIFO (Last In, First Out)</td>
+                                    <td style="padding: 1rem; border-bottom: 1px solid var(--border-color);"> Random Access</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 1rem; border-bottom: 1px solid var(--border-color);"><strong>Data Lifetime</strong></td>
+                                    <td style="padding: 1rem; border-bottom: 1px solid var(--border-color);">⏱️ Function scope only</td>
+                                    <td style="padding: 1rem; border-bottom: 1px solid var(--border-color);">♾️ Until manually freed</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 1rem;"><strong>Common Problems</strong></td>
+                                    <td style="padding: 1rem;">💥 Stack Overflow</td>
+                                    <td style="padding: 1rem;"> Memory Leaks, Fragmentation</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 2rem;">
+                    <h4 style="color: var(--accent-blue); margin-bottom: 1rem;"> Code Examples</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div style="padding: 1.5rem; background: rgba(63, 185, 80, 0.05); border-radius: var(--radius-md); border: 1px solid rgba(63, 185, 80, 0.3);">
+                            <h5 style="color: var(--accent-green); margin-bottom: 1rem;">🥞 Stack Allocation</h5>
+                            <pre style="background: var(--code-bg); padding: 1rem; border-radius: var(--radius-sm); overflow-x: auto; font-size: 0.9rem;"><code>void function() {
+    int x = 10;        // Stack
+    char arr[100];     // Stack
+    
+    // Automatically cleaned up
+    // when function ends
+}</code></pre>
+                            <p style="font-size: 0.9rem; margin-top: 0.5rem; color: var(--text-muted);">
+                                <strong>When:</strong> Fixed-size data, local variables
+                            </p>
+                        </div>
+                        
+                        <div style="padding: 1.5rem; background: rgba(247, 129, 102, 0.05); border-radius: var(--radius-md); border: 1px solid rgba(247, 129, 102, 0.3);">
+                            <h5 style="color: var(--accent-orange); margin-bottom: 1rem;">🌍 Heap Allocation</h5>
+                            <pre style="background: var(--code-bg); padding: 1rem; border-radius: var(--radius-sm); overflow-x: auto; font-size: 0.9rem;"><code>void function() {
+    int* ptr = malloc(sizeof(int));
+    *ptr = 10;         // Heap
+    
+    // YOU must call free()
+    free(ptr);
+}</code></pre>
+                            <p style="font-size: 0.9rem; margin-top: 0.5rem; color: var(--text-muted);">
+                                <strong>When:</strong> Dynamic size, large data, persistent data
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Memory Layout Section -->
+        <section id="memory-layout" class="fade-in-up">
+            <h2>Memory Layout of Programs</h2>
+            
+            <div class="card">
+                <div class="card-header">
+                    
+                    <h3>How Programs Are Organized in Memory</h3>
+                </div>
+                
+                <div class="memory-visualizer">
+                    <h4>Program Memory Layout</h4>
+                    <div style="display: flex; flex-direction: column; gap: 1rem; font-family: monospace;">
+                        <div style="background: linear-gradient(135deg, var(--accent-red), #ff9999); padding: 1rem; border-radius: var(--radius-sm); color: white;">
+                            <strong> Code Segment (Text)</strong><br>
+                            <small>Your compiled program instructions</small>
+                        </div>
+                        <div style="background: linear-gradient(135deg, var(--accent-blue), #66b3ff); padding: 1rem; border-radius: var(--radius-sm);">
+                            <strong> Data Segment</strong><br>
+                            <small>Global & static variables</small>
+                        </div>
+                        <div style="background: linear-gradient(135deg, var(--accent-yellow), #ffe066); padding: 1rem; border-radius: var(--radius-sm); color: var(--primary-bg);">
+                            <strong>🌍 Heap</strong><br>
+                            <small>Dynamic memory allocation ↑</small>
+                        </div>
+                        <div style="background: linear-gradient(135deg, var(--accent-green), #66dd66); padding: 1rem; border-radius: var(--radius-sm); color: var(--primary-bg);">
+                            <strong>🥞 Stack</strong><br>
+                            <small>Local variables & function calls </small>
+                        </div>
+                    </div>
+                    <p style="text-align: center; margin-top: 1rem;"><em>Memory addresses increase from top to bottom</em></p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Optimization Section -->
+        <section id="optimization" class="fade-in-up">
+            <h2>Cache Optimization & Memory-Efficient Programming</h2>
+            
+            <div class="card">
+                <div class="card-header">
+                    
+                    <h3>Performance Revolution: Cache-Aware Programming</h3>
+                </div>
+                
+                <div class="grid-responsive-2">
+                    <div>
+                        <h4 style="color: var(--accent-blue); margin-bottom: 1rem;"> The Cache Performance Story</h4>
+                        <p style="line-height: 1.7; margin-bottom: 1rem;">
+                            Modern CPUs are incredibly fast, but memory access is the bottleneck. 
+                            Understanding cache behavior can make your algorithms 10-100x faster!
+                        </p>
+                        
+                        <div style="margin-bottom: 1.5rem;">
+                            <h5 style="color: var(--accent-green); margin-bottom: 0.5rem;">� Key Principles:</h5>
+                            <ul style="line-height: 1.6; font-size: 0.9rem;">
+                                <li><strong>Spatial Locality:</strong> Access data near recently accessed data</li>
+                                <li><strong>Temporal Locality:</strong> Access recently used data again</li>
+                                <li><strong>Cache Lines:</strong> CPU loads 64-byte chunks at a time</li>
+                                <li><strong>Prefetching:</strong> Hardware predicts access patterns</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <div style="margin-top: 1rem; padding: 1rem; background: rgba(255, 210, 61, 0.1); border-radius: var(--radius-md);">
+                            <h5 style="color: var(--accent-yellow); margin-bottom: 0.5rem;">Real Performance Numbers</h5>
+                            <div style="font-size: 0.8rem; text-align: left; line-height: 1.5;">
+                                <p><strong>Cache Hit:</strong> ~1-4 cycles (~0.5-2 ns)</p>
+                                <p><strong>Cache Miss:</strong> ~200-400 cycles (~100-200 ns)</p>
+                                <p><strong>Impact:</strong> 100x+ speed difference!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--accent-blue); margin-bottom: 1rem;"> Cache Line Visualization</h4>
+                    <div style="text-align: center; margin-bottom: 1rem;">
+                        <div class="visualization-container" style="background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));">
+                            <div style="text-align: center;">
+                                <div style="font-size: 1.5rem;"></div>
+                                <div style="font-size: 0.8rem;">64-byte</div>
+                                <div style="font-size: 0.8rem;">Cache Line</div>
+                            </div>
+                            <div style="font-size: 2rem;"></div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 1.5rem;"></div>
+                                <div style="font-size: 0.8rem;">Memory</div>
+                                <div style="font-size: 0.8rem;">Address</div>
+                            </div>
+                        </div>
+                        <p style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">Cache Line Organization</p>
+                    </div>
+                    
+                    <div class="grid-responsive-auto">
+                        <div style="padding: 1rem; background: rgba(63, 185, 80, 0.05); border-radius: var(--radius-md); border: 1px solid rgba(63, 185, 80, 0.3);">
+                            <h5 style="color: var(--accent-green); margin-bottom: 0.5rem;"> Cache-Friendly Access</h5>
+                            <p style="font-size: 0.9rem;">Sequential access loads full 64-byte cache lines efficiently.</p>
+                        </div>
+                        <div style="padding: 1rem; background: rgba(255, 123, 114, 0.05); border-radius: var(--radius-md); border: 1px solid rgba(255, 123, 114, 0.3);">
+                            <h5 style="color: var(--accent-red); margin-bottom: 0.5rem;"> Cache-Unfriendly Access</h5>
+                            <p style="font-size: 0.9rem;">Random access wastes cache lines, causing frequent misses.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    
+                    <h3>Practical Optimization Techniques</h3>
+                </div>
+                
+                <div class="simulation-steps">
+                    <div class="step" onclick="toggleStep(this)">
+                        <div class="step-header">
+                            <div class="step-number">1</div>
+                            <div class="step-title">Data Structure Layout Optimization</div>
+                            <div class="step-chevron"></div>
+                        </div>
+                        <div class="step-content">
+                            <div class="grid-responsive-2">
+                                <div>
+                                    <h5 style="color: var(--accent-green); margin-bottom: 0.5rem;"> Cache-Friendly: Arrays</h5>
+                                    <div class="memory-block" style="background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));">
+                                        [1][2][3][4][5]...
+                                    </div>
+                                    <p style="font-size: 0.8rem; margin-top: 0.5rem; color: var(--text-muted);">Contiguous memory = excellent cache performance</p>
+                                </div>
+                                <div>
+                                    <h5 style="color: var(--accent-red); margin-bottom: 0.5rem;"> Cache-Unfriendly: Linked Lists</h5>
+                                    <div class="memory-block" style="background: linear-gradient(90deg, var(--accent-red), var(--accent-orange));">
+                                        A?B?C?
+                                    </div>
+                                    <p style="font-size: 0.8rem; margin-top: 0.5rem; color: var(--text-muted);">Scattered memory = frequent cache misses</p>
+                                </div>
+                            </div>
+                            
+                            <div class="code-title">Arrays vs Linked Lists - Cache Performance</div>
+                            <pre><code><span class="comment">// GOOD: Array - Cache-friendly</span>
+<span class="keyword">int</span> arr[<span class="number">1000000</span>];  <span class="comment">// Contiguous memory</span>
+<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">1000000</span>; i++) {
+    sum += arr[i];  <span class="comment">// Sequential access, great cache hits</span>
+}
+
+<span class="comment">// BAD: Linked List - Cache-unfriendly</span>
+<span class="keyword">struct</span> Node {
+    <span class="keyword">int</span> data;
+    Node* next;  <span class="comment">// Pointer to arbitrary memory location</span>
+};
+<span class="comment">// Each node access is a potential cache miss</span></code></pre>
+                            
+                            <div class="callout success">
+                                <div class="callout-title"> Performance Impact</div>
+                                <p>Array traversal can be 10-50x faster than linked list traversal for the same amount of data due to better cache utilization!</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step" onclick="toggleStep(this)">
+                        <div class="step-header">
+                            <div class="step-number">2</div>
+                            <div class="step-title">Loop Optimization Patterns</div>
+                            <div class="step-chevron"></div>
+                        </div>
+                        <div class="step-content">
+                            <div style="text-align: center; margin-bottom: 1.5rem;">
+                                <div class="visualization-container" style="background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue)); max-width: 300px; height: 150px; flex-direction: column;">
+                                    <div style="font-size: 2rem; margin-bottom: 0.5rem;"></div>
+                                    <div style="font-size: 1rem; font-weight: bold;">Row-Major Access</div>
+                                    <div style="font-size: 0.8rem;">Sequential Memory Pattern</div>
+                                </div>
+                                <p style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">Memory access optimization patterns</p>
+                            </div>
+                            
+                            <div class="code-title">Matrix Access Patterns</div>
+                            <pre><code><span class="comment">// BAD: Column-major access (for row-major storage)</span>
+<span class="keyword">for</span> (<span class="keyword">int</span> col = <span class="number">0</span>; col &lt; <span class="number">1000</span>; col++) {
+    <span class="keyword">for</span> (<span class="keyword">int</span> row = <span class="number">0</span>; row &lt; <span class="number">1000</span>; row++) {
+        matrix[row][col] += <span class="number">1</span>;  <span class="comment">// Jumps around memory</span>
+    }
+}
+
+<span class="comment">// GOOD: Row-major access</span>
+<span class="keyword">for</span> (<span class="keyword">int</span> row = <span class="number">0</span>; row &lt; <span class="number">1000</span>; row++) {
+    <span class="keyword">for</span> (<span class="keyword">int</span> col = <span class="number">0</span>; col &lt; <span class="number">1000</span>; col++) {
+        matrix[row][col] += <span class="number">1</span>;  <span class="comment">// Sequential access</span>
+    }
+}</code></pre>
+                            
+                            <div class="callout warning">
+                                <div class="callout-title"> Speed Difference</div>
+                                <p>The row-major version can be 10-100x faster on large matrices! Always access memory in the order it's laid out.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Comprehensive Summary Section -->
+        <section id="summary" class="fade-in-up">
+            <h2>Memory Mastery: Your Complete Journey</h2>
+            
+            <div class="card">
+                <div class="card-header">
+                    
+                    <h3>What You've Learned</h3>
+                </div>
+                
+                <div class="grid-responsive-auto">
+                    <div style="padding: 1.5rem; background: rgba(63, 185, 80, 0.05); border-radius: var(--radius-lg); border: 1px solid rgba(63, 185, 80, 0.3);">
+                        <h4 style="color: var(--accent-green); margin-bottom: 1rem;"> Foundational Concepts</h4>
+                        <ul style="line-height: 1.7; font-size: 0.95rem;">
+                            <li>Memory is a vast array of numbered bytes</li>
+                            <li>Each byte has a unique address (like house numbers)</li>
+                            <li>Data types require different amounts of memory</li>
+                            <li>Binary representation is fundamental to computing</li>
+                            <li>Memory addresses enable direct data access</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="padding: 1.5rem; background: rgba(88, 166, 255, 0.05); border-radius: var(--radius-lg); border: 1px solid rgba(88, 166, 255, 0.3);">
+                        <h4 style="color: var(--accent-blue); margin-bottom: 1rem;"> Memory Hierarchy</h4>
+                        <ul style="line-height: 1.7; font-size: 0.95rem;">
+                            <li>Speed vs size trade-offs at each level</li>
+                            <li>Cache hierarchy optimizes common access patterns</li>
+                            <li>Understanding latency differences (ns vs ms)</li>
+                            <li>Hardware manages most cache operations automatically</li>
+                            <li>Locality principle drives performance</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="padding: 1.5rem; background: rgba(188, 140, 255, 0.05); border-radius: var(--radius-lg); border: 1px solid rgba(188, 140, 255, 0.3);">
+                        <h4 style="color: var(--accent-purple); margin-bottom: 1rem;"> Stack vs Heap</h4>
+                        <ul style="line-height: 1.7; font-size: 0.95rem;">
+                            <li>Stack: Fast, automatic, function-scoped</li>
+                            <li>Heap: Flexible, manual management, dynamic size</li>
+                            <li>Understanding allocation patterns</li>
+                            <li>Memory safety and common pitfalls</li>
+                            <li>Performance implications of each approach</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="padding: 1.5rem; background: rgba(255, 210, 61, 0.05); border-radius: var(--radius-lg); border: 1px solid rgba(255, 210, 61, 0.3);">
+                        <h4 style="color: var(--accent-yellow); margin-bottom: 1rem;"> Optimization Mastery</h4>
+                        <ul style="line-height: 1.7; font-size: 0.95rem;">
+                            <li>Cache-friendly data structure design</li>
+                            <li>Sequential vs random access patterns</li>
+                            <li>Loop optimization for better cache utilization</li>
+                            <li>Real-world performance measurement</li>
+                            <li>Algorithm choices based on memory behavior</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    
+                    <h3>Essential References & Deeper Learning</h3>
+                </div>
+                
+                <div class="grid-responsive-2">
+                    <div>
+                        <h4 style="color: var(--accent-blue); margin-bottom: 1rem;"> Recommended Books</h4>
+                        <div class="flex-responsive">
+                            <div style="padding: 1rem; background: rgba(88, 166, 255, 0.05); border-radius: var(--radius-md); border-left: 4px solid var(--accent-blue);">
+                                <h5>"Computer Systems: A Programmer's Perspective"</h5>
+                                <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem;">Bryant & O'Hallaron - The definitive guide to how computers really work</p>
+                            </div>
+                            <div style="padding: 1rem; background: rgba(63, 185, 80, 0.05); border-radius: var(--radius-md); border-left: 4px solid var(--accent-green);">
+                                <h5>"What Every Programmer Should Know About Memory"</h5>
+                                <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem;">Ulrich Drepper - Deep dive into memory systems and optimization</p>
+                            </div>
+                            <div style="padding: 1rem; background: rgba(188, 140, 255, 0.05); border-radius: var(--radius-md); border-left: 4px solid var(--accent-purple);">
+                                <h5>"The Art of Computer Programming"</h5>
+                                <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem;">Donald Knuth - Volume 1 covers fundamental algorithms and memory management</p>
+                            </div>
+                        </div>
+                        
+                        <h4 style="color: var(--accent-orange); margin: 2rem 0 1rem 0;"> Practical Tools</h4>
+                        <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+                            <div style="padding: 0.8rem; background: rgba(247, 129, 102, 0.05); border-radius: var(--radius-sm);">
+                                <strong>Valgrind:</strong> Memory debugging and profiling
+                            </div>
+                            <div style="padding: 0.8rem; background: rgba(247, 129, 102, 0.05); border-radius: var(--radius-sm);">
+                                <strong>Intel VTune:</strong> CPU and memory performance analysis
+                            </div>
+                            <div style="padding: 0.8rem; background: rgba(247, 129, 102, 0.05); border-radius: var(--radius-sm);">
+                                <strong>perf:</strong> Linux performance analysis tool
+                            </div>
+                            <div style="padding: 0.8rem; background: rgba(247, 129, 102, 0.05); border-radius: var(--radius-sm);">
+                                <strong>AddressSanitizer:</strong> Memory error detection
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 style="color: var(--accent-green); margin-bottom: 1rem;"> Next Steps in Your Journey</h4>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                            <div style="padding: 1.5rem; background: rgba(63, 185, 80, 0.05); border-radius: var(--radius-lg); border: 1px solid rgba(63, 185, 80, 0.3);">
+                                <h5 style="color: var(--accent-green); margin-bottom: 0.8rem;"> Beginner Next Steps</h5>
+                                <ul style="font-size: 0.9rem; line-height: 1.6;">
+                                    <li>Practice implementing basic data structures</li>
+                                    <li>Measure performance of different algorithms</li>
+                                    <li>Experiment with memory profiling tools</li>
+                                    <li>Learn about garbage collection in managed languages</li>
+                                </ul>
+                            </div>
+                            
+                            <div style="padding: 1.5rem; background: rgba(255, 210, 61, 0.05); border-radius: var(--radius-lg); border: 1px solid rgba(255, 210, 61, 0.3);">
+                                <h5 style="color: var(--accent-yellow); margin-bottom: 0.8rem;"> Advanced Topics</h5>
+                                <ul style="font-size: 0.9rem; line-height: 1.6;">
+                                    <li>NUMA (Non-Uniform Memory Access) systems</li>
+                                    <li>Lock-free and wait-free programming</li>
+                                    <li>Memory ordering and consistency models</li>
+                                    <li>GPU memory hierarchies and CUDA programming</li>
+                                </ul>
+                            </div>
+                            
+                            <div style="padding: 1.5rem; background: rgba(188, 140, 255, 0.05); border-radius: var(--radius-lg); border: 1px solid rgba(188, 140, 255, 0.3);">
+                                <h5 style="color: var(--accent-purple); margin-bottom: 0.8rem;">💼 Industry Applications</h5>
+                                <ul style="font-size: 0.9rem; line-height: 1.6;">
+                                    <li>Database system internals and buffer management</li>
+                                    <li>Operating system memory management</li>
+                                    <li>High-frequency trading system optimization</li>
+                                    <li>Game engine memory pooling strategies</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    
+                    <h3>Key Takeaways for Algorithm Design</h3>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                    <div style="padding: 1.5rem; background: linear-gradient(135deg, rgba(88, 166, 255, 0.1), rgba(63, 185, 80, 0.1)); border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+                        <h4 style="color: var(--accent-blue); margin-bottom: 1rem;"> Design Principle #1</h4>
+                        <h5 style="margin-bottom: 0.5rem;">Favor Sequential Access</h5>
+                        <p style="font-size: 0.9rem; line-height: 1.6;">
+                            Arrays and sequential processing will almost always outperform pointer-chasing 
+                            structures like linked lists. Design your algorithms to access memory sequentially 
+                            whenever possible.
+                        </p>
+                    </div>
+                    
+                    <div style="padding: 1.5rem; background: linear-gradient(135deg, rgba(63, 185, 80, 0.1), rgba(188, 140, 255, 0.1)); border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+                        <h4 style="color: var(--accent-green); margin-bottom: 1rem;"> Design Principle #2</h4>
+                        <h5 style="margin-bottom: 0.5rem;">Consider Cache Behavior</h5>
+                        <p style="font-size: 0.9rem; line-height: 1.6;">
+                            Modern algorithms must account for memory hierarchy. A theoretically optimal 
+                            O(log n) algorithm might be slower than an O(n) algorithm that uses memory efficiently.
+                        </p>
+                    </div>
+                    
+                    <div style="padding: 1.5rem; background: linear-gradient(135deg, rgba(188, 140, 255, 0.1), rgba(247, 129, 102, 0.1)); border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+                        <h4 style="color: var(--accent-purple); margin-bottom: 1rem;"> Design Principle #3</h4>
+                        <h5 style="margin-bottom: 0.5rem;">Profile and Measure</h5>
+                        <p style="font-size: 0.9rem; line-height: 1.6;">
+                            Understanding memory behavior requires measurement. Use profiling tools to 
+                            validate your assumptions and find the real bottlenecks in your code.
+                        </p>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 2rem; padding: 2rem; background: linear-gradient(135deg, rgba(88, 166, 255, 0.05), rgba(188, 140, 255, 0.05)); border-radius: var(--radius-lg); border: 1px solid var(--border-color); text-align: center;">
+                    <h3 style="color: var(--accent-blue); margin-bottom: 1rem;"> Congratulations!</h3>
+                    <p style="font-size: 1.1rem; line-height: 1.7; max-width: 800px; margin: 0 auto;">
+                        You now have a deep understanding of computer memory fundamentals. This knowledge 
+                        will serve as the foundation for writing efficient algorithms, debugging complex 
+                        performance issues, and making informed design decisions throughout your programming career.
+                    </p>
+                    
+                    <div style="margin-top: 1.5rem; text-align: center;">
+                        <p style="font-size: 1.1rem; color: var(--accent-blue); font-weight: bold;">
+                            Memory fundamentals mastered!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+    </main>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Rover. Made with ❤️ for learners everywhere.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Progress bar functionality
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
+        });
+
+        // Toggle step functionality
+        function toggleStep(step) {
+            step.classList.toggle('active');
+        }
+
+        // Binary converter functionality
+        function convertToBinary() {
+            const decimal = parseInt(document.getElementById('decimalInput').value) || 0;
+            if (decimal > 255) {
+                document.getElementById('decimalInput').value = 255;
+                return convertToBinary();
+            }
+            
+            const binary = decimal.toString(2).padStart(8, '0');
+            const binaryDisplay = document.getElementById('binaryDisplay');
+            
+            let html = '';
+            for (let i = 7; i >= 0; i--) {
+                const bit = binary[7-i];
+                const power = Math.pow(2, i);
+                html += `
+                    <div class="bit-position">
+                        <div class="bit-power">2^${i}</div>
+                        <div class="bit-value">${bit}</div>
+                        <div class="bit-power">${bit === '1' ? power : '0'}</div>
+                    </div>
+                `;
+            }
+            
+            binaryDisplay.innerHTML = html;
+            
+            // Show calculation
+            const calculation = binary.split('').map((bit, index) => {
+                const power = 7 - index;
+                return bit === '1' ? Math.pow(2, power) : 0;
+            }).filter(val => val > 0).join(' + ');
+            
+            binaryDisplay.innerHTML += `
+                <div style="grid-column: 1 / -1; text-align: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                    <strong>Binary:</strong> ${binary}<br>
+                    <strong>Calculation:</strong> ${calculation} = ${decimal}
+                </div>
+            `;
+        }
+
+        function generateRandomByte() {
+            const random = Math.floor(Math.random() * 256);
+            document.getElementById('decimalInput').value = random;
+            convertToBinary();
+        }
+
+        // Data type details
+        function showDataTypeDetails(type) {
+            const details = {
+                'bool': {
+                    title: 'Boolean (bool)',
+                    description: 'Stores true or false values. Only needs 1 bit theoretically, but uses 1 byte for memory alignment.',
+                    example: 'bool isActive = true;',
+                    memory: '1 byte = 8 bits (7 bits unused for alignment)'
+                },
+                'char': {
+                    title: 'Character (char)',
+                    description: 'Stores a single character using ASCII encoding. Each character maps to a number 0-255.',
+                    example: 'char letter = \'A\'; // ASCII value 65',
+                    memory: '1 byte = 8 bits = 256 possible characters'
+                },
+                'int': {
+                    title: 'Integer (int)',
+                    description: 'Stores whole numbers using 4 bytes in most modern systems. Uses two\'s complement for negative numbers.',
+                    example: 'int age = 25; int temperature = -10;',
+                    memory: '4 bytes = 32 bits = 2^32 possible values'
+                },
+                'float': {
+                    title: 'Floating Point (float)',
+                    description: 'Stores decimal numbers using IEEE 754 standard. Has limited precision due to binary representation.',
+                    example: 'float price = 19.99f; float pi = 3.14159f;',
+                    memory: '4 bytes = 32 bits (1 sign + 8 exponent + 23 mantissa)'
+                },
+                'long': {
+                    title: 'Long Integer (long)',
+                    description: 'Stores larger whole numbers using 8 bytes. Can represent much larger ranges than int.',
+                    example: 'long population = 7800000000L;',
+                    memory: '8 bytes = 64 bits = 2^64 possible values'
+                },
+                'double': {
+                    title: 'Double Precision (double)',
+                    description: 'Stores decimal numbers with higher precision than float. Standard for most scientific calculations.',
+                    example: 'double precise_pi = 3.141592653589793;',
+                    memory: '8 bytes = 64 bits (1 sign + 11 exponent + 52 mantissa)'
+                },
+                'pointer': {
+                    title: 'Pointer (ptr)',
+                    description: 'Stores memory addresses. Size depends on system architecture (4 bytes on 32-bit, 8 bytes on 64-bit).',
+                    example: 'int* ptr = &age; // Points to memory address of age',
+                    memory: '8 bytes on 64-bit systems = 2^64 possible addresses'
+                }
+            };
+            
+            const detail = details[type];
+            const explanationDiv = document.getElementById('dataTypeExplanation');
+            
+            explanationDiv.innerHTML = `
+                <h4>${detail.title}</h4>
+                <p><strong>Description:</strong> ${detail.description}</p>
+                <p><strong>Example:</strong> <code>${detail.example}</code></p>
+                <p><strong>Memory Layout:</strong> ${detail.memory}</p>
+            `;
+            
+            explanationDiv.style.display = 'block';
+        }
+
+        // Memory hierarchy details
+        function showHierarchyDetails(level) {
+            const details = {
+                'registers': {
+                    title: ' CPU Registers - The Speed Champions',
+                    description: 'Registers are tiny storage locations built directly into the CPU chip. They\'re the fastest memory available.',
+                    specs: 'Size: ~1 KB total | Speed: ~1 nanosecond | Location: Inside CPU',
+                    details: [
+                        'RAX, RBX, RCX, RDX: General purpose arithmetic',
+                        'RSP: Stack pointer (tracks stack top)',
+                        'RIP: Instruction pointer (next instruction to execute)',
+                        'Used for: Immediate calculations, loop counters, temporary values'
+                    ]
+                },
+                'l1': {
+                    title: ' L1 Cache - The Inner Circle',
+                    description: 'L1 cache is the closest memory to the CPU cores. Split into instruction cache (L1i) and data cache (L1d).',
+                    specs: 'Size: ~64 KB per core | Speed: ~2 nanoseconds | Location: Inside each CPU core',
+                    details: [
+                        'L1i: Stores recently used instructions',
+                        'L1d: Stores recently used data',
+                        'Cache line size: 64 bytes',
+                        'Hit rate: ~95% for well-optimized code'
+                    ]
+                },
+                'l2': {
+                    title: ' L2 Cache - The Backup Plan',
+                    description: 'L2 cache serves as a larger, slightly slower backup for L1 cache. Still private to each CPU core.',
+                    specs: 'Size: ~256 KB per core | Speed: ~10 nanoseconds | Location: Inside each CPU core',
+                    details: [
+                        'Unified cache (both instructions and data)',
+                        'Larger capacity than L1',
+                        'Feeds data to L1 cache',
+                        'Better for larger data sets'
+                    ]
+                },
+                'l3': {
+                    title: ' L3 Cache - The Shared Resource',
+                    description: 'L3 cache is shared among all CPU cores, providing a large pool of fast memory for the entire processor.',
+                    specs: 'Size: ~8-32 MB total | Speed: ~40 nanoseconds | Location: Shared by all cores',
+                    details: [
+                        'Shared by all CPU cores',
+                        'Last level cache (LLC)',
+                        'Reduces RAM access frequency',
+                        'Critical for multi-core performance'
+                    ]
+                },
+                'ram': {
+                    title: ' Main RAM - The Workhorse',
+                    description: 'Random Access Memory is your computer\'s primary working memory. Volatile memory that loses data when power is off.',
+                    specs: 'Size: 8-64 GB typical | Speed: ~100 nanoseconds | Type: DDR4/DDR5',
+                    details: [
+                        'Stores currently running programs',
+                        'Virtual memory management',
+                        'DRAM technology (capacitors)',
+                        'Needs constant refresh to maintain data'
+                    ]
+                },
+                'ssd': {
+                    title: ' SSD - The Silent Speed',
+                    description: 'Solid State Drives use NAND flash memory with no moving parts. Much faster than traditional hard drives.',
+                    specs: 'Size: 256GB-2TB typical | Speed: ~100 microseconds | Type: NAND Flash',
+                    details: [
+                        'No moving parts (silent operation)',
+                        'NAND flash memory technology',
+                        'Wear leveling for longevity',
+                        'NVMe interface for maximum speed'
+                    ]
+                },
+                'hdd': {
+                    title: ' Hard Disk - The Reliable Giant',
+                    description: 'Traditional hard drives with spinning magnetic platters. Slowest but offers massive capacity at low cost.',
+                    specs: 'Size: 1-10 TB typical | Speed: ~10 milliseconds | Type: Magnetic',
+                    details: [
+                        'Spinning magnetic platters',
+                        'Mechanical read/write heads',
+                        'Sequential access faster than random',
+                        'Best cost per gigabyte ratio'
+                    ]
+                }
+            };
+            
+            const detail = details[level];
+            const detailsDiv = document.getElementById('hierarchyDetails');
+            
+            detailsDiv.innerHTML = `
+                <h4>${detail.title}</h4>
+                <p>${detail.description}</p>
+                <div style="background: rgba(88, 166, 255, 0.1); padding: 1rem; border-radius: var(--radius-sm); margin: 1rem 0;">
+                    <strong> Specifications:</strong> ${detail.specs}
+                </div>
+                <ul>
+                    ${detail.details.map(item => `<li>${item}</li>`).join('')}
+                </ul>
+            `;
+            
+            detailsDiv.style.display = 'block';
+        }
+
+        // Stack vs Heap details
+        function showStackHeapDetails(type) {
+            const details = {
+                'stack': {
+                    title: '🥞 The Stack - Fast & Organized',
+                    description: 'The stack is a region of memory that stores local variables, function parameters, and return addresses. It follows LIFO (Last In, First Out) principle.',
+                    characteristics: [
+                        ' Very fast allocation and deallocation',
+                        '📏 Limited size (usually 1-8 MB)',
+                        ' Automatic memory management',
+                        ' Grows downward from high addresses',
+                        '🔒 Thread-local (each thread has its own stack)'
+                    ],
+                    useCases: [
+                        'Local variables inside functions',
+                        'Function parameters and return values',
+                        'Return addresses for function calls',
+                        'Small, temporary data structures'
+                    ]
+                },
+                'heap': {
+                    title: '🌍 The Heap - Flexible & Dynamic',
+                    description: 'The heap is a region of memory used for dynamic memory allocation. It allows you to allocate and deallocate memory at runtime.',
+                    characteristics: [
+                        '🌊 Large, flexible size (limited by system RAM)',
+                        '🐌 Slower allocation and deallocation',
+                        '🧹 Manual memory management (malloc/free, new/delete)',
+                        ' Grows upward from low addresses',
+                        '🤝 Shared among all threads'
+                    ],
+                    useCases: [
+                        'Large data structures (arrays, objects)',
+                        'Dynamic arrays and linked lists',
+                        'Objects with unknown lifetime',
+                        'Data that needs to persist beyond function scope'
+                    ]
+                }
+            };
+            
+            const detail = details[type];
+            const explanationDiv = document.getElementById('stackHeapExplanation');
+            
+            explanationDiv.innerHTML = `
+                <h4>${detail.title}</h4>
+                <p>${detail.description}</p>
+                <div style="margin: 1rem 0;">
+                    <h5>🔑 Key Characteristics:</h5>
+                    <ul>
+                        ${detail.characteristics.map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+                </div>
+                <div style="margin: 1rem 0;">
+                    <h5>💼 Common Use Cases:</h5>
+                    <ul>
+                        ${detail.useCases.map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+            
+            explanationDiv.style.display = 'block';
+        }
+
+        // Row highlighting
+        function highlightRow(row) {
+            // Remove previous highlights
+            document.querySelectorAll('tr').forEach(r => r.style.background = '');
+            // Highlight current row
+            row.style.background = 'rgba(88, 166, 255, 0.2)';
+        }
+
+        // Initialize drawer grid
+        function initializeDrawerGrid() {
+            const grid = document.getElementById('drawerGrid');
+            if (!grid) return;
+            
+            let html = '';
+            for (let i = 0; i < 32; i++) {
+                const address = (0x1000 + i).toString(16).toUpperCase();
+                const hasData = Math.random() > 0.7;
+                const data = hasData ? Math.floor(Math.random() * 256) : '??';
+                
+                html += `
+                    <div class="memory-cell" onclick="showDrawerContent(${i})" data-address="0x${address}" data-value="${data}">
+                        <div class="memory-address">0x${address}</div>
+                        <div style="margin-top: 8px;">${data}</div>
+                    </div>
+                `;
+            }
+            grid.innerHTML = html;
+        }
+
+        function showDrawerContent(index) {
+            const cell = document.querySelectorAll('.memory-cell')[index];
+            const address = cell.dataset.address;
+            const value = cell.dataset.value;
+            
+            // Highlight the cell
+            document.querySelectorAll('.memory-cell').forEach(c => c.classList.remove('highlighted'));
+            cell.classList.add('highlighted');
+            
+            // Show tooltip or alert
+            alert(`Memory Address: ${address}\nStored Value: ${value}\n\nThis represents one byte of data in memory!`);
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDrawerGrid();
+            convertToBinary(); // Initialize binary converter with default value
+            
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+            
+            // Add fade-in animation to cards as they come into view
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in-up');
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.card').forEach(card => {
+                observer.observe(card);
+            });
+        });
+
+        // Mobile Navigation Functions
+        function toggleMobileNav() {
+            const hamburger = document.querySelector('.hamburger');
+            const mobileNav = document.getElementById('mobileNav');
+            
+            hamburger.classList.toggle('active');
+            mobileNav.classList.toggle('active');
+        }
+
+        function closeMobileNav() {
+            const hamburger = document.querySelector('.hamburger');
+            const mobileNav = document.getElementById('mobileNav');
+            
+            hamburger.classList.remove('active');
+            mobileNav.classList.remove('active');
+        }
+
+        // Close mobile nav when clicking outside
+        document.addEventListener('click', function(event) {
+            const hamburger = document.querySelector('.hamburger');
+            const mobileNav = document.getElementById('mobileNav');
+            
+            if (!hamburger.contains(event.target) && !mobileNav.contains(event.target)) {
+                hamburger.classList.remove('active');
+                mobileNav.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
+
+
