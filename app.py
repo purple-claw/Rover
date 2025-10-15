@@ -57,7 +57,7 @@ async def view_content(path: str):
             <body>
                 <h1>404 - Content Not Found</h1>
                 <p>The requested content does not exist.</p>
-                <a href="/dashboard">← Back to Dashboard</a>
+                <a href="/">← Back to Navigation</a>
             </body>
         </html>
         """)
@@ -65,7 +65,7 @@ async def view_content(path: str):
     # Add navigation back button
     nav_back = '''
     <div style="position:fixed; top:10px; left:10px; z-index:1000; background:#ff8c00; padding:10px 15px; border-radius:5px;">
-        <a href="/dashboard" style="color:white; text-decoration:none; font-weight:bold;">← Back to Dashboard</a>
+        <a href="/" style="color:white; text-decoration:none; font-weight:bold;">← Back to Navigation</a>
     </div>
     '''
     

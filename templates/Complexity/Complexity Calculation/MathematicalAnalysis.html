@@ -1,0 +1,2747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathematical Foundations of Complexity Analysis | DS-Rover</title>
+    
+    <!-- Chart.js for Professional Graphs -->
+    <!-- Chart.js loaded from CDN - needs internet -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+    <!-- Fallback for offline: Simple canvas drawing functions -->
+    <script>
+    // Fallback chart implementation if Chart.js doesn't load
+    window.createFallbackChart = function(canvas, data, type) {
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        
+        // Clear canvas
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+        ctx.fillRect(0, 0, width, height);
+        
+        // Draw simple bar/line chart
+        if (type === 'bar' || type === 'line') {
+            const values = data.datasets[0].data;
+            const max = Math.max(...values);
+            const barWidth = width / values.length;
+            
+            values.forEach((val, i) => {
+                const barHeight = (val / max) * (height - 40);
+                const x = i * barWidth;
+                const y = height - barHeight - 20;
+                
+                if (type === 'bar') {
+                    ctx.fillStyle = data.datasets[0].borderColor || '#FF8000';
+                    ctx.fillRect(x + 5, y, barWidth - 10, barHeight);
+                } else {
+                    if (i > 0) {
+                        const prevVal = values[i-1];
+                        const prevHeight = (prevVal / max) * (height - 40);
+                        const prevY = height - prevHeight - 20;
+                        ctx.strokeStyle = data.datasets[0].borderColor || '#FF8000';
+                        ctx.lineWidth = 3;
+                        ctx.beginPath();
+                        ctx.moveTo((i-1) * barWidth + barWidth/2, prevY);
+                        ctx.lineTo(x + barWidth/2, y);
+                        ctx.stroke();
+                    }
+                }
+                
+                // Draw label
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(data.labels[i], x + barWidth/2, height - 5);
+            });
+        }
+    };
+    </script>
+    
+    <style>
+        /* ==================== QUICKSAND FONT ==================== */
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap');
+
+        /* ==================== GLASSMORPHISM THEME ==================== */
+        :root {
+            /* Pure Black Base */
+            --bg-primary: #000000;
+            --bg-secondary: #0a0a0a;
+            
+            /* Glass Effect Colors */
+            --glass-white: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-highlight: rgba(255, 255, 255, 0.15);
+            
+            /* McLaren Orange */
+            --mclaren-orange: #FF8000;
+            --mclaren-glow: rgba(255, 128, 0, 0.3);
+            --mclaren-light: #FFA040;
+            --mclaren-dark: #CC6600;
+            
+            /* RedBull Red */
+            --redbull-red: #DC0000;
+            --redbull-blue: #1E41FF;
+            --redbull-glow: rgba(220, 0, 0, 0.3);
+            --redbull-light: #FF3333;
+            
+            /* Meta Blue */
+            --meta-blue: #0081FB;
+            --meta-glow: rgba(0, 129, 251, 0.3);
+            --meta-light: #33A3FF;
+            --meta-dark: #0066CC;
+            
+            /* Text Colors - Ultra White */
+            --text-primary: #FFFFFF;
+            --text-secondary: #FFFFFF;
+            --text-muted: rgba(255, 255, 255, 0.9);
+            --text-dim: rgba(255, 255, 255, 0.7);
+            
+            /* Code Syntax */
+            --code-bg: rgba(20, 20, 20, 0.6);
+            --code-keyword: #FF8000;
+            --code-function: #0081FB;
+            --code-string: #3fb950;
+            --code-comment: rgba(255, 255, 255, 0.4);
+            --code-number: #DC0000;
+            --code-variable: #FFA040;
+            
+            /* Layout */
+            --container-width: 1100px;
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 2.5rem;
+            --spacing-2xl: 3rem;
+            
+            /* Border Radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            
+            /* Animations */
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #000000;
+            border-left: 1px solid rgba(255, 128, 0, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--mclaren-orange);
+            border-radius: 6px;
+            border: 2px solid #000000;
+            transition: all 0.3s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--mclaren-light);
+            box-shadow: 0 0 10px var(--mclaren-glow);
+        }
+
+        body {
+            font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+            font-size: 16px;
+            font-weight: 500;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+        }
+
+        code, pre {
+            font-family: 'Quicksand', 'Courier New', monospace;
+            font-weight: 500;
+        }
+
+        /* Liquid Glass Card Style */
+        .glass {
+            background: #000000;
+            backdrop-filter: blur(20px) saturate(150%);
+            -webkit-backdrop-filter: blur(20px) saturate(150%);
+            border: none;
+            border-radius: var(--radius-md);
+            transition: all var(--transition-normal);
+            position: relative;
+            z-index: 1;
+        }
+
+        .glass::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius-md);
+            padding: 1px;
+            pointer-events: none;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.1) 0%, 
+                rgba(255, 255, 255, 0.05) 50%, 
+                rgba(255, 255, 255, 0.1) 100%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity var(--transition-normal);
+        }
+
+        .glass:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 50px rgba(255, 128, 0, 0.12);
+        }
+
+        .glass:hover::before {
+            opacity: 1;
+            background: rgba(255, 128, 0, 0.2);
+        }
+
+        /* Container */
+        .container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Stunning Navigation */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 0.75rem 0;
+            box-shadow: 
+                0 1px 3px rgba(0, 0, 0, 0.5),
+                0 1px 20px rgba(255, 128, 0, 0.1),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        nav::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent,
+                rgba(255, 128, 0, 0.3) 20%,
+                rgba(255, 128, 0, 0.5) 50%,
+                rgba(255, 128, 0, 0.3) 80%,
+                transparent
+            );
+            opacity: 0.8;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+        }
+
+        .nav-logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--mclaren-orange);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1.25rem;
+            border-radius: 6px;
+            border: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Quicksand', sans-serif;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 10;
+            pointer-events: auto;
+        }
+
+        .btn:hover {
+            background: rgba(255, 128, 0, 0.15);
+            border-color: var(--mclaren-orange);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: var(--mclaren-orange);
+            color: #000;
+            border: none;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 3.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--mclaren-orange);
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        /* Progress Tracker */
+        .progress-tracker {
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+            border-radius: var(--radius-lg);
+            background: rgba(255, 128, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .progress-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .progress-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all var(--transition-normal);
+        }
+
+        .progress-item:hover {
+            border-color: var(--mclaren-orange);
+            transform: translateY(-2px);
+        }
+
+        .progress-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--mclaren-orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #000;
+            flex-shrink: 0;
+        }
+
+        /* Collapsible Section */
+        .section {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: var(--radius-md);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all var(--transition-normal);
+            position: relative;
+            z-index: 5;
+        }
+
+        .section-header:hover {
+            background: rgba(255, 128, 0, 0.08);
+            border-color: rgba(255, 128, 0, 0.3);
+        }
+
+        .section-title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section-number {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            background: var(--mclaren-orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #000;
+        }
+
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .section-meta {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-dim);
+            margin-top: 0.25rem;
+        }
+
+        .section-toggle svg {
+            width: 24px;
+            height: 24px;
+            transition: transform var(--transition-normal);
+        }
+
+        .section.active .section-toggle svg {
+            transform: rotate(180deg);
+        }
+
+        .section-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+
+        .section.active .section-content {
+            max-height: 100000px;
+        }
+
+        .section-inner {
+            padding: var(--spacing-lg);
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: none;
+            border-radius: 0 0 var(--radius-md) var(--radius-md);
+            position: relative;
+            z-index: 3;
+        }
+
+        /* Subsections */
+        .subsection {
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-md);
+        }
+
+        .subsection-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-md);
+            color: var(--meta-blue);
+        }
+
+        .content p {
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .content ul, .content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .content li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Feynman Box - New! */
+        .feynman-box {
+            background: rgba(255, 128, 0, 0.08);
+            border-left: 4px solid var(--mclaren-orange);
+            padding: var(--spacing-md);
+            margin: var(--spacing-md) 0;
+            border-radius: var(--radius-sm);
+        }
+
+        .feynman-title {
+            font-weight: 700;
+            color: var(--mclaren-orange);
+            margin-bottom: 0.5rem;
+            font-size: 1.15rem;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: var(--code-bg);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            margin: var(--spacing-md) 0;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-family: 'Quicksand', 'Courier New', monospace;
+            font-size: 0.95rem;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+
+        .keyword { color: var(--code-keyword); font-weight: 700; }
+        .function { color: var(--code-function); }
+        .string { color: var(--code-string); }
+        .comment { color: var(--code-comment); font-style: italic; }
+        .number { color: var(--code-number); font-weight: 600; }
+
+        /* Demo Container */
+        .demo-container {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 128, 0, 0.2);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-lg) 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .demo-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--mclaren-orange);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .demo-controls {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: var(--spacing-md);
+            position: relative;
+            z-index: 10;
+        }
+
+        .demo-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: 'Quicksand', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .demo-input:focus {
+            outline: none;
+            border-color: var(--mclaren-orange);
+            background: rgba(255, 128, 0, 0.05);
+        }
+
+        /* Chart Container - Enhanced! */
+        .chart-container {
+            background: rgba(0, 0, 0, 0.5);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin: var(--spacing-lg) 0;
+            position: relative;
+        }
+
+        .chart-container canvas {
+            max-height: 400px !important;
+            width: 100% !important;
+        }
+
+        /* Visual Elements */
+        .visual-grid {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: var(--spacing-md) 0;
+        }
+
+        .visual-item {
+            min-width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            font-weight: 700;
+            transition: all var(--transition-fast);
+            cursor: pointer;
+        }
+
+        .visual-item:hover {
+            transform: translateY(-2px);
+            border-color: var(--mclaren-orange);
+        }
+
+        .visual-item.active {
+            background: var(--mclaren-orange);
+            color: #000;
+            border-color: var(--mclaren-orange);
+            animation: pulse 0.5s;
+        }
+
+        .visual-item.checked {
+            opacity: 0.4;
+        }
+
+        .visual-item.found {
+            background: var(--code-string);
+            color: #000;
+            border-color: var(--code-string);
+            animation: bounce 0.5s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Output Terminal */
+        .demo-output {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-md);
+            margin-top: var(--spacing-md);
+            font-family: 'Quicksand', 'Courier New', monospace;
+            font-size: 0.9rem;
+            font-weight: 500;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .output-line {
+            padding: 0.25rem 0;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: var(--spacing-md) 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .data-table th {
+            background: rgba(255, 128, 0, 0.15);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--mclaren-orange);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .data-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .data-table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: var(--spacing-md);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-dim);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all var(--transition-fast);
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 500;
+            position: relative;
+            z-index: 10;
+            pointer-events: auto;
+        }
+
+        .tab:hover {
+            color: var(--text-primary);
+            background: rgba(255, 128, 0, 0.05);
+        }
+
+        .tab.active {
+            color: var(--mclaren-orange);
+            border-bottom-color: var(--mclaren-orange);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        /* Complexity Badges */
+        .complexity-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-left: 0.5rem;
+        }
+
+        .complexity-1 { background: rgba(63, 185, 80, 0.2); color: #3fb950; }
+        .complexity-logn { background: rgba(0, 129, 251, 0.2); color: var(--meta-blue); }
+        .complexity-n { background: rgba(255, 128, 0, 0.2); color: var(--mclaren-orange); }
+        .complexity-n2 { background: rgba(220, 0, 0, 0.2); color: var(--redbull-red); }
+
+        /* ========================================
+           INTELLIGENT ADAPTIVE RESPONSIVE DESIGN
+           ======================================== */
+
+        /* Mobile First - Extra Small Devices (< 480px) */
+        @media (max-width: 479px) {
+            body {
+                font-size: 14px;
+            }
+
+            .container {
+                padding: 0 clamp(8px, 2vw, 12px);
+            }
+
+            nav {
+                padding: 8px 0;
+            }
+
+            .nav-container {
+                flex-direction: column;
+                gap: 8px;
+                padding: 0 8px;
+            }
+
+            .nav-logo {
+                font-size: 1rem;
+            }
+
+            .nav-actions {
+                width: 100%;
+                justify-content: space-between;
+                gap: 6px;
+            }
+
+            .btn {
+                padding: 6px 10px;
+                font-size: 10px;
+                min-height: 32px;
+            }
+
+            .hero {
+                padding: 16px 0;
+                margin-bottom: 16px;
+            }
+
+            .hero h1 {
+                font-size: clamp(20px, 6vw, 28px);
+            }
+
+            .hero-subtitle {
+                font-size: clamp(12px, 3vw, 14px);
+            }
+
+            .progress-tracker {
+                padding: 10px;
+                margin-bottom: 16px;
+            }
+
+            .progress-items {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .progress-item {
+                padding: 8px;
+                gap: 8px;
+            }
+
+            .progress-number {
+                width: 28px;
+                height: 28px;
+                font-size: 0.8rem;
+            }
+
+            .section {
+                margin-bottom: 12px;
+            }
+
+            .section-header {
+                padding: 10px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .section-number {
+                width: 32px;
+                height: 32px;
+                font-size: 0.9rem;
+            }
+
+            .section-title {
+                font-size: clamp(16px, 4vw, 20px);
+            }
+
+            .section-meta {
+                font-size: 0.75rem;
+            }
+
+            .section-inner {
+                padding: 10px;
+            }
+
+            .subsection {
+                padding: 10px;
+                margin-bottom: 12px;
+            }
+
+            .subsection-title {
+                font-size: clamp(14px, 3.5vw, 18px);
+            }
+
+            .feynman-box {
+                padding: 10px;
+                margin: 10px 0;
+            }
+
+            .feynman-title {
+                font-size: 0.95rem;
+            }
+
+            .code-block {
+                padding: 10px;
+                margin: 10px 0;
+                font-size: 0.75rem;
+            }
+
+            .demo-container {
+                padding: 10px;
+                margin: 10px 0;
+            }
+
+            .demo-title {
+                font-size: 0.95rem;
+                margin-bottom: 10px;
+            }
+
+            .demo-controls {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .demo-input {
+                min-width: 100%;
+                padding: 8px;
+                font-size: 12px;
+            }
+
+            .visual-grid {
+                gap: 6px;
+            }
+
+            .visual-item {
+                min-width: 45px;
+                height: 45px;
+                font-size: 0.9rem;
+            }
+
+            .demo-output {
+                padding: 10px;
+                font-size: 0.75rem;
+                max-height: 250px;
+            }
+
+            .chart-container {
+                padding: 10px;
+                margin: 10px 0;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 8px;
+                font-size: 0.8rem;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+
+            .tab {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+
+            .complexity-badge {
+                padding: 2px 6px;
+                font-size: 0.7rem;
+                display: block;
+                margin: 4px 0 0 0;
+            }
+        }
+
+        /* Small Devices - Phones (480px - 767px) */
+        @media (min-width: 480px) and (max-width: 767px) {
+            .container {
+                padding: 0 16px;
+            }
+
+            .nav-container {
+                flex-wrap: wrap;
+            }
+
+            .hero h1 {
+                font-size: clamp(24px, 7vw, 32px);
+            }
+
+            .progress-items {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+
+            .section-header {
+                padding: 12px;
+            }
+
+            .demo-controls {
+                flex-wrap: wrap;
+            }
+
+            .demo-input {
+                min-width: 150px;
+                flex: 1;
+            }
+
+            .visual-item {
+                min-width: 50px;
+                height: 50px;
+            }
+        }
+
+        /* Medium Devices - Tablets (768px - 1023px) */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .progress-items {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .visual-item {
+                min-width: 55px;
+                height: 55px;
+            }
+        }
+
+        /* Large Devices - Desktops (1024px+) */
+        @media (min-width: 1024px) {
+            .btn:hover {
+                transform: translateY(-1px);
+            }
+
+            .glass:hover {
+                transform: translateY(-2px);
+            }
+
+            .visual-item:hover {
+                transform: translateY(-2px);
+            }
+        }
+
+        /* Landscape orientation on mobile */
+        @media (max-width: 767px) and (orientation: landscape) {
+            .hero {
+                padding: 12px 0;
+                margin-bottom: 12px;
+            }
+
+            .hero h1 {
+                font-size: clamp(18px, 5vw, 24px);
+            }
+
+            .section-header {
+                padding: 8px;
+            }
+
+            .visual-item {
+                min-width: 40px;
+                height: 40px;
+                font-size: 0.85rem;
+            }
+
+            .demo-output {
+                max-height: 180px;
+            }
+        }
+
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+
+            .visual-item {
+                min-width: 44px;
+                min-height: 44px;
+            }
+
+            .tab {
+                min-height: 44px;
+                padding: 12px 16px;
+            }
+
+            .section-header {
+                padding: 16px;
+            }
+
+            /* Disable hover effects on touch */
+            .btn:hover,
+            .glass:hover,
+            .visual-item:hover,
+            .tab:hover {
+                transform: none;
+            }
+        }
+
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            body {
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+        }
+
+        /* Reduced motion preference */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            nav,
+            .btn,
+            .demo-controls,
+            .section-toggle {
+                display: none;
+            }
+
+            body {
+                background: white;
+                color: black;
+            }
+
+            .section-content {
+                max-height: none !important;
+            }
+
+            .section {
+                page-break-inside: avoid;
+            }
+
+            .demo-container,
+            .chart-container {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* CRITICAL FIX: Ensure all interactive elements are clickable */
+        button {
+            pointer-events: auto;
+            position: relative;
+            z-index: 100;
+            cursor: pointer;
+        }
+        
+        .btn {
+            pointer-events: auto;
+            cursor: pointer;
+        }
+        
+        .tab {
+            pointer-events: auto;
+            cursor: pointer;
+        }
+        
+        input {
+            pointer-events: auto;
+            cursor: text;
+        }
+        
+        .section-header {
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        /* Ensure pseudo-elements don't block clicks */
+        *::before, *::after {
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="nav-logo">DS-Rover | Complexity Analysis</div>
+            <div class="nav-actions">
+                <button class="btn" onclick="collapseAll()">Collapse All</button>
+                <button class="btn" onclick="expandAll()">Expand All</button>
+                <a href="/Rover/static/dashboard.html" class="btn btn-primary">Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Hero -->
+        <div class="hero">
+            <h1>Mathematics of Complexity Analysis</h1>
+            <p class="hero-subtitle">Master algorithm complexity from absolute zero with Feynman-style explanations and interactive visualizations
+                Because Mathematics is Fun and its what drive everything in the universe!
+            </p>
+        </div>
+
+        <!-- Progress Tracker -->
+        <div class="progress-tracker glass">
+            <h3 style="margin-bottom: 1rem; color: var(--mclaren-orange);">Your 90-Minute Learning Journey</h3>
+            <div class="progress-items">
+                <div class="progress-item">
+                    <div class="progress-number">1</div>
+                    <div>
+                        <div style="font-weight: 600;">What is Complexity?</div>
+                        <div style="font-size: 0.85rem; color: var(--text-dim);">0-25 min</div>
+                    </div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-number">2</div>
+                    <div>
+                        <div style="font-weight: 600;">Logarithms Mastery</div>
+                        <div style="font-size: 0.85rem; color: var(--text-dim);">25-50 min</div>
+                    </div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-number">3</div>
+                    <div>
+                        <div style="font-weight: 600;">Big-O Notation</div>
+                        <div style="font-size: 0.85rem; color: var(--text-dim);">50-70 min</div>
+                    </div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-number">4</div>
+                    <div>
+                        <div style="font-weight: 600;">Code Analysis</div>
+                        <div style="font-size: 0.85rem; color: var(--text-dim);">70-90 min</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== SECTION 1: WHAT IS COMPLEXITY? ========== -->
+        <div class="section active" id="section1">
+            <div class="section-header" onclick="toggleSection('section1')">
+                <div class="section-title-wrapper">
+                    <div class="section-number">1</div>
+                    <div>
+                        <div class="section-title">What is Complexity? Why Should You Care?</div>
+                        <div class="section-meta">0-25 min | Starting from Absolute Zero</div>
+                    </div>
+                </div>
+                <div class="section-toggle">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="section-content">
+                <div class="section-inner">
+                    
+                    <!-- Phone Book Example -->
+                    <div class="subsection glass">
+                        <h3 class="subsection-title">Starting from Absolute Zero</h3>
+                        
+                        <div class="feynman-box">
+                            <div class="feynman-title">🎯 Feynman's First Principle:</div>
+                            <p>Imagine you have a phone book with 1,000 pages. You need to find "John Smith".</p>
+                            <p style="margin-top: 0.5rem;"><strong>The Key Question:</strong> What's the FASTEST way to find him?</p>
+                        </div>
+
+                        <div class="content">
+                            <p><strong>Method 1: Linear Search</strong> - Start from page 1, check every single page</p>
+                            <div class="code-block">
+<pre>Check page 1: Not here
+Check page 2: Not here
+Check page 3: Not here
+...keep going...
+Check page 847: Found him!
+
+<span class="comment">How many pages did you check? <span class="number">847</span> pages</span></pre>
+                            </div>
+
+                            <p><strong>Method 2: Binary Search</strong> - Open the middle, see if John comes before or after</p>
+                            <div class="code-block">
+<pre>Open page 500: "M" - John comes before M
+Open page 250: "G" - John comes after G
+Open page 375: "K" - John comes before K
+Open page 312: "I" - John comes after I
+Open page 343: "J" - Getting close!
+...a few more steps...
+Found him in about <span class="number">10</span> tries
+
+<span class="comment">Same task. 847 steps vs 10 steps!</span></pre>
+                            </div>
+
+                            <div class="feynman-box">
+                                <div class="feynman-title">🧠 Feynman's Insight:</div>
+                                <p>Binary search is like playing "20 Questions". Each guess eliminates HALF the possibilities!</p>
+                                <p style="margin-top: 0.5rem;">Linear search is like checking every house on a street. Binary search is like starting in the middle and asking "is it to the left or right?"</p>
+                                <p style="margin-top: 0.5rem; color: var(--mclaren-orange); font-weight: 600;">This is what complexity analysis is about - finding the smartest way to solve problems!</p>
+                            </div>
+                        </div>
+
+                        <!-- Interactive Demo -->
+                        <div class="demo-container">
+                            <div class="demo-title">🎮 Interactive: Phone Book Search Comparison</div>
+                            
+                            <div class="tabs">
+                                <button class="tab active" onclick="switchTab('linear', this)">Linear Search</button>
+                                <button class="tab" onclick="switchTab('binary', this)">Binary Search</button>
+                                <button class="tab" onclick="switchTab('compare', this)">Compare with Chart</button>
+                            </div>
+
+                            <div class="tab-content active" id="linear">
+                                <div class="demo-controls">
+                                    <input type="number" id="linearPages" class="demo-input" value="16" min="4" max="64" placeholder="Pages">
+                                    <input type="number" id="linearTarget" class="demo-input" value="11" min="1" placeholder="Target">
+                                    <button class="btn btn-primary" onclick="runLinearSearch()">Start Search</button>
+                                </div>
+                                <div class="visual-grid" id="linearVisual"></div>
+                                <div class="demo-output" id="linearOutput"></div>
+                            </div>
+
+                            <div class="tab-content" id="binary">
+                                <div class="demo-controls">
+                                    <input type="number" id="binaryPages" class="demo-input" value="16" min="4" max="64" placeholder="Pages">
+                                    <input type="number" id="binaryTarget" class="demo-input" value="11" min="1" placeholder="Target">
+                                    <button class="btn btn-primary" onclick="runBinarySearch()">Start Search</button>
+                                </div>
+                                <div class="visual-grid" id="binaryVisual"></div>
+                                <div class="demo-output" id="binaryOutput"></div>
+                            </div>
+
+                            <div class="tab-content" id="compare">
+                                <div class="demo-controls">
+                                    <button class="btn btn-primary" onclick="showComparisonChart()">Show Comparison Chart</button>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="searchComparisonChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Finding Maximum -->
+                    <div class="subsection glass">
+                        <h3 class="subsection-title">The Real Questions We're Answering</h3>
+                        
+                        <div class="feynman-box">
+                            <div class="feynman-title">🎯 Feynman's Core Questions:</div>
+                            <p>When you write code, you're asking the computer to do work. The questions are:</p>
+                            <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li>How much work does my code do?</li>
+                                <li>If my data gets bigger, how much MORE work will it do?</li>
+                                <li>Is there a faster way to do the same thing?</li>
+                            </ol>
+                        </div>
+
+                        <div class="content">
+                            <p><strong>Let me show you with real code - finding the maximum number in a list:</strong></p>
+
+                            <div class="code-block">
+<pre><span class="comment"># Finding the maximum number in a list</span>
+numbers = [<span class="number">5</span>, <span class="number">2</span>, <span class="number">9</span>, <span class="number">1</span>, <span class="number">7</span>, <span class="number">6</span>]
+
+<span class="keyword">def</span> <span class="function">find_max</span>(numbers):
+    max_so_far = numbers[<span class="number">0</span>]  <span class="comment"># Start with first number</span>
+    
+    <span class="keyword">for</span> num <span class="keyword">in</span> numbers:     <span class="comment"># Look at each number</span>
+        <span class="keyword">if</span> num > max_so_far:
+            max_so_far = num
+    
+    <span class="keyword">return</span> max_so_far</pre>
+                            </div>
+
+                            <div class="feynman-box">
+                                <div class="feynman-title">🧠 Feynman's Explanation:</div>
+                                <p><strong>Think of it like this:</strong> You're looking at a line of people to find the tallest one.</p>
+                                <p style="margin-top: 0.5rem;">You start by remembering the first person's height. Then you walk down the line. Each time you see someone taller, you update your memory.</p>
+                                <p style="margin-top: 0.5rem; color: var(--meta-blue);">You can't skip anyone - you MUST look at every person once. That's why we need n comparisons for n numbers!</p>
+                            </div>
+
+                            <p><strong>Let's trace through step by step:</strong></p>
+                            <div class="code-block">
+<pre>numbers = [<span class="number">5</span>, <span class="number">2</span>, <span class="number">9</span>, <span class="number">1</span>, <span class="number">7</span>, <span class="number">6</span>]
+
+<span class="comment">Step 1:</span> max_so_far = 5 (first number)
+
+<span class="comment">Step 2:</span> Look at 5 → 5 > 5? No, max_so_far stays 5
+<span class="comment">Step 3:</span> Look at 2 → 2 > 5? No, max_so_far stays 5
+<span class="comment">Step 4:</span> Look at 9 → 9 > 5? YES! max_so_far = 9
+<span class="comment">Step 5:</span> Look at 1 → 1 > 9? No, max_so_far stays 9
+<span class="comment">Step 6:</span> Look at 7 → 7 > 9? No, max_so_far stays 9
+<span class="comment">Step 7:</span> Look at 6 → 6 > 9? No, max_so_far stays 9
+
+Return <span class="number">9</span>
+Total comparisons: <span class="number">6</span> (one for each number)</pre>
+                            </div>
+
+                            <div class="feynman-box">
+                                <div class="feynman-title">🎯 Key Observation:</div>
+                                <p style="font-weight: 600; font-size: 1.1rem;">
+                                    6 numbers → 6 comparisons<br>
+                                    10 numbers → 10 comparisons<br>
+                                    1,000 numbers → 1,000 comparisons<br>
+                                    <span style="color: var(--mclaren-orange);">n numbers → n comparisons</span>
+                                </p>
+                                <p style="margin-top: 1rem;">This is what we call <span class="complexity-badge complexity-n">O(n)</span> complexity - "Order of n" or "Linear complexity"</p>
+                            </div>
+                        </div>
+
+                        <!-- Find Max Demo -->
+                        <div class="demo-container">
+                            <div class="demo-title">🎮 Interactive: Finding Maximum</div>
+                            <div class="demo-controls">
+                                <input type="text" id="maxInput" class="demo-input" value="5,2,9,1,7,6" placeholder="Numbers (comma-separated)">
+                                <button class="btn btn-primary" onclick="runFindMax()">Find Maximum</button>
+                                <button class="btn" onclick="randomArray()">Random Array</button>
+                            </div>
+                            <div class="visual-grid" id="maxVisual"></div>
+                            <div class="demo-output" id="maxOutput"></div>
+                        </div>
+                    </div>
+
+                    <!-- Growth Comparison -->
+                    <div class="subsection glass">
+                        <h3 class="subsection-title">Why Different Data Sizes Matter</h3>
+                        
+                        <div class="feynman-box">
+                            <div class="feynman-title">🧠 Feynman's Perspective:</div>
+                            <p>Let's say each comparison takes 1 microsecond (1/1,000,000 of a second).</p>
+                            <p style="margin-top: 0.5rem;">When n is small, everything feels instant. But as n grows, the differences become MASSIVE!</p>
+                        </div>
+
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Data Size</th>
+                                    <th>Comparisons</th>
+                                    <th>Time</th>
+                                    <th>User Experience</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>10</td><td>10</td><td>0.00001s</td><td style="color: #3fb950;">Instant</td></tr>
+                                <tr><td>100</td><td>100</td><td>0.0001s</td><td style="color: #3fb950;">Instant</td></tr>
+                                <tr><td>1,000</td><td>1,000</td><td>0.001s</td><td style="color: #3fb950;">Instant</td></tr>
+                                <tr><td>10,000</td><td>10,000</td><td>0.01s</td><td style="color: #3fb950;">Instant</td></tr>
+                                <tr><td>100,000</td><td>100,000</td><td>0.1s</td><td style="color: var(--mclaren-orange);">Noticeable</td></tr>
+                                <tr><td>1,000,000</td><td>1,000,000</td><td>1s</td><td style="color: var(--mclaren-orange);">Starting to feel it</td></tr>
+                                <tr><td>10,000,000</td><td>10,000,000</td><td>10s</td><td style="color: var(--redbull-red);">Annoying</td></tr>
+                                <tr><td>100,000,000</td><td>100,000,000</td><td>100s</td><td style="color: var(--redbull-red);">Unacceptable!</td></tr>
+                            </tbody>
+                        </table>
+
+                        <div class="content">
+                            <p><strong>Now imagine a different algorithm - comparing EVERY pair:</strong></p>
+                            <div class="code-block">
+<pre><span class="comment"># Let's say we had to compare EVERY pair of numbers</span>
+<span class="keyword">def</span> <span class="function">compare_all_pairs</span>(numbers):
+    count = <span class="number">0</span>
+    <span class="keyword">for</span> num1 <span class="keyword">in</span> numbers:      <span class="comment"># For each number</span>
+        <span class="keyword">for</span> num2 <span class="keyword">in</span> numbers:  <span class="comment"># Compare with every other number</span>
+            <span class="keyword">if</span> num1 > num2:
+                count += <span class="number">1</span>
+    <span class="keyword">return</span> count</pre>
+                            </div>
+
+                            <div class="feynman-box">
+                                <div class="feynman-title">🧠 Feynman's Insight:</div>
+                                <p><strong>Think of it like handshakes at a party:</strong></p>
+                                <p style="margin-top: 0.5rem;">If 6 people each shake hands with all 6 people (including themselves), that's 6 × 6 = 36 handshakes!</p>
+                                <p style="margin-top: 0.5rem; color: var(--redbull-red); font-weight: 600;">This grows MUCH faster than linear!</p>
+                            </div>
+
+                            <p><strong>How many comparisons now?</strong></p>
+                            <div class="code-block">
+<pre>If we have 6 numbers:
+- First number compared with all 6 → 6 comparisons
+- Second number compared with all 6 → 6 comparisons  
+- Third number compared with all 6 → 6 comparisons
+- Fourth number compared with all 6 → 6 comparisons
+- Fifth number compared with all 6 → 6 comparisons
+- Sixth number compared with all 6 → 6 comparisons
+
+Total: 6 × 6 = <span class="number">36</span> comparisons
+
+<span class="comment">General pattern:</span>
+6 numbers → 36 comparisons (6²)
+10 numbers → 100 comparisons (10²)
+100 numbers → 10,000 comparisons (100²)
+1,000 numbers → 1,000,000 comparisons (1,000²)
+<span style="color: var(--redbull-red); font-weight: 600;">n numbers → n² comparisons</span>
+
+This is <span class="complexity-badge complexity-n2">O(n²)</span> complexity - "Quadratic complexity"</pre>
+                            </div>
+
+                            <p><strong>Same task, VERY different performance:</strong></p>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Data Size</th>
+                                        <th>O(n) Time</th>
+                                        <th>O(n²) Time</th>
+                                        <th>Difference</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>10</td><td>0.00001s</td><td>0.0001s</td><td style="color: var(--mclaren-orange);">10× slower</td></tr>
+                                    <tr><td>100</td><td>0.0001s</td><td>0.01s</td><td style="color: var(--mclaren-orange);">100× slower</td></tr>
+                                    <tr><td>1,000</td><td>0.001s</td><td>1s</td><td style="color: var(--redbull-red);">1,000× slower</td></tr>
+                                    <tr><td>10,000</td><td>0.01s</td><td>100s</td><td style="color: var(--redbull-red);">10,000× slower!</td></tr>
+                                </tbody>
+                            </table>
+
+                            <div class="feynman-box" style="background: rgba(220, 0, 0, 0.08); border-color: var(--redbull-red);">
+                                <div class="feynman-title" style="color: var(--redbull-red);">🎯 THIS is why we study complexity!</div>
+                                <p style="font-weight: 600; font-size: 1.1rem;">The difference between O(n) and O(n²) can mean the difference between:</p>
+                                <ul style="margin: 0.5rem 0 0 1.5rem; font-weight: 600;">
+                                    <li>0.01 seconds vs 100 seconds</li>
+                                    <li>Instant response vs painful wait</li>
+                                    <li>Happy users vs app uninstalled</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Growth Chart -->
+                        <div class="demo-container">
+                            <div class="demo-title">Interactive: Growth Rate Comparison</div>
+                            <div class="demo-controls">
+                                <button class="btn btn-primary" onclick="showGrowthChart('small')">Small (10-100)</button>
+                                <button class="btn btn-primary" onclick="showGrowthChart('medium')">Medium (100-1000)</button>
+                                <button class="btn btn-primary" onclick="showGrowthChart('large')">Large (1000-10000)</button>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="growthChart"></canvas>
+                            </div>
+                            <div class="demo-output" id="growthOutput"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== SECTION 2: LOGARITHMS ========== -->
+        <div class="section" id="section2">
+            <div class="section-header" onclick="toggleSection('section2')">
+                <div class="section-title-wrapper">
+                    <div class="section-number">2</div>
+                    <div>
+                        <div class="section-title">Logarithms - From Zero to Mastery</div>
+                        <div class="section-meta">25-50 min | Complete Understanding</div>
+                    </div>
+                </div>
+                <div class="section-toggle">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="section-content">
+                <div class="section-inner">
+                    
+                    <div class="subsection glass">
+                        <h3 class="subsection-title">What is a Logarithm? (The Simplest Explanation)</h3>
+                        
+                        <div class="feynman-box">
+                            <div class="feynman-title">🎯 Feynman's Starting Point:</div>
+                            <p>Let's start with something you ALREADY know - multiplication!</p>
+                        </div>
+
+                        <div class="content">
+                            <div class="code-block">
+<pre>2 × 2 = 4
+2 × 2 × 2 = 8
+2 × 2 × 2 × 2 = 16
+
+We can write this shorter:
+2² = 4   (2 to the power of 2)
+2³ = 8   (2 to the power of 3)
+2⁴ = 16  (2 to the power of 4)</pre>
+                            </div>
+
+                            <div class="feynman-box">
+                                <div class="feynman-title">🧠 Feynman's Key Insight:</div>
+                                <p><strong>A logarithm asks the OPPOSITE question:</strong></p>
+                                <div class="code-block" style="margin-top: 0.5rem; background: rgba(0, 129, 251, 0.1);">
+<pre>If 2³ = 8, then log₂(8) = 3
+
+Read as: "log base 2 of 8 equals 3"
+
+<span style="color: var(--meta-blue); font-weight: 600;">Meaning: "How many 2s do I multiply to get 8?"</span>
+Answer: 3 (because 2 × 2 × 2 = 8)</pre>
+                                </div>
+                                <p style="margin-top: 1rem; font-weight: 600; color: var(--mclaren-orange);">Powers and logarithms are OPPOSITES - like multiplication and division!</p>
+                            </div>
+
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Power Form</th>
+                                        <th style="text-align: center;">↔</th>
+                                        <th>Logarithm Form</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>2³ = 8</td><td style="text-align: center;">↔</td><td>log₂(8) = 3</td></tr>
+                                    <tr><td>2⁴ = 16</td><td style="text-align: center;">↔</td><td>log₂(16) = 4</td></tr>
+                                    <tr><td>10² = 100</td><td style="text-align: center;">↔</td><td>log₁₀(100) = 2</td></tr>
+                                    <tr><td><strong>b^y = x</strong></td><td style="text-align: center;">↔</td><td><strong>log_b(x) = y</strong></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Log Calculator -->
+                        <div class="demo-container">
+                            <div class="demo-title">🧮 Interactive: Logarithm Calculator</div>
+                            <div class="demo-controls">
+                                <input type="number" id="logBase" class="demo-input" value="2" min="2" placeholder="Base (b)">
+                                <input type="number" id="logNum" class="demo-input" value="8" min="1" placeholder="Number (n)">
+                                <button class="btn btn-primary" onclick="calculateLog()">Calculate</button>
+                            </div>
+                            <div class="demo-output" id="logOutput"></div>
+                        </div>
+                    </div>
+
+                    <!-- Why Logs Appear -->
+                    <div class="subsection glass">
+                        <h3 class="subsection-title">Why Logarithms Appear in Algorithms</h3>
+                        
+                        <div class="feynman-box">
+                            <div class="feynman-title">🧠 Feynman's Pattern Recognition:</div>
+                            <p>Remember the phone book? Let's understand WHY it takes log₂(n) steps!</p>
+                            <p style="margin-top: 0.5rem; font-weight: 600; color: var(--meta-blue);">Every time you divide something in half, you're doing a logarithmic operation!</p>
+                        </div>
+
+                        <div class="content">
+                            <p><strong>Phone book with 1,024 pages using binary search:</strong></p>
+                            <div class="code-block">
+<pre>Start: 1,024 pages to search
+
+Step 1: Open middle (page 512) → Remaining: 512
+Step 2: Open middle → Remaining: 256
+Step 3: Open middle → Remaining: 128
+Step 4: Remaining: 64
+Step 5: Remaining: 32
+Step 6: Remaining: 16
+Step 7: Remaining: 8
+Step 8: Remaining: 4
+Step 9: Remaining: 2
+Step 10: Remaining: 1 → FOUND!
+
+Pattern: 1,024 → 512 → 256 → 128 → 64 → 32 → 16 → 8 → 4 → 2 → 1
+           ÷2    ÷2    ÷2    ÷2   ÷2   ÷2   ÷2  ÷2  ÷2  ÷2
+
+<span class="comment">How many times did we divide by 2? <span class="number">10</span> times</span>
+<span style="color: var(--mclaren-orange); font-weight: 600;">log₂(1,024) = 10</span></pre>
+                            </div>
+
+                            <div class="feynman-box">
+                                <div class="feynman-title">🎯 The Beautiful Pattern:</div>
+                                <p style="font-size: 1.1rem; font-weight: 600;">
+                                    1,024 pages → log₂(1,024) = 10 steps<br>
+                                    1,000,000 pages → log₂(1,000,000) ≈ 20 steps
+                                </p>
+                                <p style="margin-top: 1rem; color: var(--mclaren-orange); font-weight: 600; font-size: 1.2rem;">
+                                    A MILLION pages in just 20 steps!
+                                </p>
+                                <p style="margin-top: 0.5rem;">This is why logarithmic algorithms are AMAZING!</p>
+                            </div>
+                        </div>
+
+                        <!-- Log Growth Chart -->
+                        <div class="demo-container">
+                            <div class="demo-title">📊 Log Growth Visualization</div>
+                            <div class="chart-container">
+                                <canvas id="logGrowthChart"></canvas>
+                            </div>
+                        </div>
+
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>n (Data Size)</th>
+                                    <th>log₂(n) Steps</th>
+                                    <th>What This Means</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>1</td><td>0</td><td>2⁰ = 1</td></tr>
+                                <tr><td>2</td><td>1</td><td>Double the data, add 1 step</td></tr>
+                                <tr><td>4</td><td>2</td><td>Double again, add 1 step</td></tr>
+                                <tr><td>8</td><td>3</td><td>Double again, add 1 step</td></tr>
+                                <tr><td>16</td><td>4</td><td></td></tr>
+                                <tr><td>1,024</td><td>10</td><td style="color: var(--mclaren-orange);">1000× data, just 10 steps!</td></tr>
+                                <tr><td>1,048,576</td><td>20</td><td style="color: var(--mclaren-orange);">MILLION items, 20 steps!</td></tr>
+                            </tbody>
+                        </table>
+
+                        <div class="feynman-box">
+                            <div class="feynman-title">🎯 Key Insight:</div>
+                            <p style="font-weight: 600; font-size: 1.1rem; color: var(--mclaren-orange);">
+                                Every time you DOUBLE your data, you only add ONE more step!
+                            </p>
+                            <p style="margin-top: 0.5rem;">This is why we say logarithmic growth is VERY slow.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== SECTION 3: BIG-O ========== -->
+        <div class="section" id="section3">
+            <div class="section-header" onclick="toggleSection('section3')">
+                <div class="section-title-wrapper">
+                    <div class="section-number">3</div>
+                    <div>
+                        <div class="section-title">Big-O Notation - Simple Explanation</div>
+                        <div class="section-meta">50-70 min | Understanding Growth Rates</div>
+                    </div>
+                </div>
+                <div class="section-toggle">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="section-content">
+                <div class="section-inner">
+                    
+                    <div class="subsection glass">
+                        <h3 class="subsection-title">What is Big-O?</h3>
+                        
+                        <div class="feynman-box">
+                            <div class="feynman-title">🎯 Feynman's Definition:</div>
+                            <p>Big-O is a way to describe how fast a function grows when the input gets really big.</p>
+                            <p style="margin-top: 0.5rem; font-weight: 600;">Think of it like describing how a plant grows:</p>
+                            <ul style="margin: 0.5rem 0 0 1.5rem;">
+                                <li>Some plants stay small (constant - O(1))</li>
+                                <li>Some grow slowly (logarithmic - O(log n))</li>
+                                <li>Some grow steadily (linear - O(n))</li>
+                                <li>Some grow REALLY fast (quadratic - O(n²))</li>
+                            </ul>
+                            <p style="margin-top: 0.5rem; color: var(--mclaren-orange);">Big-O does the same for algorithms!</p>
+                        </div>
+
+                        <div class="content">
+                            <p><strong>The 3 Rules of Big-O (Simple Version):</strong></p>
+
+                            <div class="feynman-box" style="background: rgba(0, 129, 251, 0.08);">
+                                <div class="feynman-title" style="color: var(--meta-blue);">Rule 1: We only care about BIG inputs</div>
+                                <p>When n is small (like 10), differences don't matter much.</p>
+                                <p>When n is HUGE (like 1,000,000), they matter A LOT.</p>
+                                <p style="margin-top: 0.5rem; font-weight: 600;">Big-O describes what happens when n gets really, really big.</p>
+                            </div>
+
+                            <div class="feynman-box" style="margin-top: 1rem; background: rgba(255, 128, 0, 0.08);">
+                                <div class="feynman-title" style="color: var(--mclaren-orange);">Rule 2: We ignore constants</div>
+                                <div class="code-block" style="margin-top: 0.5rem;">
+<pre>Algorithm 1: does n operations
+Algorithm 2: does 5n operations
+
+Yes, Algorithm 2 is 5× slower.
+But both grow at the SAME RATE.
+
+As n doubles, both times double.
+<span style="color: var(--mclaren-orange); font-weight: 600;">Same growth pattern → Both are O(n)</span></pre>
+                                </div>
+                            </div>
+
+                            <div class="feynman-box" style="margin-top: 1rem; background: rgba(220, 0, 0, 0.08);">
+                                <div class="feynman-title" style="color: var(--redbull-red);">Rule 3: Keep only the fastest-growing term</div>
+                                <div class="code-block" style="margin-top: 0.5rem;">
+<pre>Your algorithm does: 3n² + 5n + 20 operations
+
+When n = 1,000:
+3(1,000,000) + 5(1,000) + 20 = 3,000,000 + 5,000 + 20
+
+What dominates? The 3,000,000 from 3n²!
+
+<span style="color: var(--redbull-red); font-weight: 600;">Big-O: O(n²) (we drop the 5n and 20)</span></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subsection glass">
+                        <h3 class="subsection-title">Common Big-O Classes</h3>
+                        
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Notation</th>
+                                    <th>Name</th>
+                                    <th>n=1,000,000</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><span class="complexity-badge complexity-1">O(1)</span></td><td>Constant</td><td>1</td><td>array[5]</td></tr>
+                                <tr><td><span class="complexity-badge complexity-logn">O(log n)</span></td><td>Logarithmic</td><td>20</td><td>Binary search</td></tr>
+                                <tr><td><span class="complexity-badge complexity-n">O(n)</span></td><td>Linear</td><td>1,000,000</td><td>Find max</td></tr>
+                                <tr><td><span class="complexity-badge complexity-n2">O(n²)</span></td><td>Quadratic</td><td>1,000,000,000,000</td><td>Nested loops</td></tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Big-O Chart -->
+                        <div class="demo-container">
+                            <div class="demo-title">📊 Big-O Growth Comparison</div>
+                            <div class="chart-container">
+                                <canvas id="bigOChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== SECTION 4: CODE ANALYSIS ========== -->
+        <div class="section" id="section4">
+            <div class="section-header" onclick="toggleSection('section4')">
+                <div class="section-title-wrapper">
+                    <div class="section-number">4</div>
+                    <div>
+                        <div class="section-title">Analyzing Code Examples</div>
+                        <div class="section-meta">70-90 min | Practice & Application</div>
+                    </div>
+                </div>
+                <div class="section-toggle">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="section-content">
+                <div class="section-inner">
+                    
+                    <div class="feynman-box" style="background: rgba(255, 128, 0, 0.08);">
+                        <div class="feynman-title">🎯 Feynman's Approach to Code Analysis:</div>
+                        <p>To analyze code complexity, ask these simple questions:</p>
+                        <ol style="margin: 0.5rem 0 0 1.5rem; font-weight: 600;">
+                            <li>How many times do the loops run?</li>
+                            <li>Are the loops nested? (Multiply!)</li>
+                            <li>Does the loop variable multiply/divide? (Logarithmic!)</li>
+                            <li>Any function calls inside loops? (Add their complexity!)</li>
+                        </ol>
+                    </div>
+
+                    <!-- Example 1 -->
+                    <div class="subsection glass">
+                        <h3 class="subsection-title">Example 1: Simple Loop <span class="complexity-badge complexity-n">O(n)</span></h3>
+                        <div class="code-block">
+<pre><span class="keyword">def</span> <span class="function">example1</span>(n):
+    total = <span class="number">0</span>
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(n):
+        total += i
+    <span class="keyword">return</span> total</pre>
+                        </div>
+
+                        <div class="feynman-box">
+                            <div class="feynman-title">🧠 Analysis:</div>
+                            <p>Loop runs n times → Each iteration is O(1) → Total: O(n)</p>
+                        </div>
+
+                        <div class="demo-container">
+                            <div class="demo-title">🎮 Execute Step-by-Step</div>
+                            <div class="demo-controls">
+                                <input type="number" id="ex1N" class="demo-input" value="5" min="1" max="20">
+                                <button class="btn btn-primary" onclick="runEx1()">Run</button>
+                            </div>
+                            <div class="demo-output" id="ex1Output"></div>
+                        </div>
+                    </div>
+
+                    <!-- Example 2 -->
+                    <div class="subsection glass">
+                        <h3 class="subsection-title">Example 2: Nested Loops <span class="complexity-badge complexity-n2">O(n²)</span></h3>
+                        <div class="code-block">
+<pre><span class="keyword">def</span> <span class="function">example2</span>(n):
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(n):
+        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="function">range</span>(n):
+            <span class="function">print</span>(i, j)</pre>
+                        </div>
+
+                        <div class="feynman-box">
+                            <div class="feynman-title">🧠 Analysis:</div>
+                            <p>Outer: n times × Inner: n times = n × n = n² → O(n²)</p>
+                        </div>
+
+                        <div class="demo-container">
+                            <div class="demo-title">🎮 Visualize Grid</div>
+                            <div class="demo-controls">
+                                <input type="number" id="ex2N" class="demo-input" value="4" min="2" max="8">
+                                <button class="btn btn-primary" onclick="runEx2()">Visualize</button>
+                            </div>
+                            <div id="ex2Grid" style="display: grid; gap: 0.5rem; margin: 1rem 0;"></div>
+                            <div class="demo-output" id="ex2Output"></div>
+                        </div>
+                    </div>
+
+                    <!-- Example 4 -->
+                    <div class="subsection glass">
+                        <h3 class="subsection-title">Example 4: Logarithmic Loop <span class="complexity-badge complexity-logn">O(log n)</span></h3>
+                        <div class="code-block">
+<pre><span class="keyword">def</span> <span class="function">example4</span>(n):
+    i = <span class="number">1</span>
+    <span class="keyword">while</span> i < n:
+        <span class="function">print</span>(i)
+        i = i * <span class="number">2</span></pre>
+                        </div>
+
+                        <div class="feynman-box">
+                            <div class="feynman-title">🧠 Analysis:</div>
+                            <p>i doubles each time: 1 → 2 → 4 → 8 → 16...</p>
+                            <p>After k iterations: i = 2^k → Stop when 2^k ≥ n → k = log₂(n)</p>
+                            <p style="font-weight: 600; color: var(--meta-blue);">Result: O(log n)</p>
+                        </div>
+
+                        <div class="demo-container">
+                            <div class="demo-title">🎮 Execute</div>
+                            <div class="demo-controls">
+                                <input type="number" id="ex4N" class="demo-input" value="16" min="2" max="1024">
+                                <button class="btn btn-primary" onclick="runEx4()">Run</button>
+                            </div>
+                            <div class="demo-output" id="ex4Output"></div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Reference -->
+                    <div class="subsection glass">
+                        <h3 class="subsection-title">Quick Reference Guide</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Pattern</th>
+                                    <th>Complexity</th>
+                                    <th>Example Code</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Single loop</td>
+                                    <td><span class="complexity-badge complexity-n">O(n)</span></td>
+                                    <td>for i in range(n)</td>
+                                </tr>
+                                <tr>
+                                    <td>Nested loops</td>
+                                    <td><span class="complexity-badge complexity-n2">O(n²)</span></td>
+                                    <td>for i... for j...</td>
+                                </tr>
+                                <tr>
+                                    <td>Halving</td>
+                                    <td><span class="complexity-badge complexity-logn">O(log n)</span></td>
+                                    <td>while n > 1: n = n // 2</td>
+                                </tr>
+                                <tr>
+                                    <td>Doubling</td>
+                                    <td><span class="complexity-badge complexity-logn">O(log n)</span></td>
+                                    <td>while i < n: i = i * 2</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="subsection glass" style="margin-top: 2rem; background: rgba(63, 185, 80, 0.08);">
+            <h2 style="color: #3fb950; margin-bottom: 1rem;">🎉 Session Complete!</h2>
+            <p><strong>You've Mastered:</strong></p>
+            <ul style="margin-left: 2rem; margin-top: 1rem; line-height: 2;">
+                <li>Why complexity matters (847 steps vs 10 steps!)</li>
+                <li>Logarithms and how they appear in algorithms</li>
+                <li>Big-O notation and its 3 core rules</li>
+                <li>Analyzing code complexity step-by-step</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- JavaScript with Chart.js -->
+
+    <script>
+        console.log('%c🚀 JAVASCRIPT LOADING...', 'background: #FF8000; color: #000; padding: 10px; font-size: 20px; font-weight: bold;');
+        console.log('Script tag reached - JavaScript IS running!');
+        
+        // Check if Chart.js loaded
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('%c✅ DOM CONTENT LOADED EVENT FIRED', 'background: #3fb950; color: #000; padding: 10px; font-size: 16px;');
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js failed to load - creating fallback visualizations');
+                // Create fallback message
+                const style = document.createElement('style');
+                style.textContent = '.chart-fallback { background: rgba(220, 0, 0, 0.1); border: 2px solid var(--redbull-red); padding: 1rem; border-radius: 8px; text-align: center; }';
+                document.head.appendChild(style);
+            } else {
+                console.log('✅ Chart.js loaded successfully');
+            }
+        });
+        
+        // Section Toggle
+
+        function toggleSection(id) {
+            console.log('toggleSection called with id:', id);
+            document.getElementById(id).classList.toggle('active');
+        }
+        
+        function collapseAll() {
+            console.log('collapseAll called');
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        }
+        
+        function expandAll() {
+            console.log('expandAll called');
+            document.querySelectorAll('.section').forEach(s => s.classList.add('active'));
+        }
+        
+        // Log that functions are loaded
+        console.log('✅ Section toggle functions loaded');
+
+        // Tab Switching
+        function switchTab(tabId, btn) {
+            console.log('switchTab called:', tabId);
+            const parent = btn.closest('.demo-container');
+            parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            parent.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+        
+        console.log('✅ Tab switching function loaded');
+
+        // Linear Search
+        async function runLinearSearch() {
+            console.log('🎯 runLinearSearch called - BUTTON WORKS!');
+            const pages = parseInt(document.getElementById('linearPages').value) || 16;
+            const target = parseInt(document.getElementById('linearTarget').value) || 11;
+            const visual = document.getElementById('linearVisual');
+            const output = document.getElementById('linearOutput');
+            
+            visual.innerHTML = '';
+            output.innerHTML = '<div style="color: var(--mclaren-orange); font-weight: 600;">LINEAR SEARCH</div>';
+            
+            for (let i = 1; i <= pages; i++) {
+                const item = document.createElement('div');
+                item.className = 'visual-item';
+                item.textContent = i;
+                item.id = `lin-${i}`;
+                visual.appendChild(item);
+            }
+            
+            let steps = 0;
+            for (let i = 1; i <= pages; i++) {
+                steps++;
+                const item = document.getElementById(`lin-${i}`);
+                item.classList.add('active');
+                await new Promise(r => setTimeout(r, 300));
+                output.innerHTML += `<div class="output-line">Step ${steps}: Check page ${i}</div>`;
+                
+                if (i === target) {
+                    item.classList.remove('active');
+                    item.classList.add('found');
+                    output.innerHTML += `<div class="output-line" style="color: #3fb950; font-weight: 600; margin-top: 1rem;">✓ Found in ${steps} steps!</div>`;
+                    break;
+                }
+                item.classList.remove('active');
+                item.classList.add('checked');
+            }
+        }
+
+        console.log('✅ runLinearSearch function loaded');
+
+        // Binary Search
+        async function runBinarySearch() {
+            console.log('🎯 runBinarySearch called - BUTTON WORKS!');
+            const pages = parseInt(document.getElementById('binaryPages').value) || 16;
+            const target = parseInt(document.getElementById('binaryTarget').value) || 11;
+            const visual = document.getElementById('binaryVisual');
+            const output = document.getElementById('binaryOutput');
+            
+            visual.innerHTML = '';
+            output.innerHTML = '<div style="color: var(--meta-blue); font-weight: 600;">BINARY SEARCH</div>';
+            
+            for (let i = 1; i <= pages; i++) {
+                const item = document.createElement('div');
+                item.className = 'visual-item';
+                item.textContent = i;
+                item.id = `bin-${i}`;
+                visual.appendChild(item);
+            }
+            
+            let left = 1, right = pages, steps = 0;
+            while (left <= right) {
+                steps++;
+                const mid = Math.floor((left + right) / 2);
+                const item = document.getElementById(`bin-${mid}`);
+                item.classList.add('active');
+                await new Promise(r => setTimeout(r, 500));
+                output.innerHTML += `<div class="output-line">Step ${steps}: Check page ${mid}</div>`;
+                
+                if (mid === target) {
+                    item.classList.remove('active');
+                    item.classList.add('found');
+                    output.innerHTML += `<div class="output-line" style="color: #3fb950; font-weight: 600; margin-top: 1rem;">✓ Found in ${steps} steps!</div>`;
+                    break;
+                } else if (mid < target) {
+                    for (let i = left; i <= mid; i++) {
+                        document.getElementById(`bin-${i}`).style.opacity = '0.3';
+                    }
+                    left = mid + 1;
+                } else {
+                    for (let i = mid; i <= right; i++) {
+                        document.getElementById(`bin-${i}`).style.opacity = '0.3';
+                    }
+                    right = mid - 1;
+                }
+                item.classList.remove('active');
+                await new Promise(r => setTimeout(r, 300));
+            }
+        }
+
+        // Chart.js: Search Comparison
+        function showComparisonChart() {
+            const ctx = document.getElementById('searchComparisonChart').getContext('2d');
+            
+            if (window.searchChart) window.searchChart.destroy();
+            
+            const data = [10, 50, 100, 500, 1000, 5000, 10000];
+            try {
+                window.searchChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(n => n.toLocaleString()),
+                        datasets: [{
+                            label: 'Linear Search O(n)',
+                            data: data.map(n => n),
+                            borderColor: '#DC0000',
+                            backgroundColor: 'rgba(220, 0, 0, 0.1)',
+                            tension: 0.4
+                        }, {
+                            label: 'Binary Search O(log n)',
+                            data: data.map(n => Math.ceil(Math.log2(n))),
+                            borderColor: '#0081FB',
+                            backgroundColor: 'rgba(0, 129, 251, 0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#FFFFFF', font: { family: 'Quicksand' } }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Search Algorithm Comparison',
+                                color: '#FF8000',
+                                font: { size: 16, family: 'Quicksand', weight: 'bold' }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                title: { display: true, text: 'Steps', color: '#FFFFFF' },
+                                ticks: { color: '#FFFFFF' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            },
+                            x: {
+                                title: { display: true, text: 'Data Size (n)', color: '#FFFFFF' },
+                                ticks: { color: '#FFFFFF' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            }
+                        }
+                    }
+                });
+            } catch(err) {
+                console.error('Chart error:', err);
+                const fallback = document.createElement('div');
+                fallback.className = 'chart-fallback';
+                fallback.innerHTML = '<strong>⚠️ Chart unavailable</strong><br>Chart.js needs internet. Check console (F12) for details.';
+                document.getElementById('searchComparisonChart').parentElement.appendChild(fallback);
+            }
+        }
+
+        console.log('✅ runBinarySearch function loaded');
+
+        // Find Max
+        async function runFindMax() {
+            console.log('🎯 runFindMax called - BUTTON WORKS!');
+            const input = document.getElementById('maxInput').value;
+            const nums = input.split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n));
+            const visual = document.getElementById('maxVisual');
+            const output = document.getElementById('maxOutput');
+            
+            visual.innerHTML = '';
+            output.innerHTML = '<div style="color: var(--mclaren-orange); font-weight: 600;">FINDING MAXIMUM</div>';
+            
+            nums.forEach((num, i) => {
+                const item = document.createElement('div');
+                item.className = 'visual-item';
+                item.innerHTML = `<div style="font-size: 1.2rem;">${num}</div><div style="font-size: 0.75rem; color: var(--text-dim);">i=${i}</div>`;
+                item.id = `max-${i}`;
+                visual.appendChild(item);
+            });
+            
+            let maxVal = nums[0], maxIdx = 0;
+            output.innerHTML += `<div class="output-line">max_so_far = ${maxVal}</div>`;
+            
+            for (let i = 0; i < nums.length; i++) {
+                const item = document.getElementById(`max-${i}`);
+                item.classList.add('active');
+                await new Promise(r => setTimeout(r, 600));
+                
+                output.innerHTML += `<div class="output-line">Check ${nums[i]}</div>`;
+                
+                if (nums[i] > maxVal) {
+                    if (maxIdx !== i) document.getElementById(`max-${maxIdx}`).classList.remove('found');
+                    maxVal = nums[i];
+                    maxIdx = i;
+                    item.classList.add('found');
+                    output.innerHTML += `<div class="output-line" style="margin-left: 1rem; color: #3fb950;">${nums[i]} > ${nums[0]} → New max!</div>`;
+                }
+                
+                item.classList.remove('active');
+                await new Promise(r => setTimeout(r, 400));
+            }
+            
+            output.innerHTML += `<div class="output-line" style="color: #3fb950; font-weight: 600; margin-top: 1rem;">Maximum: ${maxVal}</div>`;
+        }
+
+        function randomArray() {
+            const size = 6 + Math.floor(Math.random() * 5);
+            const arr = [];
+            for (let i = 0; i < size; i++) arr.push(Math.floor(Math.random() * 20) + 1);
+            document.getElementById('maxInput').value = arr.join(',');
+        }
+
+        // Chart.js: Growth Chart
+        function showGrowthChart(scale) {
+            console.log('📊 showGrowthChart called with scale:', scale);
+            
+            // Check if Chart.js is loaded
+            if (typeof Chart === 'undefined') {
+                console.error('❌ Chart.js not loaded');
+                document.getElementById('growthOutput').innerHTML = `<div style="margin-top: 1rem; padding: 1rem; background: rgba(220, 0, 0, 0.1); border-radius: 8px; border-left: 4px solid var(--redbull-red);">
+                    <strong>⚠️ Chart.js not loaded. Please check internet connection.</strong>
+                </div>`;
+                return;
+            }
+            
+            // Get canvas element
+            const canvas = document.getElementById('growthChart');
+            if (!canvas) {
+                console.error('❌ Canvas element not found');
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                console.error('❌ Canvas context not available');
+                return;
+            }
+            
+            // Destroy existing chart if present
+            if (window.growthChart && typeof window.growthChart.destroy === 'function') {
+                window.growthChart.destroy();
+            }
+            
+            // Define data based on scale
+            let data = [];
+            if (scale === 'small') {
+                data = [
+                    {n: 10, on: 10, on2: 100},
+                    {n: 20, on: 20, on2: 400},
+                    {n: 50, on: 50, on2: 2500},
+                    {n: 100, on: 100, on2: 10000}
+                ];
+            } else if (scale === 'medium') {
+                data = [
+                    {n: 100, on: 100, on2: 10000},
+                    {n: 250, on: 250, on2: 62500},
+                    {n: 500, on: 500, on2: 250000},
+                    {n: 1000, on: 1000, on2: 1000000}
+                ];
+            } else {
+                data = [
+                    {n: 1000, on: 1000, on2: 1000000},
+                    {n: 2500, on: 2500, on2: 6250000},
+                    {n: 5000, on: 5000, on2: 25000000},
+                    {n: 10000, on: 10000, on2: 100000000}
+                ];
+            }
+            
+            console.log('📊 Creating chart with data:', data);
+            
+            // Ensure the canvas is visible and has dimensions
+            canvas.style.display = 'block';
+            canvas.width = canvas.parentElement.clientWidth || 600;
+            canvas.height = 400;
+            
+            try {
+                // Clear any existing content
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                window.growthChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(d => d.n.toLocaleString()),
+                        datasets: [{
+                            label: 'O(n) - Linear',
+                            data: data.map(d => d.on),
+                            borderColor: '#0081FB',
+                            backgroundColor: 'rgba(0, 129, 251, 0.1)',
+                            tension: 0.4,
+                            borderWidth: 3,
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }, {
+                            label: 'O(n²) - Quadratic',
+                            data: data.map(d => d.on2),
+                            borderColor: '#DC0000',
+                            backgroundColor: 'rgba(220, 0, 0, 0.1)',
+                            tension: 0.4,
+                            borderWidth: 3,
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { 
+                                    color: '#FFFFFF', 
+                                    font: { 
+                                        family: 'Quicksand',
+                                        size: 14,
+                                        weight: 600
+                                    } 
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'O(n) vs O(n²) Growth',
+                                color: '#FF8000',
+                                font: { 
+                                    size: 18, 
+                                    family: 'Quicksand', 
+                                    weight: 700 
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                title: { 
+                                    display: true, 
+                                    text: 'Operations', 
+                                    color: '#FFFFFF',
+                                    font: {
+                                        family: 'Quicksand',
+                                        size: 14,
+                                        weight: 600
+                                    }
+                                },
+                                ticks: { 
+                                    color: '#FFFFFF',
+                                    font: {
+                                        family: 'Quicksand',
+                                        size: 12
+                                    }
+                                },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            },
+                            x: {
+                                title: { 
+                                    display: true, 
+                                    text: 'Data Size (n)', 
+                                    color: '#FFFFFF',
+                                    font: {
+                                        family: 'Quicksand',
+                                        size: 14,
+                                        weight: 600
+                                    }
+                                },
+                                ticks: { 
+                                    color: '#FFFFFF',
+                                    font: {
+                                        family: 'Quicksand',
+                                        size: 12
+                                    }
+                                },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            }
+                        },
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        hover: {
+                            mode: 'nearest',
+                            intersect: true
+                        }
+                    }
+                });
+                
+                console.log('✅ Chart created successfully');
+                
+                // Update output with ratio
+                const ratio = Math.floor(data[data.length-1].on2 / data[data.length-1].on);
+                const outputElement = document.getElementById('growthOutput');
+                if (outputElement) {
+                    outputElement.innerHTML = `<div style="margin-top: 1rem; padding: 1rem; background: rgba(220, 0, 0, 0.1); border-radius: 8px; border-left: 4px solid var(--redbull-red);">
+                        <strong>At n=${data[data.length-1].n.toLocaleString()}, O(n²) is ${ratio.toLocaleString()}× slower than O(n)!</strong>
+                    </div>`;
+                } else {
+                    console.error('❌ growthOutput element not found');
+                }
+                
+            } catch (error) {
+                console.error('❌ Chart creation error:', error);
+                const outputElement = document.getElementById('growthOutput');
+                if (outputElement) {
+                    outputElement.innerHTML = `<div style="margin-top: 1rem; padding: 1rem; background: rgba(220, 0, 0, 0.1); border-radius: 8px; border-left: 4px solid var(--redbull-red);">
+                        <strong>⚠️ Error creating chart: ${error.message}</strong><br>
+                        <small>Stack trace: ${error.stack}</small>
+                    </div>`;
+                }
+            }
+        }
+
+        // Log Calculator
+        function calculateLog() {
+            const base = parseInt(document.getElementById('logBase').value) || 2;
+            const num = parseInt(document.getElementById('logNum').value) || 8;
+            const output = document.getElementById('logOutput');
+            
+            const result = Math.log(num) / Math.log(base);
+            const isExact = Math.abs(result - Math.round(result)) < 0.0001;
+            const displayVal = isExact ? Math.round(result) : result.toFixed(3);
+            
+            let html = `<div style="font-size: 1.5rem; font-weight: 700; color: var(--meta-blue); margin: 1rem 0;">log<sub>${base}</sub>(${num}) = ${displayVal}</div>`;
+            
+            if (isExact) {
+                const power = Math.round(result);
+                html += `<div style="padding: 1rem; background: rgba(0, 129, 251, 0.1); border-radius: 8px;">`;
+                html += `<strong>Verification:</strong><br>${base}<sup>${power}</sup> = ${Math.pow(base, power)}`;
+                html += `</div>`;
+            }
+            
+            output.innerHTML = html;
+        }
+
+        // Chart.js: Log Growth
+        function drawLogGrowthChart() {
+            const ctx = document.getElementById('logGrowthChart');
+            if (!ctx) return;
+            try {
+                const data = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024];
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(n => n.toLocaleString()),
+                        datasets: [{
+                            label: 'O(n) - Linear',
+                            data: data.map(n => n),
+                            borderColor: '#DC0000',
+                            backgroundColor: 'rgba(220, 0, 0, 0.1)',
+                            tension: 0.4
+                        }, {
+                            label: 'O(log n) - Logarithmic',
+                            data: data.map(n => Math.log2(n) || 0),
+                            borderColor: '#0081FB',
+                            backgroundColor: 'rgba(0, 129, 251, 0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#FFFFFF', font: { family: 'Quicksand' } }
+                            },
+                            title: {
+                                display: true,
+                                text: 'O(n) vs O(log n) Growth',
+                                color: '#FF8000',
+                                font: { size: 16, family: 'Quicksand', weight: 'bold' }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                title: { display: true, text: 'Operations', color: '#FFFFFF' },
+                                ticks: { color: '#FFFFFF' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            },
+                            x: {
+                                title: { display: true, text: 'Data Size (n)', color: '#FFFFFF' },
+                                ticks: { color: '#FFFFFF' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            }
+                        }
+                    }
+                });
+            } catch(err) {
+                console.error('Chart error:', err);
+                const fallback = document.createElement('div');
+                fallback.className = 'chart-fallback';
+                fallback.innerHTML = '<strong>⚠️ Chart unavailable</strong><br>Chart.js needs internet. Check console (F12) for details.';
+                document.getElementById('logGrowthChart').parentElement.appendChild(fallback);
+            }
+        }
+
+        // Chart.js: Big-O Chart
+        function drawBigOChart() {
+            const ctx = document.getElementById('bigOChart');
+            if (!ctx) return;
+            try {
+                const data = [1, 5, 10, 20, 30, 40, 50];
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(n => n.toLocaleString()),
+                        datasets: [
+                            {
+                                label: 'O(1) - Constant',
+                                data: data.map(n => 1),
+                                borderColor: '#3fb950',
+                                backgroundColor: 'rgba(63, 185, 80, 0.1)',
+                                tension: 0.4
+                            },
+                            {
+                                label: 'O(log n) - Logarithmic',
+                                data: data.map(n => Math.log2(n)),
+                                borderColor: '#0081FB',
+                                backgroundColor: 'rgba(0, 129, 251, 0.1)',
+                                tension: 0.4
+                            },
+                            {
+                                label: 'O(n) - Linear',
+                                data: data.map(n => n),
+                                borderColor: '#FF8000',
+                                backgroundColor: 'rgba(255, 128, 0, 0.1)',
+                                tension: 0.4
+                            },
+                            {
+                                label: 'O(n²) - Quadratic',
+                                data: data.map(n => n * n),
+                                borderColor: '#DC0000',
+                                backgroundColor: 'rgba(220, 0, 0, 0.1)',
+                                tension: 0.4
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#FFFFFF', font: { family: 'Quicksand' } }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Big-O Complexity Comparison',
+                                color: '#FF8000',
+                                font: { size: 16, family: 'Quicksand', weight: 'bold' }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                title: { display: true, text: 'Operations', color: '#FFFFFF' },
+                                ticks: { color: '#FFFFFF' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            },
+                            x: {
+                                title: { display: true, text: 'Data Size (n)', color: '#FFFFFF' },
+                                ticks: { color: '#FFFFFF' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            }
+                        }
+                    }
+                });
+            } catch(err) {
+                console.error('Chart error:', err);
+                const fallback = document.createElement('div');
+                fallback.className = 'chart-fallback';
+                fallback.innerHTML = '<strong>⚠️ Chart unavailable</strong><br>Chart.js needs internet. Check console (F12) for details.';
+                document.getElementById('bigOChart').parentElement.appendChild(fallback);
+            }
+        }
+
+        // Code Examples
+        async function runEx1() {
+            const n = parseInt(document.getElementById('ex1N').value) || 5;
+            const output = document.getElementById('ex1Output');
+            output.innerHTML = '';
+            
+            let total = 0;
+            for (let i = 0; i < n; i++) {
+                await new Promise(r => setTimeout(r, 400));
+                total += i;
+                output.innerHTML += `<div class="output-line">i=${i}, total=${total}</div>`;
+            }
+            output.innerHTML += `<div class="output-line" style="color: #3fb950; margin-top: 1rem;">Result: ${total} | Complexity: O(n)</div>`;
+        }
+
+        async function runEx2() {
+            const n = parseInt(document.getElementById('ex2N').value) || 4;
+            const grid = document.getElementById('ex2Grid');
+            const output = document.getElementById('ex2Output');
+            
+            grid.style.gridTemplateColumns = `repeat(${n}, 1fr)`;
+            grid.innerHTML = '';
+            output.innerHTML = '';
+            
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n; j++) {
+                    const cell = document.createElement('div');
+                    cell.style.padding = '1rem';
+                    cell.style.background = 'rgba(255, 255, 255, 0.03)';
+                    cell.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+                    cell.style.borderRadius = '8px';
+                    cell.style.textAlign = 'center';
+                    cell.textContent = `(${i},${j})`;
+                    cell.id = `cell-${i}-${j}`;
+                    grid.appendChild(cell);
+                }
+            }
+            
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n; j++) {
+                    const cell = document.getElementById(`cell-${i}-${j}`);
+                    cell.style.background = 'var(--mclaren-orange)';
+                    cell.style.color = '#000';
+                    await new Promise(r => setTimeout(r, 150));
+                    cell.style.background = 'rgba(255, 128, 0, 0.2)';
+                    cell.style.color = '#FFF';
+                }
+            }
+            
+            output.innerHTML = `<div class="output-line" style="color: #3fb950;">Total: ${n}×${n} = ${n*n} operations | O(n²)</div>`;
+        }
+
+        async function runEx4() {
+            const n = parseInt(document.getElementById('ex4N').value) || 16;
+            const output = document.getElementById('ex4Output');
+            output.innerHTML = '';
+            
+            let i = 1, steps = 0;
+            while (i < n) {
+                steps++;
+                output.innerHTML += `<div class="output-line">Step ${steps}: i=${i}</div>`;
+                await new Promise(r => setTimeout(r, 500));
+                i *= 2;
+            }
+            
+            output.innerHTML += `<div class="output-line" style="color: #3fb950; margin-top: 1rem;">Steps: ${steps} ≈ log₂(${n}) | O(log n)</div>`;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 DOM Content Loaded - Initializing charts...');
+            
+            // Wait for Chart.js to load if not ready yet
+            if (typeof Chart === 'undefined') {
+                console.log('⏳ Waiting for Chart.js to load...');
+                // Check every 100ms for up to 5 seconds
+                let attempts = 0;
+                const checkChart = setInterval(function() {
+                    attempts++;
+                    if (typeof Chart !== 'undefined') {
+                        clearInterval(checkChart);
+                        console.log('✅ Chart.js loaded after ' + (attempts * 100) + 'ms');
+                        initializeCharts();
+                    } else if (attempts > 50) {
+                        clearInterval(checkChart);
+                        console.error('❌ Chart.js failed to load after 5 seconds');
+                        showChartFallback();
+                    }
+                }, 100);
+            } else {
+                initializeCharts();
+            }
+        });
+        
+        function initializeCharts() {
+            console.log('📊 Initializing all charts...');
+            drawLogGrowthChart();
+            drawBigOChart();
+            showGrowthChart('small');
+            console.log('✅ All charts initialized');
+            verifyFunctions();
+        }
+        
+        function showChartFallback() {
+            console.log('⚠️ Showing fallback message for charts');
+            const chartContainers = ['growthChart', 'logGrowthChart', 'bigOChart', 'searchComparisonChart'];
+            chartContainers.forEach(id => {
+                const element = document.getElementById(id);
+                if (element && element.parentElement) {
+                    const fallback = document.createElement('div');
+                    fallback.style.cssText = 'background: rgba(220, 0, 0, 0.1); border: 2px solid var(--redbull-red); padding: 2rem; border-radius: 8px; text-align: center; color: #FFFFFF;';
+                    fallback.innerHTML = '<strong>⚠️ Chart unavailable</strong><br>Chart.js needs internet connection.<br>Check console (F12) for details.';
+                    element.parentElement.appendChild(fallback);
+                    element.style.display = 'none';
+                }
+            });
+        }
+        
+        // After charts are initialized, verify all interactive functions
+        function verifyFunctions() {
+            const functions = ['toggleSection', 'collapseAll', 'expandAll', 'switchTab', 
+                             'runLinearSearch', 'runBinarySearch', 'showComparisonChart',
+                             'runFindMax', 'randomArray', 'showGrowthChart', 'calculateLog'];
+            console.log('\n🔍 Checking interactive functions:');
+            functions.forEach(fn => {
+                if (typeof window[fn] === 'function') {
+                    console.log(`  ✅ ${fn} - Available`);
+                } else {
+                    console.error(`  ❌ ${fn} - NOT FOUND`);
+                }
+            });
+            console.log('\n💡 TIP: Open Console (F12) and click buttons to see logs\n');
+        }
+        
+        console.log('All script functions defined - Ready for interaction!');
+        
+        // Make functions globally accessible (ensure they're on window object)
+        window.toggleSection = toggleSection;
+        window.collapseAll = collapseAll;
+        window.expandAll = expandAll;
+        window.switchTab = switchTab;
+        window.runLinearSearch = runLinearSearch;
+        window.runBinarySearch = runBinarySearch;
+        window.showComparisonChart = showComparisonChart;
+        window.runFindMax = runFindMax;
+        window.randomArray = randomArray;
+        window.showGrowthChart = showGrowthChart;
+        window.calculateLog = calculateLog;
+        window.runEx1 = runEx1;
+        window.runEx2 = runEx2;
+        window.runEx4 = runEx4;
+        
+        console.log('All functions attached to window object');
+    </script>
+</body>
+</html>

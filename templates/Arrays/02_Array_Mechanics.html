@@ -1,0 +1,2702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Array Mechanics: Deep Dive into Memory & Operations | DS-Rover</title>
+    <style>
+        /* ==================== MUSEOSANS FONT ==================== */
+        @font-face {
+            font-family: 'MuseoSans';
+            src: local('MuseoSans'), local('Museo Sans'), local('Arial');
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        /* ==================== GLASSMORPHISM THEME ==================== */
+        :root {
+            /* Pure Black Base */
+            --bg-primary: #000000;
+            --bg-secondary: #0a0a0a;
+            
+            /* Glass Effect Colors */
+            --glass-white: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-highlight: rgba(255, 255, 255, 0.15);
+            
+            /* McLaren Orange */
+            --mclaren-orange: #FF8000;
+            --mclaren-glow: rgba(255, 128, 0, 0.3);
+            --mclaren-light: #FFA040;
+            --mclaren-dark: #CC6600;
+            
+            /* RedBull Red */
+            --redbull-red: #DC0000;
+            --redbull-blue: #1E41FF;
+            --redbull-glow: rgba(220, 0, 0, 0.3);
+            --redbull-light: #FF3333;
+            
+            /* Meta Blue */
+            --meta-blue: #0081FB;
+            --meta-glow: rgba(0, 129, 251, 0.3);
+            --meta-light: #33A3FF;
+            --meta-dark: #0066CC;
+            
+            /* Text Colors - Ultra White */
+            --text-primary: #FFFFFF;
+            --text-secondary: #FFFFFF;
+            --text-muted: rgba(255, 255, 255, 0.9);
+            --text-dim: rgba(255, 255, 255, 0.7);
+            
+            /* Code Syntax */
+            --code-bg: rgba(20, 20, 20, 0.6);
+            --code-keyword: #FF8000;
+            --code-function: #0081FB;
+            --code-string: #3fb950;
+            --code-comment: rgba(255, 255, 255, 0.4);
+            --code-number: #DC0000;
+            --code-variable: #FFA040;
+            
+            /* Layout */
+            --container-width: 1100px;
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 2.5rem;
+            --spacing-2xl: 3rem;
+            
+            /* Border Radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            
+            /* Animations */
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'MuseoSans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+            font-size: 15px;
+            font-weight: 400;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'MuseoSans', sans-serif;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+        }
+
+        code, pre {
+            font-family: 'MuseoSans', 'Courier New', monospace;
+            font-weight: 400;
+        }
+
+        /* Glass Container */
+        .container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Liquid Glass Card Style */
+        .glass {
+            background: #000000;
+            backdrop-filter: blur(20px) saturate(150%);
+            -webkit-backdrop-filter: blur(20px) saturate(150%);
+            border: none;
+            border-radius: var(--radius-md);
+            transition: all var(--transition-normal);
+            position: relative;
+        }
+
+        .glass::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius-md);
+            padding: 1px;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.1) 0%, 
+                rgba(255, 255, 255, 0.05) 50%, 
+                rgba(255, 255, 255, 0.1) 100%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity var(--transition-normal);
+        }
+
+        .glass:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 50px rgba(255, 128, 0, 0.12);
+        }
+
+        .glass:hover::before {
+            opacity: 1;
+            background: linear-gradient(135deg, 
+                rgba(255, 128, 0, 0.2) 0%, 
+                rgba(255, 128, 0, 0.1) 50%, 
+                rgba(255, 128, 0, 0.2) 100%);
+        }
+
+        /* Navigation */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 0.75rem 0;
+            box-shadow: 
+                0 1px 3px rgba(0, 0, 0, 0.5),
+                0 1px 20px rgba(255, 128, 0, 0.1),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        nav::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent,
+                rgba(255, 128, 0, 0.3) 20%,
+                rgba(255, 128, 0, 0.5) 50%,
+                rgba(255, 128, 0, 0.3) 80%,
+                transparent
+            );
+            opacity: 0.8;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding: 0 var(--spacing-lg);
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all var(--transition-fast);
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-link:hover {
+            color: var(--mclaren-orange);
+            text-shadow: 0 0 20px var(--mclaren-glow);
+        }
+
+        .nav-link.active {
+            color: var(--mclaren-orange);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--mclaren-orange);
+            box-shadow: 0 0 10px var(--mclaren-glow);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: var(--spacing-2xl) 0;
+            text-align: center;
+            position: relative;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, 
+                var(--mclaren-orange) 0%, 
+                var(--mclaren-light) 50%, 
+                var(--mclaren-orange) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Section Styling */
+        .section {
+            margin-bottom: var(--spacing-2xl);
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-header {
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 1px solid var(--glass-border);
+            position: relative;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* Interactive Components Container */
+        .interactive-container {
+            background: var(--glass-white);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-lg) 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .interactive-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(
+                circle at center,
+                transparent 30%,
+                var(--mclaren-glow) 70%,
+                transparent 70%
+            );
+            opacity: 0;
+            animation: pulse 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0; transform: scale(0.8); }
+            50% { opacity: 0.3; transform: scale(1); }
+        }
+
+        /* Code Block Styling */
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-md);
+            margin: var(--spacing-md) 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .code-block::before {
+            content: attr(data-lang);
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            color: var(--text-dim);
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .code-line {
+            display: block;
+            padding: 2px 0;
+            transition: background var(--transition-fast);
+        }
+
+        .code-line:hover {
+            background: rgba(255, 128, 0, 0.1);
+        }
+
+        .code-line.highlight {
+            background: rgba(255, 128, 0, 0.2);
+            border-left: 3px solid var(--mclaren-orange);
+            padding-left: 10px;
+        }
+
+        /* Button Styles */
+        .btn {
+            background: linear-gradient(135deg, var(--mclaren-orange), var(--mclaren-dark));
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px var(--mclaren-glow);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+            margin: var(--spacing-md) 0;
+        }
+
+        /* Visualization Container */
+        .visualization {
+            background: var(--glass-white);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-lg) 0;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Array Visual Representation */
+        .array-visual {
+            display: flex;
+            gap: 8px;
+            padding: var(--spacing-md);
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--radius-sm);
+            margin: var(--spacing-md) 0;
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
+        .array-element {
+            min-width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--meta-blue), var(--meta-dark));
+            border: 2px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            transition: all var(--transition-normal);
+            position: relative;
+            cursor: pointer;
+        }
+
+        .array-element:hover {
+            transform: scale(1.1) translateY(-5px);
+            box-shadow: 0 10px 30px var(--meta-glow);
+            border-color: var(--meta-light);
+            z-index: 10;
+        }
+
+        .array-element.highlight {
+            background: linear-gradient(135deg, var(--mclaren-orange), var(--mclaren-dark));
+            animation: bounce 0.5s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .array-index {
+            position: absolute;
+            top: -25px;
+            font-size: 12px;
+            color: var(--text-dim);
+            font-weight: normal;
+        }
+
+        .array-address {
+            position: absolute;
+            bottom: -25px;
+            font-size: 10px;
+            color: var(--mclaren-orange);
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--glass-border);
+            border-radius: 50%;
+            border-top-color: var(--mclaren-orange);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Step-by-step Animation */
+        .step-container {
+            background: var(--glass-white);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            margin: var(--spacing-md) 0;
+        }
+
+        .step {
+            padding: var(--spacing-sm);
+            margin: var(--spacing-sm) 0;
+            border-left: 3px solid transparent;
+            transition: all var(--transition-normal);
+            opacity: 0.5;
+        }
+
+        .step.active {
+            border-left-color: var(--mclaren-orange);
+            background: rgba(255, 128, 0, 0.1);
+            opacity: 1;
+        }
+
+        .step.complete {
+            border-left-color: var(--meta-blue);
+            opacity: 0.8;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            background: var(--glass-white);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            margin: var(--spacing-md) 0;
+            display: flex;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .control-input {
+            background: var(--code-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            color: white;
+            font-size: 14px;
+            transition: all var(--transition-normal);
+        }
+
+        .control-input:focus {
+            outline: none;
+            border-color: var(--mclaren-orange);
+            box-shadow: 0 0 10px var(--mclaren-glow);
+        }
+
+        .control-label {
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Speed Slider */
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .speed-slider {
+            width: 150px;
+            height: 4px;
+            background: var(--glass-border);
+            border-radius: 2px;
+            -webkit-appearance: none;
+            appearance: none;
+            outline: none;
+        }
+
+        .speed-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--mclaren-orange);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .speed-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 10px var(--mclaren-glow);
+        }
+
+        /* Info Box */
+        .info-box {
+            background: linear-gradient(135deg, 
+                rgba(0, 129, 251, 0.1), 
+                rgba(0, 129, 251, 0.05));
+            border: 1px solid var(--meta-blue);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-md);
+            margin: var(--spacing-md) 0;
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .info-box::before {
+            content: 'ℹ';
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: var(--meta-blue);
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, 
+                rgba(220, 0, 0, 0.1), 
+                rgba(220, 0, 0, 0.05));
+            border: 1px solid var(--redbull-red);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-md);
+            margin: var(--spacing-md) 0;
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .warning-box::before {
+            content: '⚠';
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: var(--redbull-red);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .nav-container {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: center;
+            }
+
+            .array-visual {
+                padding: var(--spacing-sm);
+            }
+
+            .array-element {
+                min-width: 50px;
+                height: 50px;
+                font-size: 16px;
+            }
+
+            .control-panel {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Scroll Reveal Animation */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-delay-1 { animation-delay: 0.2s; }
+        .fade-in-delay-2 { animation-delay: 0.4s; }
+        .fade-in-delay-3 { animation-delay: 0.6s; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="#fundamentals" class="nav-link active">Fundamentals</a>
+            <a href="#operations" class="nav-link">Operations</a>
+            <a href="#traversal" class="nav-link">Traversal</a>
+            <a href="#memory" class="nav-link">Memory</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="container">
+            <h1 class="fade-in">Array Mechanics Deep Dive</h1>
+            <p class="fade-in fade-in-delay-1">Master arrays from the ground up - Memory architecture, operations, patterns, and optimization</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div id="app"></div>
+    </div>
+
+    <!-- React and Main App -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <script type="text/babel">
+        const { useState, useEffect, useRef, useCallback } = React;
+
+        // ================ SECTION 1: ARRAY FUNDAMENTALS ================
+        
+        // Component for visualizing memory layout
+        const MemoryVisualization = () => {
+            const [selectedIndex, setSelectedIndex] = useState(null);
+            const [showAddresses, setShowAddresses] = useState(false);
+            const [animateAccess, setAnimateAccess] = useState(false);
+            
+            const array = [10, 20, 30, 40, 50];
+            const baseAddress = 0x1000;
+            const elementSize = 4; // bytes
+            
+            const handleElementClick = (index) => {
+                setSelectedIndex(index);
+                setAnimateAccess(true);
+                setTimeout(() => setAnimateAccess(false), 1000);
+            };
+            
+            const calculateAddress = (index) => {
+                return `0x${(baseAddress + index * elementSize).toString(16).toUpperCase()}`;
+            };
+            
+            return (
+                <div className="interactive-container">
+                    <h3>Memory Layout Visualization</h3>
+                    <p>Click on any array element to see how memory addressing works!</p>
+                    
+                    <div className="control-panel">
+                        <button 
+                            className="btn"
+                            onClick={() => setShowAddresses(!showAddresses)}
+                        >
+                            {showAddresses ? 'Hide' : 'Show'} Memory Addresses
+                        </button>
+                    </div>
+                    
+                    <div className="array-visual">
+                        {array.map((value, index) => (
+                            <div
+                                key={index}
+                                className={`array-element ${selectedIndex === index ? 'highlight' : ''}`}
+                                onClick={() => handleElementClick(index)}
+                            >
+                                <span className="array-index">i={index}</span>
+                                {value}
+                                {showAddresses && (
+                                    <span className="array-address">{calculateAddress(index)}</span>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                    
+                    {selectedIndex !== null && (
+                        <div className="info-box" style={{marginTop: '20px'}}>
+                            <h4>Memory Access Calculation for arr[{selectedIndex}]</h4>
+                            <div className="code-block">
+                                <code>
+                                    Base Address: {calculateAddress(0)}<br />
+                                    Index: {selectedIndex}<br />
+                                    Element Size: {elementSize} bytes<br />
+                                    <br />
+                                    <strong>Address = Base + (Index × Element Size)</strong><br />
+                                    Address = 0x{baseAddress.toString(16).toUpperCase()} + ({selectedIndex} × {elementSize})<br />
+                                    Address = 0x{baseAddress.toString(16).toUpperCase()} + {selectedIndex * elementSize}<br />
+                                    <strong>Address = {calculateAddress(selectedIndex)}</strong><br />
+                                    <br />
+                                    Value at {calculateAddress(selectedIndex)} = <strong>{array[selectedIndex]}</strong>
+                                </code>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // Component for Three Levels of Understanding
+        const ThreeLevelsDemo = () => {
+            const [currentLevel, setCurrentLevel] = useState(1);
+            
+            const levels = [
+                {
+                    title: "Level 1: The 5-Year-Old Explanation",
+                    content: (
+                        <div>
+                            <p>Imagine you have a toy box shelf with numbered compartments:</p>
+                            <div className="array-visual" style={{justifyContent: 'center'}}>
+                                {['🚗', '🎾', '🎨', '📚', '🎮', '🧸'].map((emoji, i) => (
+                                    <div key={i} className="array-element" style={{fontSize: '24px'}}>
+                                        <span className="array-index">Box {i}</span>
+                                        {emoji}
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="info-box" style={{marginTop: '20px'}}>
+                                <strong>Rules of the Toy Shelf:</strong>
+                                <ul style={{marginTop: '10px', marginLeft: '20px'}}>
+                                    <li>Numbered compartments - Start from 0 (not 1!)</li>
+                                    <li>Fixed size - 6 compartments, no more, no less</li>
+                                    <li>Side by side - They're glued together, can't be separated</li>
+                                    <li>Direct access - Want compartment 3? Go straight to it!</li>
+                                    <li>Same-sized toys - Each compartment fits one toy</li>
+                                </ul>
+                            </div>
+                        </div>
+                    )
+                },
+                {
+                    title: "Level 2: The Programmer's Explanation",
+                    content: (
+                        <div>
+                            <p>An array is a <strong>fixed-size, contiguous block of memory</strong> storing elements of the same type.</p>
+                            
+                            <div className="step-container">
+                                <div className="step active">
+                                    <strong>Fixed-size:</strong> Size determined at creation, cannot change
+                                    <div className="code-block" style={{marginTop: '10px'}}>
+                                        <code>
+                                            arr = [0] * 5  # Creates array of size 5<br />
+                                            # Size is always 5, can't become 6 or shrink to 3
+                                        </code>
+                                    </div>
+                                </div>
+                                
+                                <div className="step active">
+                                    <strong>Contiguous:</strong> Elements stored next to each other with NO gaps
+                                    <div className="array-visual" style={{marginTop: '10px'}}>
+                                        {[10, 20, 30, 40, 50].map((val, i) => (
+                                            <div key={i} className="array-element" style={{margin: '0'}}>
+                                                {val}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                
+                                <div className="step active">
+                                    <strong>Same type:</strong> All elements must be of identical data type
+                                    <div className="code-block" style={{marginTop: '10px'}}>
+                                        <code>
+                                            int_array = [10, 20, 30, 40]  # ✓ Valid - all integers<br />
+                                            str_array = ["apple", "banana"]  # ✓ Valid - all strings<br />
+                                            mixed = [10, "hello", 3.14]  # ✗ Invalid in static languages
+                                        </code>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                },
+                {
+                    title: "Level 3: The Computer Scientist's Explanation",
+                    content: (
+                        <div>
+                            <p>An array is a data structure providing <strong>O(1) random access</strong> through index-based addressing via <strong>pointer arithmetic</strong> on a contiguous memory allocation.</p>
+                            
+                            <div className="visualization" style={{flexDirection: 'column', alignItems: 'stretch'}}>
+                                <h4>Hardware-Level Memory Layout</h4>
+                                <table style={{width: '100%', borderCollapse: 'collapse', marginTop: '20px'}}>
+                                    <thead>
+                                        <tr style={{borderBottom: '2px solid var(--glass-border)'}}>
+                                            <th style={{padding: '10px', textAlign: 'left'}}>Memory Address</th>
+                                            <th style={{padding: '10px', textAlign: 'left'}}>Binary (32-bit)</th>
+                                            <th style={{padding: '10px', textAlign: 'left'}}>Decimal</th>
+                                            <th style={{padding: '10px', textAlign: 'left'}}>Array Element</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {[10, 20, 30, 40, 50].map((val, i) => (
+                                            <tr key={i} style={{borderBottom: '1px solid var(--glass-border)'}}>
+                                                <td style={{padding: '10px', fontFamily: 'monospace', color: 'var(--mclaren-orange)'}}>
+                                                    0x{(0x1000 + i * 4).toString(16).toUpperCase()}
+                                                </td>
+                                                <td style={{padding: '10px', fontFamily: 'monospace', fontSize: '12px'}}>
+                                                    {val.toString(2).padStart(32, '0')}
+                                                </td>
+                                                <td style={{padding: '10px'}}>{val}</td>
+                                                <td style={{padding: '10px', color: 'var(--meta-blue)'}}>arr[{i}]</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                                
+                                <div className="code-block" style={{marginTop: '20px'}}>
+                                    <code>
+                                        <span style={{color: 'var(--code-comment)'}}>// Assembly code for arr[3] access</span><br />
+                                        MOV RAX, [arr]      <span style={{color: 'var(--code-comment)'}}>; Load base address → RAX = 0x1000</span><br />
+                                        MOV RBX, 3          <span style={{color: 'var(--code-comment)'}}>; Load index → RBX = 3</span><br />
+                                        IMUL RBX, 4         <span style={{color: 'var(--code-comment)'}}>; Multiply by element size → RBX = 12</span><br />
+                                        ADD RAX, RBX        <span style={{color: 'var(--code-comment)'}}>; Calculate address → RAX = 0x100C</span><br />
+                                        MOV RCX, [RAX]      <span style={{color: 'var(--code-comment)'}}>; Load value → RCX = 40</span><br />
+                                        <br />
+                                        <strong style={{color: 'var(--mclaren-orange)'}}>Total: 5 instructions = O(1) constant time!</strong>
+                                    </code>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                }
+            ];
+            
+            return (
+                <div className="section">
+                    <h2 className="section-title">The Three Levels of Understanding Arrays</h2>
+                    
+                    <div className="btn-group">
+                        {levels.map((level, index) => (
+                            <button
+                                key={index}
+                                className={`btn ${currentLevel === index + 1 ? '' : ''}`}
+                                onClick={() => setCurrentLevel(index + 1)}
+                                style={{
+                                    background: currentLevel === index + 1 
+                                        ? 'linear-gradient(135deg, var(--mclaren-orange), var(--mclaren-dark))'
+                                        : 'var(--glass-white)',
+                                    border: '1px solid var(--glass-border)'
+                                }}
+                            >
+                                Level {index + 1}
+                            </button>
+                        ))}
+                    </div>
+                    
+                    <div className="interactive-container">
+                        <h3>{levels[currentLevel - 1].title}</h3>
+                        {levels[currentLevel - 1].content}
+                    </div>
+                </div>
+            );
+        };
+
+        // Component for Static vs Dynamic Arrays
+        const StaticVsDynamicArrays = () => {
+            const [showDynamic, setShowDynamic] = useState(false);
+            const [dynamicArray, setDynamicArray] = useState([10, 20, 30]);
+            const [capacity, setCapacity] = useState(4);
+            const [inputValue, setInputValue] = useState('');
+            const [resizeAnimation, setResizeAnimation] = useState(false);
+            
+            const handleAppend = () => {
+                const value = parseInt(inputValue) || Math.floor(Math.random() * 100);
+                
+                if (dynamicArray.length >= capacity) {
+                    // Simulate resize
+                    setResizeAnimation(true);
+                    setTimeout(() => {
+                        const newCapacity = Math.floor(capacity * 1.5) + 3;
+                        setCapacity(newCapacity);
+                        setDynamicArray([...dynamicArray, value]);
+                        setResizeAnimation(false);
+                    }, 1500);
+                } else {
+                    setDynamicArray([...dynamicArray, value]);
+                }
+                setInputValue('');
+            };
+            
+            const handleRemove = () => {
+                if (dynamicArray.length > 0) {
+                    setDynamicArray(dynamicArray.slice(0, -1));
+                }
+            };
+            
+            return (
+                <div className="section">
+                    <h2 className="section-title">Static vs Dynamic Arrays</h2>
+                    
+                    <div className="btn-group">
+                        <button 
+                            className="btn"
+                            onClick={() => setShowDynamic(false)}
+                            style={{
+                                background: !showDynamic 
+                                    ? 'linear-gradient(135deg, var(--mclaren-orange), var(--mclaren-dark))'
+                                    : 'var(--glass-white)',
+                                border: '1px solid var(--glass-border)'
+                            }}
+                        >
+                            Static Array
+                        </button>
+                        <button 
+                            className="btn"
+                            onClick={() => setShowDynamic(true)}
+                            style={{
+                                background: showDynamic 
+                                    ? 'linear-gradient(135deg, var(--meta-blue), var(--meta-dark))'
+                                    : 'var(--glass-white)',
+                                border: '1px solid var(--glass-border)'
+                            }}
+                        >
+                            Dynamic Array
+                        </button>
+                    </div>
+                    
+                    {!showDynamic ? (
+                        <div className="interactive-container">
+                            <h3>Static Array (Fixed Size)</h3>
+                            <div className="code-block">
+                                <code>
+                                    int arr[5];  // Size fixed at compile time<br />
+                                    // Allocated on STACK - instant allocation!
+                                </code>
+                            </div>
+                            
+                            <div className="visualization" style={{flexDirection: 'column'}}>
+                                <h4>Stack Memory Layout</h4>
+                                <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                                    <div style={{border: '2px solid var(--glass-border)', padding: '10px', marginBottom: '5px'}}>
+                                        Previous Stack Frame
+                                    </div>
+                                    {[4, 3, 2, 1, 0].map(i => (
+                                        <div 
+                                            key={i}
+                                            className="array-element" 
+                                            style={{margin: '2px', width: '150px', justifyContent: 'space-between', padding: '0 15px'}}
+                                        >
+                                            <span>arr[{i}]</span>
+                                            <span>4 bytes</span>
+                                        </div>
+                                    ))}
+                                    <div style={{color: 'var(--mclaren-orange)', marginTop: '10px'}}>
+                                        ← Stack Pointer (moves here instantly!)
+                                    </div>
+                                </div>
+                                
+                                <div className="info-box" style={{marginTop: '20px'}}>
+                                    <strong>Characteristics:</strong>
+                                    <ul style={{marginTop: '10px', marginLeft: '20px'}}>
+                                        <li>✓ Extremely fast allocation (1 CPU instruction)</li>
+                                        <li>✓ Automatic cleanup (when function returns)</li>
+                                        <li>✓ Cache-friendly (stack locality)</li>
+                                        <li>✗ Fixed size (can't grow)</li>
+                                        <li>✗ Limited size (stack typically 1-8 MB)</li>
+                                        <li>✗ Can't outlive function scope</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="interactive-container">
+                            <h3>Dynamic Array (Resizable)</h3>
+                            
+                            <div className="control-panel">
+                                <input 
+                                    type="number" 
+                                    className="control-input"
+                                    placeholder="Value to append"
+                                    value={inputValue}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                />
+                                <button className="btn" onClick={handleAppend}>Append</button>
+                                <button className="btn" onClick={handleRemove}>Remove Last</button>
+                            </div>
+                            
+                            <div className="visualization" style={{flexDirection: 'column'}}>
+                                <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '10px'}}>
+                                    <span>Size: {dynamicArray.length}</span>
+                                    <span>Capacity: {capacity}</span>
+                                    <span style={{color: 'var(--mclaren-orange)'}}>
+                                        Load Factor: {((dynamicArray.length / capacity) * 100).toFixed(0)}%
+                                    </span>
+                                </div>
+                                
+                                {resizeAnimation && (
+                                    <div className="warning-box" style={{marginBottom: '20px'}}>
+                                        <strong>Resizing in progress!</strong><br />
+                                        1. Allocating new array with capacity {Math.floor(capacity * 1.5) + 3}<br />
+                                        2. Copying {dynamicArray.length} elements to new location<br />
+                                        3. Freeing old memory<br />
+                                        <div className="loading" style={{marginTop: '10px'}}></div>
+                                    </div>
+                                )}
+                                
+                                <div className="array-visual">
+                                    {Array.from({length: capacity}, (_, i) => (
+                                        <div 
+                                            key={i}
+                                            className={`array-element ${i < dynamicArray.length ? '' : ''}`}
+                                            style={{
+                                                background: i < dynamicArray.length 
+                                                    ? 'linear-gradient(135deg, var(--meta-blue), var(--meta-dark))'
+                                                    : 'var(--glass-white)',
+                                                border: i < dynamicArray.length 
+                                                    ? '2px solid var(--meta-blue)'
+                                                    : '2px dashed var(--glass-border)'
+                                            }}
+                                        >
+                                            {i < dynamicArray.length ? dynamicArray[i] : 'empty'}
+                                        </div>
+                                    ))}
+                                </div>
+                                
+                                <div className="code-block" style={{marginTop: '20px'}}>
+                                    <code>
+                                        <span style={{color: 'var(--code-comment)'}}>// Python list growth strategy</span><br />
+                                        new_capacity = (old_capacity &gt;&gt; 1) + old_capacity + 3<br />
+                                        <span style={{color: 'var(--code-comment)'}}>// For {capacity}: new_capacity = {Math.floor(capacity * 1.5) + 3}</span><br />
+                                        <br />
+                                        <strong>Growth Pattern:</strong> 0 → 4 → 8 → 16 → 25 → 35 → 46...<br />
+                                        <strong>Amortized Append:</strong> O(1) average time
+                                    </code>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // ================ SECTION 2: BASIC OPERATIONS ================
+        
+        // Component for Array Access Operation
+        const ArrayAccessDemo = () => {
+            const [targetIndex, setTargetIndex] = useState('');
+            const [accessStep, setAccessStep] = useState(0);
+            const [isAnimating, setIsAnimating] = useState(false);
+            
+            const array = [10, 20, 30, 40, 50, 60, 70, 80];
+            const baseAddress = 0x1000;
+            const elementSize = 4;
+            
+            const steps = [
+                "Load base address from variable 'arr'",
+                "Calculate offset: index × element_size",
+                "Add offset to base address",
+                "Read value from calculated address"
+            ];
+            
+            const performAccess = () => {
+                const idx = parseInt(targetIndex);
+                if (isNaN(idx) || idx < 0 || idx >= array.length) {
+                    alert('Please enter a valid index (0 to ' + (array.length - 1) + ')');
+                    return;
+                }
+                
+                setIsAnimating(true);
+                setAccessStep(0);
+                
+                const animateSteps = () => {
+                    let step = 0;
+                    const interval = setInterval(() => {
+                        if (step < steps.length) {
+                            setAccessStep(step + 1);
+                            step++;
+                        } else {
+                            clearInterval(interval);
+                            setTimeout(() => {
+                                setIsAnimating(false);
+                                setAccessStep(0);
+                            }, 2000);
+                        }
+                    }, 1000);
+                };
+                
+                animateSteps();
+            };
+            
+            return (
+                <div className="interactive-container">
+                    <h3>Array Access Operation - arr[i]</h3>
+                    <p>See how O(1) random access works at the hardware level</p>
+                    
+                    <div className="control-panel">
+                        <label className="control-label">Enter Index:</label>
+                        <input 
+                            type="number" 
+                            className="control-input"
+                            value={targetIndex}
+                            onChange={(e) => setTargetIndex(e.target.value)}
+                            placeholder="0-7"
+                            min="0"
+                            max={array.length - 1}
+                        />
+                        <button 
+                            className="btn" 
+                            onClick={performAccess}
+                            disabled={isAnimating}
+                        >
+                            Access Element
+                        </button>
+                    </div>
+                    
+                    <div className="array-visual">
+                        {array.map((value, index) => (
+                            <div
+                                key={index}
+                                className={`array-element ${
+                                    parseInt(targetIndex) === index && isAnimating ? 'highlight' : ''
+                                }`}
+                            >
+                                <span className="array-index">i={index}</span>
+                                {value}
+                                <span className="array-address">
+                                    0x{(baseAddress + index * elementSize).toString(16).toUpperCase()}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                    
+                    {isAnimating && (
+                        <div className="step-container">
+                            {steps.map((step, idx) => (
+                                <div 
+                                    key={idx}
+                                    className={`step ${idx < accessStep ? 'complete' : ''} ${idx === accessStep - 1 ? 'active' : ''}`}
+                                >
+                                    <strong>Step {idx + 1}:</strong> {step}
+                                    {idx === 0 && accessStep > 0 && (
+                                        <div style={{marginLeft: '20px', marginTop: '5px'}}>
+                                            → Base address = 0x{baseAddress.toString(16).toUpperCase()}
+                                        </div>
+                                    )}
+                                    {idx === 1 && accessStep > 1 && (
+                                        <div style={{marginLeft: '20px', marginTop: '5px'}}>
+                                            → {targetIndex} × {elementSize} = {parseInt(targetIndex) * elementSize} bytes
+                                        </div>
+                                    )}
+                                    {idx === 2 && accessStep > 2 && (
+                                        <div style={{marginLeft: '20px', marginTop: '5px'}}>
+                                            → 0x{baseAddress.toString(16).toUpperCase()} + {parseInt(targetIndex) * elementSize} = 
+                                            0x{(baseAddress + parseInt(targetIndex) * elementSize).toString(16).toUpperCase()}
+                                        </div>
+                                    )}
+                                    {idx === 3 && accessStep > 3 && (
+                                        <div style={{marginLeft: '20px', marginTop: '5px', color: 'var(--mclaren-orange)'}}>
+                                            → Value = {array[parseInt(targetIndex)]}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    
+                    <div className="info-box" style={{marginTop: '20px'}}>
+                        <strong>Time Complexity: O(1)</strong> - Same 4 operations regardless of array size or index value!
+                    </div>
+                </div>
+            );
+        };
+        
+        // Component for Insert Operation
+        const InsertOperationDemo = () => {
+            const [array, setArray] = useState([10, 20, 30, 40, 50]);
+            const [insertIndex, setInsertIndex] = useState('');
+            const [insertValue, setInsertValue] = useState('');
+            const [isAnimating, setIsAnimating] = useState(false);
+            const [currentStep, setCurrentStep] = useState('');
+            const [shiftingIndex, setShiftingIndex] = useState(-1);
+            
+            const performInsert = async () => {
+                const idx = parseInt(insertIndex);
+                const val = parseInt(insertValue) || Math.floor(Math.random() * 100);
+                
+                if (isNaN(idx) || idx < 0 || idx > array.length) {
+                    alert('Please enter a valid index (0 to ' + array.length + ')');
+                    return;
+                }
+                
+                setIsAnimating(true);
+                const newArray = [...array, null]; // Make space
+                setArray(newArray);
+                setCurrentStep('Making space for new element...');
+                
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Shift elements to the right
+                for (let i = array.length - 1; i >= idx; i--) {
+                    setShiftingIndex(i);
+                    setCurrentStep(`Shifting element at index ${i} to index ${i + 1}`);
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                    
+                    const temp = [...newArray];
+                    temp[i + 1] = temp[i];
+                    setArray(temp);
+                }
+                
+                // Insert new element
+                setCurrentStep(`Inserting ${val} at index ${idx}`);
+                setShiftingIndex(-1);
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
+                const finalArray = [...newArray];
+                finalArray[idx] = val;
+                setArray(finalArray.filter(x => x !== null));
+                
+                setCurrentStep('Insert complete!');
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                setIsAnimating(false);
+                setCurrentStep('');
+                setInsertIndex('');
+                setInsertValue('');
+            };
+            
+            const reset = () => {
+                setArray([10, 20, 30, 40, 50]);
+                setInsertIndex('');
+                setInsertValue('');
+            };
+            
+            return (
+                <div className="interactive-container">
+                    <h3>Insert Operation - arr.insert(i, value)</h3>
+                    <p>Watch how elements shift to make room for the new element</p>
+                    
+                    <div className="control-panel">
+                        <label className="control-label">Index:</label>
+                        <input 
+                            type="number" 
+                            className="control-input"
+                            value={insertIndex}
+                            onChange={(e) => setInsertIndex(e.target.value)}
+                            placeholder="0-5"
+                            disabled={isAnimating}
+                        />
+                        <label className="control-label">Value:</label>
+                        <input 
+                            type="number" 
+                            className="control-input"
+                            value={insertValue}
+                            onChange={(e) => setInsertValue(e.target.value)}
+                            placeholder="Any number"
+                            disabled={isAnimating}
+                        />
+                        <button 
+                            className="btn" 
+                            onClick={performInsert}
+                            disabled={isAnimating || !insertIndex}
+                        >
+                            Insert
+                        </button>
+                        <button className="btn" onClick={reset} disabled={isAnimating}>
+                            Reset
+                        </button>
+                    </div>
+                    
+                    <div className="array-visual">
+                        {array.map((value, index) => (
+                            <div
+                                key={index}
+                                className={`array-element ${
+                                    shiftingIndex === index ? 'highlight' : ''
+                                } ${value === null ? '' : ''}`}
+                                style={{
+                                    background: value === null 
+                                        ? 'var(--glass-white)'
+                                        : shiftingIndex === index
+                                        ? 'linear-gradient(135deg, var(--mclaren-orange), var(--mclaren-dark))'
+                                        : 'linear-gradient(135deg, var(--meta-blue), var(--meta-dark))'
+                                }}
+                            >
+                                <span className="array-index">i={index}</span>
+                                {value === null ? '?' : value}
+                            </div>
+                        ))}
+                    </div>
+                    
+                    {currentStep && (
+                        <div className="info-box" style={{marginTop: '20px', borderColor: 'var(--mclaren-orange)'}}>
+                            <strong>Current Step:</strong> {currentStep}
+                        </div>
+                    )}
+                    
+                    <div className="info-box" style={{marginTop: '10px'}}>
+                        <strong>Time Complexity:</strong><br />
+                        • Best Case (insert at end): O(1)<br />
+                        • Worst Case (insert at beginning): O(n) - shift all elements<br />
+                        • Average Case: O(n)
+                    </div>
+                </div>
+            );
+        };
+        
+        // Component for Delete Operation
+        const DeleteOperationDemo = () => {
+            const [array, setArray] = useState([10, 20, 30, 40, 50, 60]);
+            const [deleteIndex, setDeleteIndex] = useState('');
+            const [isAnimating, setIsAnimating] = useState(false);
+            const [currentStep, setCurrentStep] = useState('');
+            const [shiftingIndex, setShiftingIndex] = useState(-1);
+            
+            const performDelete = async () => {
+                const idx = parseInt(deleteIndex);
+                
+                if (isNaN(idx) || idx < 0 || idx >= array.length) {
+                    alert('Please enter a valid index (0 to ' + (array.length - 1) + ')');
+                    return;
+                }
+                
+                setIsAnimating(true);
+                setCurrentStep(`Deleting element at index ${idx}`);
+                
+                // Mark element as deleted
+                const tempArray = [...array];
+                tempArray[idx] = null;
+                setArray(tempArray);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Shift elements to the left
+                for (let i = idx + 1; i < array.length; i++) {
+                    setShiftingIndex(i);
+                    setCurrentStep(`Shifting element at index ${i} to index ${i - 1}`);
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                    
+                    tempArray[i - 1] = tempArray[i];
+                    tempArray[i] = null;
+                    setArray([...tempArray]);
+                }
+                
+                // Remove the last element
+                setCurrentStep('Reducing array size...');
+                await new Promise(resolve => setTimeout(resolve, 800));
+                setArray(tempArray.slice(0, -1).filter(x => x !== null));
+                
+                setCurrentStep('Delete complete!');
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                setIsAnimating(false);
+                setCurrentStep('');
+                setShiftingIndex(-1);
+                setDeleteIndex('');
+            };
+            
+            const reset = () => {
+                setArray([10, 20, 30, 40, 50, 60]);
+                setDeleteIndex('');
+            };
+            
+            return (
+                <div className="interactive-container">
+                    <h3>Delete Operation - arr.delete(i)</h3>
+                    <p>Watch how elements shift left to fill the gap</p>
+                    
+                    <div className="control-panel">
+                        <label className="control-label">Delete Index:</label>
+                        <input 
+                            type="number" 
+                            className="control-input"
+                            value={deleteIndex}
+                            onChange={(e) => setDeleteIndex(e.target.value)}
+                            placeholder={`0-${array.length - 1}`}
+                            disabled={isAnimating}
+                        />
+                        <button 
+                            className="btn" 
+                            onClick={performDelete}
+                            disabled={isAnimating || !deleteIndex || array.length === 0}
+                        >
+                            Delete
+                        </button>
+                        <button className="btn" onClick={reset} disabled={isAnimating}>
+                            Reset
+                        </button>
+                    </div>
+                    
+                    <div className="array-visual">
+                        {array.map((value, index) => (
+                            <div
+                                key={index}
+                                className={`array-element ${
+                                    shiftingIndex === index ? 'highlight' : ''
+                                }`}
+                                style={{
+                                    background: value === null 
+                                        ? 'rgba(220, 0, 0, 0.3)'
+                                        : shiftingIndex === index
+                                        ? 'linear-gradient(135deg, var(--mclaren-orange), var(--mclaren-dark))'
+                                        : 'linear-gradient(135deg, var(--meta-blue), var(--meta-dark))',
+                                    textDecoration: value === null ? 'line-through' : 'none'
+                                }}
+                            >
+                                <span className="array-index">i={index}</span>
+                                {value === null ? '✗' : value}
+                            </div>
+                        ))}
+                    </div>
+                    
+                    {currentStep && (
+                        <div className="info-box" style={{marginTop: '20px', borderColor: 'var(--redbull-red)'}}>
+                            <strong>Current Step:</strong> {currentStep}
+                        </div>
+                    )}
+                    
+                    <div className="info-box" style={{marginTop: '10px'}}>
+                        <strong>Time Complexity:</strong><br />
+                        • Best Case (delete last element): O(1)<br />
+                        • Worst Case (delete first element): O(n) - shift all remaining elements<br />
+                        • Average Case: O(n)
+                    </div>
+                </div>
+            );
+        };
+        
+        // Component for Search Operations
+        const SearchOperationsDemo = () => {
+            const [searchType, setSearchType] = useState('linear');
+            const [searchValue, setSearchValue] = useState('');
+            const [currentIndex, setCurrentIndex] = useState(-1);
+            const [foundIndex, setFoundIndex] = useState(-1);
+            const [isSearching, setIsSearching] = useState(false);
+            const [comparisons, setComparisons] = useState(0);
+            const [left, setLeft] = useState(-1);
+            const [right, setRight] = useState(-1);
+            const [mid, setMid] = useState(-1);
+            
+            const unsortedArray = [45, 23, 67, 12, 89, 34, 56, 78];
+            const sortedArray = [12, 23, 34, 45, 56, 67, 78, 89];
+            
+            const array = searchType === 'linear' ? unsortedArray : sortedArray;
+            
+            const linearSearch = async () => {
+                const target = parseInt(searchValue);
+                if (isNaN(target)) return;
+                
+                setIsSearching(true);
+                setFoundIndex(-1);
+                setComparisons(0);
+                
+                for (let i = 0; i < array.length; i++) {
+                    setCurrentIndex(i);
+                    setComparisons(prev => prev + 1);
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                    if (array[i] === target) {
+                        setFoundIndex(i);
+                        break;
+                    }
+                }
+                
+                setCurrentIndex(-1);
+                setIsSearching(false);
+            };
+            
+            const binarySearch = async () => {
+                const target = parseInt(searchValue);
+                if (isNaN(target)) return;
+                
+                setIsSearching(true);
+                setFoundIndex(-1);
+                setComparisons(0);
+                
+                let l = 0, r = array.length - 1;
+                
+                while (l <= r) {
+                    setLeft(l);
+                    setRight(r);
+                    
+                    const m = Math.floor(l + (r - l) / 2);
+                    setMid(m);
+                    setComparisons(prev => prev + 1);
+                    
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                    
+                    if (array[m] === target) {
+                        setFoundIndex(m);
+                        break;
+                    } else if (array[m] < target) {
+                        l = m + 1;
+                    } else {
+                        r = m - 1;
+                    }
+                }
+                
+                setLeft(-1);
+                setRight(-1);
+                setMid(-1);
+                setIsSearching(false);
+            };
+            
+            const performSearch = () => {
+                if (searchType === 'linear') {
+                    linearSearch();
+                } else {
+                    binarySearch();
+                }
+            };
+            
+            return (
+                <div className="interactive-container">
+                    <h3>Search Operations</h3>
+                    <p>Compare Linear Search (O(n)) vs Binary Search (O(log n))</p>
+                    
+                    <div className="control-panel">
+                        <div className="btn-group">
+                            <button 
+                                className="btn"
+                                onClick={() => {
+                                    setSearchType('linear');
+                                    setFoundIndex(-1);
+                                    setComparisons(0);
+                                }}
+                                style={{
+                                    background: searchType === 'linear' 
+                                        ? 'linear-gradient(135deg, var(--mclaren-orange), var(--mclaren-dark))'
+                                        : 'var(--glass-white)',
+                                    border: '1px solid var(--glass-border)'
+                                }}
+                            >
+                                Linear Search
+                            </button>
+                            <button 
+                                className="btn"
+                                onClick={() => {
+                                    setSearchType('binary');
+                                    setFoundIndex(-1);
+                                    setComparisons(0);
+                                }}
+                                style={{
+                                    background: searchType === 'binary' 
+                                        ? 'linear-gradient(135deg, var(--meta-blue), var(--meta-dark))'
+                                        : 'var(--glass-white)',
+                                    border: '1px solid var(--glass-border)'
+                                }}
+                            >
+                                Binary Search
+                            </button>
+                        </div>
+                        
+                        <input 
+                            type="number" 
+                            className="control-input"
+                            value={searchValue}
+                            onChange={(e) => setSearchValue(e.target.value)}
+                            placeholder="Enter value to search"
+                            disabled={isSearching}
+                        />
+                        <button 
+                            className="btn" 
+                            onClick={performSearch}
+                            disabled={isSearching || !searchValue}
+                        >
+                            Search
+                        </button>
+                    </div>
+                    
+                    <div className="array-visual">
+                        {array.map((value, index) => (
+                            <div
+                                key={index}
+                                className={`array-element ${
+                                    foundIndex === index ? 'highlight' : ''
+                                }`}
+                                style={{
+                                    background: 
+                                        foundIndex === index 
+                                            ? 'linear-gradient(135deg, #00ff00, #00aa00)'
+                                            : searchType === 'linear' && currentIndex === index
+                                            ? 'linear-gradient(135deg, var(--mclaren-orange), var(--mclaren-dark))'
+                                            : searchType === 'binary' && mid === index
+                                            ? 'linear-gradient(135deg, var(--redbull-red), var(--redbull-light))'
+                                            : searchType === 'binary' && (index === left || index === right)
+                                            ? 'linear-gradient(135deg, var(--meta-blue), var(--meta-dark))'
+                                            : 'linear-gradient(135deg, #333, #555)',
+                                    border: 
+                                        searchType === 'binary' && index === left 
+                                            ? '2px solid var(--meta-blue)'
+                                            : searchType === 'binary' && index === right
+                                            ? '2px solid var(--meta-blue)'
+                                            : '2px solid var(--glass-border)'
+                                }}
+                            >
+                                <span className="array-index">i={index}</span>
+                                {value}
+                                {searchType === 'binary' && index === left && <span style={{position: 'absolute', top: '-30px', fontSize: '12px'}}>L</span>}
+                                {searchType === 'binary' && index === right && <span style={{position: 'absolute', top: '-30px', fontSize: '12px'}}>R</span>}
+                                {searchType === 'binary' && index === mid && <span style={{position: 'absolute', top: '-30px', fontSize: '12px'}}>M</span>}
+                            </div>
+                        ))}
+                    </div>
+                    
+                    <div style={{display: 'flex', gap: '20px', marginTop: '20px'}}>
+                        <div className="info-box" style={{flex: 1}}>
+                            <strong>Comparisons:</strong> {comparisons}
+                        </div>
+                        <div className="info-box" style={{flex: 1}}>
+                            <strong>Result:</strong> {
+                                foundIndex >= 0 
+                                    ? `Found at index ${foundIndex}` 
+                                    : isSearching 
+                                    ? 'Searching...' 
+                                    : comparisons > 0 
+                                    ? 'Not found' 
+                                    : 'Ready'
+                            }
+                        </div>
+                    </div>
+                    
+                    {searchType === 'binary' && (
+                        <div className="warning-box" style={{marginTop: '10px'}}>
+                            Binary search requires a <strong>sorted array</strong>!
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // ================ SECTION 3: ARRAY TRAVERSAL PATTERNS ================
+        
+        // Component for Forward and Backward Traversal
+        const TraversalPatternsDemo = () => {
+            const [pattern, setPattern] = useState('forward');
+            const [currentIndex, setCurrentIndex] = useState(-1);
+            const [isAnimating, setIsAnimating] = useState(false);
+            const [speed, setSpeed] = useState(500);
+            const [result, setResult] = useState([]);
+            
+            const array = [10, 20, 30, 40, 50, 60, 70, 80];
+            
+            const startTraversal = async () => {
+                setIsAnimating(true);
+                setResult([]);
+                setCurrentIndex(-1);
+                
+                if (pattern === 'forward') {
+                    for (let i = 0; i < array.length; i++) {
+                        setCurrentIndex(i);
+                        setResult(prev => [...prev, array[i]]);
+                        await new Promise(resolve => setTimeout(resolve, speed));
+                    }
+                } else if (pattern === 'backward') {
+                    for (let i = array.length - 1; i >= 0; i--) {
+                        setCurrentIndex(i);
+                        setResult(prev => [...prev, array[i]]);
+                        await new Promise(resolve => setTimeout(resolve, speed));
+                    }
+                }
+                
+                setCurrentIndex(-1);
+                setIsAnimating(false);
+            };
+            
+            return (
+                <div className="interactive-container">
+                    <h3>Array Traversal Patterns</h3>
+                    <p>Explore different ways to iterate through an array</p>
+                    
+                    <div className="control-panel">
+                        <div className="btn-group">
+                            <button 
+                                className="btn"
+                                onClick={() => setPattern('forward')}
+                                style={{
+                                    background: pattern === 'forward' 
+                                        ? 'linear-gradient(135deg, var(--mclaren-orange), var(--mclaren-dark))'
+                                        : 'var(--glass-white)',
+                                    border: '1px solid var(--glass-border)'
+                                }}
+                            >
+                                Forward
+                            </button>
+                            <button 
+                                className="btn"
+                                onClick={() => setPattern('backward')}
+                                style={{
+                                    background: pattern === 'backward' 
+                                        ? 'linear-gradient(135deg, var(--meta-blue), var(--meta-dark))'
+                                        : 'var(--glass-white)',
+                                    border: '1px solid var(--glass-border)'
+                                }}
+                            >
+                                Backward
+                            </button>
+                        </div>
+                        
+                        <div className="speed-control">
+                            <label className="control-label">Speed:</label>
+                            <input 
+                                type="range" 
+                                className="speed-slider"
+                                min="100" 
+                                max="1000" 
+                                value={speed}
+                                onChange={(e) => setSpeed(1100 - e.target.value)}
+                            />
+                            <span>{1100 - speed}ms</span>
+                        </div>
+                        
+                        <button 
+                            className="btn" 
+                            onClick={startTraversal}
+                            disabled={isAnimating}
+                        >
+                            {isAnimating ? 'Traversing...' : 'Start Traversal'}
+                        </button>
+                    </div>
+                    
+                    <div className="array-visual">
+                        {array.map((value, index) => (
+                            <div
+                                key={index}
+                                className={`array-element ${currentIndex === index ? 'highlight' : ''}`}
+                                style={{
+                                    transition: 'all 0.3s ease',
+                                    opacity: currentIndex >= 0 && 
+                                            ((pattern === 'forward' && index <= currentIndex) ||
+                                             (pattern === 'backward' && index >= currentIndex)) 
+                                            ? 0.5 : 1
+                                }}
+                            >
+                                <span className="array-index">i={index}</span>
+                                {value}
+                            </div>
+                        ))}
+                    </div>
+                    
+                    {result.length > 0 && (
+                        <div className="info-box" style={{marginTop: '20px'}}>
+                            <strong>Traversal Order:</strong> [{result.join(', ')}]
+                        </div>
+                    )}
+                    
+                    <div className="code-block" data-lang="Python">
+                        <code>
+                            {pattern === 'forward' ? (
+                                <>
+                                    <span style={{color: 'var(--code-comment)'}}># Forward Traversal</span><br />
+                                    <span style={{color: 'var(--code-keyword)'}}>for</span> i <span style={{color: 'var(--code-keyword)'}}>in</span> <span style={{color: 'var(--code-function)'}}>range</span>(<span style={{color: 'var(--code-function)'}}>len</span>(arr)):<br />
+                                    {'    '}print(f"Index {'{i}'}: {'{arr[i]}'}")
+                                </>
+                            ) : (
+                                <>
+                                    <span style={{color: 'var(--code-comment)'}}># Backward Traversal</span><br />
+                                    <span style={{color: 'var(--code-keyword)'}}>for</span> i <span style={{color: 'var(--code-keyword)'}}>in</span> <span style={{color: 'var(--code-function)'}}>range</span>(<span style={{color: 'var(--code-function)'}}>len</span>(arr) - <span style={{color: 'var(--code-number)'}}>1</span>, <span style={{color: 'var(--code-number)'}}>-1</span>, <span style={{color: 'var(--code-number)'}}>-1</span>):<br />
+                                    {'    '}print(f"Index {'{i}'}: {'{arr[i]}'}")
+                                </>
+                            )}
+                        </code>
+                    </div>
+                </div>
+            );
+        };
+        
+        // Component for Two Pointers Pattern
+        const TwoPointersDemo = () => {
+            const [pointerType, setPointerType] = useState('opposite');
+            const [left, setLeft] = useState(0);
+            const [right, setRight] = useState(7);
+            const [slow, setSlow] = useState(0);
+            const [fast, setFast] = useState(0);
+            const [isAnimating, setIsAnimating] = useState(false);
+            const [targetSum, setTargetSum] = useState('70');
+            const [result, setResult] = useState('');
+            
+            const array = [10, 20, 30, 40, 50, 60, 70, 80];
+            
+            const runOppositePointers = async () => {
+                setIsAnimating(true);
+                setResult('');
+                let l = 0, r = array.length - 1;
+                const target = parseInt(targetSum) || 70;
+                
+                while (l < r) {
+                    setLeft(l);
+                    setRight(r);
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                    
+                    const sum = array[l] + array[r];
+                    if (sum === target) {
+                        setResult(`Found! arr[${l}] + arr[${r}] = ${array[l]} + ${array[r]} = ${sum}`);
+                        break;
+                    } else if (sum < target) {
+                        l++;
+                    } else {
+                        r--;
+                    }
+                }
+                
+                if (l >= r && !result) {
+                    setResult('No pair found with sum = ' + target);
+                }
+                
+                setIsAnimating(false);
+            };
+            
+            const runSameDirection = async () => {
+                setIsAnimating(true);
+                setResult('');
+                setSlow(0);
+                setFast(0);
+                
+                // Simulate removing duplicates
+                const uniqueElements = [];
+                let s = 0;
+                
+                for (let f = 0; f < array.length; f++) {
+                    setFast(f);
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                    if (!uniqueElements.includes(array[f])) {
+                        uniqueElements.push(array[f]);
+                        setSlow(s);
+                        s++;
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                    }
+                }
+                
+                setResult(`Unique elements: [${uniqueElements.join(', ')}]`);
+                setIsAnimating(false);
+            };
+            
+            const startAnimation = () => {
+                if (pointerType === 'opposite') {
+                    runOppositePointers();
+                } else {
+                    runSameDirection();
+                }
+            };
+            
+            return (
+                <div className="interactive-container">
+                    <h3>Two Pointers Technique</h3>
+                    <p>Efficient pattern for array manipulation</p>
+                    
+                    <div className="control-panel">
+                        <div className="btn-group">
+                            <button 
+                                className="btn"
+                                onClick={() => {
+                                    setPointerType('opposite');
+                                    setLeft(0);
+                                    setRight(array.length - 1);
+                                }}
+                                style={{
+                                    background: pointerType === 'opposite' 
+                                        ? 'linear-gradient(135deg, var(--mclaren-orange), var(--mclaren-dark))'
+                                        : 'var(--glass-white)',
+                                    border: '1px solid var(--glass-border)'
+                                }}
+                            >
+                                Opposite Ends
+                            </button>
+                            <button 
+                                className="btn"
+                                onClick={() => {
+                                    setPointerType('same');
+                                    setSlow(0);
+                                    setFast(0);
+                                }}
+                                style={{
+                                    background: pointerType === 'same' 
+                                        ? 'linear-gradient(135deg, var(--meta-blue), var(--meta-dark))'
+                                        : 'var(--glass-white)',
+                                    border: '1px solid var(--glass-border)'
+                                }}
+                            >
+                                Same Direction
+                            </button>
+                        </div>
+                        
+                        {pointerType === 'opposite' && (
+                            <>
+                                <label className="control-label">Target Sum:</label>
+                                <input 
+                                    type="number" 
+                                    className="control-input"
+                                    value={targetSum}
+                                    onChange={(e) => setTargetSum(e.target.value)}
+                                    disabled={isAnimating}
+                                />
+                            </>
+                        )}
+                        
+                        <button 
+                            className="btn" 
+                            onClick={startAnimation}
+                            disabled={isAnimating}
+                        >
+                            Run Algorithm
+                        </button>
+                    </div>
+                    
+                    <div className="array-visual">
+                        {array.map((value, index) => {
+                            const isHighlighted = pointerType === 'opposite' 
+                                ? (index === left || index === right)
+                                : (index === slow || index === fast);
+                            
+                            return (
+                                <div
+                                    key={index}
+                                    className={`array-element ${isHighlighted ? 'highlight' : ''}`}
+                                    style={{
+                                        position: 'relative',
+                                        background: 
+                                            pointerType === 'opposite' && index === left
+                                                ? 'linear-gradient(135deg, var(--mclaren-orange), var(--mclaren-dark))'
+                                                : pointerType === 'opposite' && index === right
+                                                ? 'linear-gradient(135deg, var(--meta-blue), var(--meta-dark))'
+                                                : pointerType === 'same' && index === slow
+                                                ? 'linear-gradient(135deg, #00ff00, #00aa00)'
+                                                : pointerType === 'same' && index === fast
+                                                ? 'linear-gradient(135deg, var(--redbull-red), var(--redbull-light))'
+                                                : 'linear-gradient(135deg, #333, #555)'
+                                    }}
+                                >
+                                    <span className="array-index">i={index}</span>
+                                    {value}
+                                    {pointerType === 'opposite' && index === left && (
+                                        <span style={{position: 'absolute', top: '-30px', fontSize: '14px', color: 'var(--mclaren-orange)'}}>L</span>
+                                    )}
+                                    {pointerType === 'opposite' && index === right && (
+                                        <span style={{position: 'absolute', top: '-30px', fontSize: '14px', color: 'var(--meta-blue)'}}>R</span>
+                                    )}
+                                    {pointerType === 'same' && index === slow && (
+                                        <span style={{position: 'absolute', top: '-30px', fontSize: '14px', color: '#00ff00'}}>S</span>
+                                    )}
+                                    {pointerType === 'same' && index === fast && (
+                                        <span style={{position: 'absolute', top: '-30px', fontSize: '14px', color: 'var(--redbull-red)'}}>F</span>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                    
+                    {result && (
+                        <div className="info-box" style={{marginTop: '20px', borderColor: '#00ff00'}}>
+                            <strong>Result:</strong> {result}
+                        </div>
+                    )}
+                    
+                    <div className="info-box" style={{marginTop: '10px'}}>
+                        <strong>{pointerType === 'opposite' ? 'Two Sum (Sorted Array)' : 'Remove Duplicates'}:</strong><br />
+                        {pointerType === 'opposite' 
+                            ? '• Move pointers based on sum comparison with target\n• O(n) time, O(1) space'
+                            : '• Fast pointer scans, slow pointer tracks position\n• O(n) time, O(1) space'}
+                    </div>
+                </div>
+            );
+        };
+        
+        // Component for Sliding Window Pattern
+        const SlidingWindowDemo = () => {
+            const [windowType, setWindowType] = useState('fixed');
+            const [windowSize, setWindowSize] = useState(3);
+            const [currentWindow, setCurrentWindow] = useState([0, 2]);
+            const [isAnimating, setIsAnimating] = useState(false);
+            const [maxSum, setMaxSum] = useState(0);
+            const [currentSum, setCurrentSum] = useState(0);
+            const [threshold, setThreshold] = useState(100);
+            
+            const array = [10, 20, 30, 40, 50, 25, 35, 45, 15];
+            
+            const runFixedWindow = async () => {
+                setIsAnimating(true);
+                let max = 0;
+                let sum = 0;
+                
+                // Calculate first window sum
+                for (let i = 0; i < windowSize; i++) {
+                    sum += array[i];
+                }
+                max = sum;
+                setCurrentSum(sum);
+                setMaxSum(max);
+                setCurrentWindow([0, windowSize - 1]);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Slide the window
+                for (let i = windowSize; i < array.length; i++) {
+                    sum = sum - array[i - windowSize] + array[i];
+                    setCurrentSum(sum);
+                    if (sum > max) {
+                        max = sum;
+                        setMaxSum(max);
+                    }
+                    setCurrentWindow([i - windowSize + 1, i]);
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                }
+                
+                setIsAnimating(false);
+            };
+            
+            const runVariableWindow = async () => {
+                setIsAnimating(true);
+                let left = 0;
+                let sum = 0;
+                let maxLength = 0;
+                
+                for (let right = 0; right < array.length; right++) {
+                    sum += array[right];
+                    
+                    while (sum > threshold && left <= right) {
+                        sum -= array[left];
+                        left++;
+                    }
+                    
+                    const length = right - left + 1;
+                    if (length > maxLength) {
+                        maxLength = length;
+                    }
+                    
+                    setCurrentWindow([left, right]);
+                    setCurrentSum(sum);
+                    setMaxSum(maxLength);
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                }
+                
+                setIsAnimating(false);
+            };
+            
+            const startAnimation = () => {
+                if (windowType === 'fixed') {
+                    runFixedWindow();
+                } else {
+                    runVariableWindow();
+                }
+            };
+            
+            return (
+                <div className="interactive-container">
+                    <h3>Sliding Window Technique</h3>
+                    <p>Optimize subarray/substring problems</p>
+                    
+                    <div className="control-panel">
+                        <div className="btn-group">
+                            <button 
+                                className="btn"
+                                onClick={() => setWindowType('fixed')}
+                                style={{
+                                    background: windowType === 'fixed' 
+                                        ? 'linear-gradient(135deg, var(--mclaren-orange), var(--mclaren-dark))'
+                                        : 'var(--glass-white)',
+                                    border: '1px solid var(--glass-border)'
+                                }}
+                            >
+                                Fixed Size
+                            </button>
+                            <button 
+                                className="btn"
+                                onClick={() => setWindowType('variable')}
+                                style={{
+                                    background: windowType === 'variable' 
+                                        ? 'linear-gradient(135deg, var(--meta-blue), var(--meta-dark))'
+                                        : 'var(--glass-white)',
+                                    border: '1px solid var(--glass-border)'
+                                }}
+                            >
+                                Variable Size
+                            </button>
+                        </div>
+                        
+                        {windowType === 'fixed' ? (
+                            <>
+                                <label className="control-label">Window Size:</label>
+                                <input 
+                                    type="number" 
+                                    className="control-input"
+                                    value={windowSize}
+                                    onChange={(e) => setWindowSize(Math.min(Math.max(1, parseInt(e.target.value) || 1), array.length))}
+                                    min="1"
+                                    max={array.length}
+                                    disabled={isAnimating}
+                                />
+                            </>
+                        ) : (
+                            <>
+                                <label className="control-label">Max Sum:</label>
+                                <input 
+                                    type="number" 
+                                    className="control-input"
+                                    value={threshold}
+                                    onChange={(e) => setThreshold(parseInt(e.target.value) || 100)}
+                                    disabled={isAnimating}
+                                />
+                            </>
+                        )}
+                        
+                        <button 
+                            className="btn" 
+                            onClick={startAnimation}
+                            disabled={isAnimating}
+                        >
+                            Slide Window
+                        </button>
+                    </div>
+                    
+                    <div className="array-visual">
+                        {array.map((value, index) => (
+                            <div
+                                key={index}
+                                className={`array-element`}
+                                style={{
+                                    background: 
+                                        index >= currentWindow[0] && index <= currentWindow[1]
+                                            ? 'linear-gradient(135deg, var(--mclaren-orange), var(--mclaren-dark))'
+                                            : 'linear-gradient(135deg, #333, #555)',
+                                    transform: 
+                                        index >= currentWindow[0] && index <= currentWindow[1]
+                                            ? 'scale(1.1) translateY(-5px)'
+                                            : 'scale(1)',
+                                    boxShadow:
+                                        index >= currentWindow[0] && index <= currentWindow[1]
+                                            ? '0 10px 30px var(--mclaren-glow)'
+                                            : 'none'
+                                }}
+                            >
+                                <span className="array-index">i={index}</span>
+                                {value}
+                            </div>
+                        ))}
+                    </div>
+                    
+                    <div style={{display: 'flex', gap: '20px', marginTop: '20px'}}>
+                        <div className="info-box" style={{flex: 1}}>
+                            <strong>Current Window Sum:</strong> {currentSum}
+                        </div>
+                        <div className="info-box" style={{flex: 1}}>
+                            <strong>{windowType === 'fixed' ? 'Max Sum:' : 'Max Length:'}</strong> {maxSum}
+                        </div>
+                    </div>
+                    
+                    <div className="code-block" data-lang="Python">
+                        <code>
+                            {windowType === 'fixed' ? (
+                                <>
+                                    <span style={{color: 'var(--code-comment)'}}># Fixed Window - Max sum of k consecutive elements</span><br />
+                                    window_sum = <span style={{color: 'var(--code-function)'}}>sum</span>(arr[:<span style={{color: 'var(--code-variable)'}}>k</span>])<br />
+                                    max_sum = window_sum<br />
+                                    <br />
+                                    <span style={{color: 'var(--code-keyword)'}}>for</span> i <span style={{color: 'var(--code-keyword)'}}>in</span> <span style={{color: 'var(--code-function)'}}>range</span>(k, <span style={{color: 'var(--code-function)'}}>len</span>(arr)):<br />
+                                    {'    '}window_sum = window_sum - arr[i - k] + arr[i]<br />
+                                    {'    '}max_sum = <span style={{color: 'var(--code-function)'}}>max</span>(max_sum, window_sum)
+                                </>
+                            ) : (
+                                <>
+                                    <span style={{color: 'var(--code-comment)'}}># Variable Window - Longest subarray with sum ≤ threshold</span><br />
+                                    left = <span style={{color: 'var(--code-number)'}}>0</span><br />
+                                    current_sum = <span style={{color: 'var(--code-number)'}}>0</span><br />
+                                    max_length = <span style={{color: 'var(--code-number)'}}>0</span><br />
+                                    <br />
+                                    <span style={{color: 'var(--code-keyword)'}}>for</span> right <span style={{color: 'var(--code-keyword)'}}>in</span> <span style={{color: 'var(--code-function)'}}>range</span>(<span style={{color: 'var(--code-function)'}}>len</span>(arr)):<br />
+                                    {'    '}current_sum += arr[right]<br />
+                                    {'    '}<span style={{color: 'var(--code-keyword)'}}>while</span> current_sum &gt; threshold:<br />
+                                    {'        '}current_sum -= arr[left]<br />
+                                    {'        '}left += <span style={{color: 'var(--code-number)'}}>1</span><br />
+                                    {'    '}max_length = <span style={{color: 'var(--code-function)'}}>max</span>(max_length, right - left + <span style={{color: 'var(--code-number)'}}>1</span>)
+                                </>
+                            )}
+                        </code>
+                    </div>
+                </div>
+            );
+        };
+        
+        // ================ SECTION 4: MEMORY OPTIMIZATION ================
+        
+        // Component for In-Place Algorithms
+        const InPlaceAlgorithmsDemo = () => {
+            const [algorithm, setAlgorithm] = useState('reverse');
+            const [array, setArray] = useState([1, 2, 3, 4, 5, 6, 7, 8]);
+            const [isAnimating, setIsAnimating] = useState(false);
+            const [highlightIndices, setHighlightIndices] = useState([]);
+            const [spaceUsed, setSpaceUsed] = useState('O(1)');
+            
+            const reverseInPlace = async () => {
+                setIsAnimating(true);
+                const arr = [...array];
+                let left = 0, right = arr.length - 1;
+                
+                while (left < right) {
+                    setHighlightIndices([left, right]);
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                    
+                    [arr[left], arr[right]] = [arr[right], arr[left]];
+                    setArray([...arr]);
+                    
+                    left++;
+                    right--;
+                }
+                
+                setHighlightIndices([]);
+                setIsAnimating(false);
+            };
+            
+            const partitionInPlace = async () => {
+                setIsAnimating(true);
+                const arr = [...array];
+                const pivot = arr[arr.length - 1];
+                let i = -1;
+                
+                for (let j = 0; j < arr.length - 1; j++) {
+                    setHighlightIndices([j]);
+                    await new Promise(resolve => setTimeout(resolve, 600));
+                    
+                    if (arr[j] <= pivot) {
+                        i++;
+                        [arr[i], arr[j]] = [arr[j], arr[i]];
+                        setArray([...arr]);
+                    }
+                }
+                
+                [arr[i + 1], arr[arr.length - 1]] = [arr[arr.length - 1], arr[i + 1]];
+                setArray([...arr]);
+                
+                setHighlightIndices([]);
+                setIsAnimating(false);
+            };
+            
+            const rotateInPlace = async () => {
+                setIsAnimating(true);
+                const arr = [...array];
+                const k = 3; // Rotate by 3 positions
+                const n = arr.length;
+                
+                // Helper to reverse portion of array
+                const reverse = async (start, end) => {
+                    while (start < end) {
+                        setHighlightIndices([start, end]);
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        [arr[start], arr[end]] = [arr[end], arr[start]];
+                        setArray([...arr]);
+                        start++;
+                        end--;
+                    }
+                };
+                
+                // Three-step reversal algorithm
+                await reverse(0, n - 1);
+                await reverse(0, k - 1);
+                await reverse(k, n - 1);
+                
+                setHighlightIndices([]);
+                setIsAnimating(false);
+            };
+            
+            const runAlgorithm = () => {
+                if (algorithm === 'reverse') reverseInPlace();
+                else if (algorithm === 'partition') partitionInPlace();
+                else if (algorithm === 'rotate') rotateInPlace();
+            };
+            
+            const reset = () => {
+                setArray([1, 2, 3, 4, 5, 6, 7, 8]);
+            };
+            
+            return (
+                <div className="interactive-container">
+                    <h3>In-Place Array Algorithms</h3>
+                    <p>Modify arrays with O(1) extra space</p>
+                    
+                    <div className="control-panel">
+                        <select 
+                            className="control-input"
+                            value={algorithm}
+                            onChange={(e) => setAlgorithm(e.target.value)}
+                            disabled={isAnimating}
+                        >
+                            <option value="reverse">Reverse Array</option>
+                            <option value="partition">Partition (QuickSort)</option>
+                            <option value="rotate">Rotate Array</option>
+                        </select>
+                        
+                        <button className="btn" onClick={runAlgorithm} disabled={isAnimating}>
+                            Run Algorithm
+                        </button>
+                        <button className="btn" onClick={reset} disabled={isAnimating}>
+                            Reset
+                        </button>
+                    </div>
+                    
+                    <div className="array-visual">
+                        {array.map((value, index) => (
+                            <div
+                                key={index}
+                                className={`array-element ${highlightIndices.includes(index) ? 'highlight' : ''}`}
+                            >
+                                <span className="array-index">i={index}</span>
+                                {value}
+                            </div>
+                        ))}
+                    </div>
+                    
+                    <div style={{display: 'flex', gap: '20px', marginTop: '20px'}}>
+                        <div className="info-box" style={{flex: 1}}>
+                            <strong>Space Complexity:</strong> {spaceUsed}
+                        </div>
+                        <div className="info-box" style={{flex: 1}}>
+                            <strong>Algorithm:</strong> {algorithm.charAt(0).toUpperCase() + algorithm.slice(1)}
+                        </div>
+                    </div>
+                    
+                    <div className="info-box" style={{marginTop: '10px'}}>
+                        <strong>Benefits of In-Place Algorithms:</strong>
+                        <ul style={{marginTop: '10px', marginLeft: '20px'}}>
+                            <li>✓ Constant O(1) extra space</li>
+                            <li>✓ Cache-friendly (modifies existing memory)</li>
+                            <li>✓ Reduces memory allocation overhead</li>
+                            <li>✓ Essential for embedded systems</li>
+                        </ul>
+                    </div>
+                </div>
+            );
+        };
+        
+        // Component for Cache Optimization
+        const CacheOptimizationDemo = () => {
+            const [accessPattern, setAccessPattern] = useState('sequential');
+            const [cacheHits, setCacheHits] = useState(0);
+            const [cacheMisses, setCacheMisses] = useState(0);
+            const [isAnimating, setIsAnimating] = useState(false);
+            const [currentAccess, setCurrentAccess] = useState(-1);
+            const [cacheLines, setCacheLines] = useState([]);
+            
+            const matrix = [
+                [1, 2, 3, 4],
+                [5, 6, 7, 8],
+                [9, 10, 11, 12],
+                [13, 14, 15, 16]
+            ];
+            
+            const simulateAccess = async () => {
+                setIsAnimating(true);
+                setCacheHits(0);
+                setCacheMisses(0);
+                setCacheLines([]);
+                
+                const cache = new Set();
+                let hits = 0, misses = 0;
+                
+                const accessOrder = accessPattern === 'sequential' 
+                    ? generateSequentialAccess() 
+                    : generateRandomAccess();
+                
+                for (const [row, col] of accessOrder) {
+                    const index = row * 4 + col;
+                    setCurrentAccess(index);
+                    
+                    // Simulate cache line (4 elements loaded together)
+                    const cacheLineStart = Math.floor(index / 4) * 4;
+                    const cacheLine = [cacheLineStart, cacheLineStart + 1, cacheLineStart + 2, cacheLineStart + 3];
+                    
+                    if (cache.has(cacheLineStart)) {
+                        hits++;
+                        setCacheHits(hits);
+                    } else {
+                        misses++;
+                        setCacheMisses(misses);
+                        cache.add(cacheLineStart);
+                        setCacheLines(Array.from(cache));
+                    }
+                    
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                }
+                
+                setCurrentAccess(-1);
+                setIsAnimating(false);
+            };
+            
+            const generateSequentialAccess = () => {
+                const order = [];
+                for (let i = 0; i < 4; i++) {
+                    for (let j = 0; j < 4; j++) {
+                        order.push([i, j]);
+                    }
+                }
+                return order;
+            };
+            
+            const generateRandomAccess = () => {
+                const order = generateSequentialAccess();
+                // Shuffle array
+                for (let i = order.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [order[i], order[j]] = [order[j], order[i]];
+                }
+                return order;
+            };
+            
+            return (
+                <div className="interactive-container">
+                    <h3>Cache Optimization Patterns</h3>
+                    <p>See how memory access patterns affect performance</p>
+                    
+                    <div className="control-panel">
+                        <div className="btn-group">
+                            <button 
+                                className="btn"
+                                onClick={() => setAccessPattern('sequential')}
+                                style={{
+                                    background: accessPattern === 'sequential' 
+                                        ? 'linear-gradient(135deg, var(--mclaren-orange), var(--mclaren-dark))'
+                                        : 'var(--glass-white)',
+                                    border: '1px solid var(--glass-border)'
+                                }}
+                            >
+                                Sequential Access
+                            </button>
+                            <button 
+                                className="btn"
+                                onClick={() => setAccessPattern('random')}
+                                style={{
+                                    background: accessPattern === 'random' 
+                                        ? 'linear-gradient(135deg, var(--redbull-red), var(--redbull-light))'
+                                        : 'var(--glass-white)',
+                                    border: '1px solid var(--glass-border)'
+                                }}
+                            >
+                                Random Access
+                            </button>
+                        </div>
+                        
+                        <button 
+                            className="btn" 
+                            onClick={simulateAccess}
+                            disabled={isAnimating}
+                        >
+                            Simulate Access
+                        </button>
+                    </div>
+                    
+                    <div style={{display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', margin: '20px 0'}}>
+                        {matrix.flat().map((value, index) => (
+                            <div
+                                key={index}
+                                className="array-element"
+                                style={{
+                                    background: currentAccess === index
+                                        ? 'linear-gradient(135deg, var(--mclaren-orange), var(--mclaren-dark))'
+                                        : cacheLines.includes(Math.floor(index / 4) * 4)
+                                        ? 'linear-gradient(135deg, var(--meta-blue), var(--meta-dark))'
+                                        : 'linear-gradient(135deg, #333, #555)',
+                                    width: '60px',
+                                    height: '60px'
+                                }}
+                            >
+                                {value}
+                            </div>
+                        ))}
+                    </div>
+                    
+                    <div style={{display: 'flex', gap: '20px', marginTop: '20px'}}>
+                        <div className="info-box" style={{flex: 1, borderColor: 'var(--meta-blue)'}}>
+                            <strong>Cache Hits:</strong> {cacheHits}
+                        </div>
+                        <div className="info-box" style={{flex: 1, borderColor: 'var(--redbull-red)'}}>
+                            <strong>Cache Misses:</strong> {cacheMisses}
+                        </div>
+                        <div className="info-box" style={{flex: 1}}>
+                            <strong>Hit Rate:</strong> {
+                                cacheHits + cacheMisses > 0 
+                                    ? ((cacheHits / (cacheHits + cacheMisses)) * 100).toFixed(1) + '%'
+                                    : '0%'
+                            }
+                        </div>
+                    </div>
+                    
+                    <div className="warning-box" style={{marginTop: '10px'}}>
+                        <strong>Key Insight:</strong> Sequential access patterns leverage CPU cache lines effectively, 
+                        resulting in {accessPattern === 'sequential' ? 'higher' : 'lower'} performance. 
+                        {accessPattern === 'random' && ' Random access causes more cache misses!'}
+                    </div>
+                </div>
+            );
+        };
+
+        // Main App Component
+        const App = () => {
+            useEffect(() => {
+                // Smooth scroll effect for sections
+                const observerOptions = {
+                    threshold: 0.1,
+                    rootMargin: '0px 0px -100px 0px'
+                };
+                
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                        }
+                    });
+                }, observerOptions);
+                
+                document.querySelectorAll('.section').forEach(section => {
+                    observer.observe(section);
+                });
+                
+                // Update active navigation link on scroll
+                const handleScroll = () => {
+                    const sections = document.querySelectorAll('.section');
+                    const navLinks = document.querySelectorAll('.nav-link');
+                    
+                    let current = '';
+                    sections.forEach(section => {
+                        const sectionTop = section.offsetTop;
+                        const sectionHeight = section.clientHeight;
+                        if (window.scrollY >= sectionTop - 100) {
+                            current = section.getAttribute('id') || '';
+                        }
+                    });
+                    
+                    navLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === `#${current}`) {
+                            link.classList.add('active');
+                        }
+                    });
+                };
+                
+                window.addEventListener('scroll', handleScroll);
+                
+                return () => {
+                    window.removeEventListener('scroll', handleScroll);
+                };
+            }, []);
+            
+            return (
+                <>
+                    {/* Section 1: Array Fundamentals */}
+                    <div id="fundamentals" className="section">
+                        <div className="section-header">
+                            <h2 className="section-title">Array Fundamentals & Memory Architecture</h2>
+                            <p className="section-subtitle">Understanding arrays from the ground up</p>
+                        </div>
+                        
+                        <ThreeLevelsDemo />
+                        <MemoryVisualization />
+                        <StaticVsDynamicArrays />
+                    </div>
+                    
+                    {/* Section 2: Basic Operations */}
+                    <div id="operations" className="section">
+                        <div className="section-header">
+                            <h2 className="section-title">Basic Array Operations</h2>
+                            <p className="section-subtitle">Complete analysis with step-by-step visualizations</p>
+                        </div>
+                        
+                        <ArrayAccessDemo />
+                        <InsertOperationDemo />
+                        <DeleteOperationDemo />
+                        <SearchOperationsDemo />
+                    </div>
+                    
+                    {/* Section 3: Array Traversal Patterns */}
+                    <div id="traversal" className="section">
+                        <div className="section-header">
+                            <h2 className="section-title">Array Traversal Patterns</h2>
+                            <p className="section-subtitle">Master different iteration techniques</p>
+                        </div>
+                        
+                        <TraversalPatternsDemo />
+                        <TwoPointersDemo />
+                        <SlidingWindowDemo />
+                    </div>
+                    
+                    {/* Section 4: Memory Optimization */}
+                    <div id="memory" className="section">
+                        <div className="section-header">
+                            <h2 className="section-title">Memory Optimization Techniques</h2>
+                            <p className="section-subtitle">Write efficient, cache-friendly code</p>
+                        </div>
+                        
+                        <InPlaceAlgorithmsDemo />
+                        <CacheOptimizationDemo />
+                    </div>
+                    
+                    <div style={{height: '100px'}}></div>
+                </>
+            );
+        };
+
+        // Render the app
+        const root = ReactDOM.createRoot(document.getElementById('app'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
