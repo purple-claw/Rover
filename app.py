@@ -78,11 +78,22 @@ async def view_content(path: str):
 @app.get("/api/navigation")
 async def get_navigation():
     nav = nav_builder.build_navigation()
+    # Debug: print the navigation structure
+    print(f"Navigation data has {len(nav)} top-level items")
+    for item in nav:
+        if item.get('type') == 'folder':
+            print(f"Folder: {item.get('name', 'Unknown')}, children: {len(item.get('children', []))}")
     return JSONResponse(content={"navigation": nav})
 
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
+
+@app.get("/test-dashboard", response_class=HTMLResponse)
+async def test_dashboard():
+    """Serve the test dashboard page"""
+    with open("static/test-dashboard.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read())
 
 if __name__ == "__main__":
     import uvicorn

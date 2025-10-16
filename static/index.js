@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const target = document.querySelector(this.getAttribute('href'));
             if (target) {
-                const navHeight = document.querySelector('.navbar').offsetHeight;
+                const navbarEl = document.querySelector('.navbar');
+                const navHeight = navbarEl ? navbarEl.offsetHeight : 0;
                 const targetPosition = target.offsetTop - navHeight;
                 
                 window.scrollTo({
@@ -29,11 +30,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     window.addEventListener('scroll', () => {
         const currentScroll = window.pageYOffset;
-        
-        if (currentScroll > 50) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
+        if (navbar) {
+            if (currentScroll > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
         }
         
         lastScroll = currentScroll;
@@ -55,13 +57,17 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Close mobile menu when clicking outside
     document.addEventListener('click', (e) => {
+        if (!navMenu || !mobileMenuToggle) return;
         if (!navMenu.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
             closeMobileMenu();
         }
     });
     
-    // Stats counter animation
-    animateStats();
+    // Stats counter animation (only when data-target is present)
+    const hasCounters = document.querySelector('.stat-value[data-target]');
+    if (hasCounters) {
+        animateStats();
+    }
     
     // Intersection Observer for fade-in animations
     setupScrollAnimations();
@@ -81,7 +87,8 @@ function updateActiveNavLink(clickedLink) {
 // ===== Update Active Section on Scroll =====
 function updateActiveSectionOnScroll() {
     const sections = document.querySelectorAll('section[id]');
-    const navHeight = document.querySelector('.navbar').offsetHeight;
+    const navbarEl = document.querySelector('.navbar');
+    const navHeight = navbarEl ? navbarEl.offsetHeight : 0;
     const scrollPosition = window.pageYOffset + navHeight + 100;
     
     sections.forEach(section => {
@@ -115,7 +122,8 @@ function closeMobileMenu() {
 
 // ===== Animate Statistics Counter =====
 function animateStats() {
-    const stats = document.querySelectorAll('.stat-value');
+    // Only animate elements that explicitly declare a numeric target
+    const stats = document.querySelectorAll('.stat-value[data-target]');
     
     const observerOptions = {
         threshold: 0.5,
@@ -126,7 +134,14 @@ function animateStats() {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const stat = entry.target;
-                const target = parseInt(stat.getAttribute('data-target'));
+                const targetAttr = stat.getAttribute('data-target');
+                const target = targetAttr != null ? parseInt(targetAttr, 10) : NaN;
+                if (!Number.isFinite(target)) {
+                    // If target isn't a valid number, skip animation safely
+                    stat.textContent = stat.textContent || '0';
+                    observer.unobserve(stat);
+                    return;
+                }
                 animateValue(stat, 0, target, 2000);
                 observer.unobserve(stat);
             }
@@ -138,6 +153,12 @@ function animateStats() {
 
 // ===== Animate Value Counter =====
 function animateValue(element, start, end, duration) {
+    if (!Number.isFinite(start)) start = 0;
+    if (!Number.isFinite(end)) {
+        // Fallback: set to 0 if invalid
+        element.textContent = '0';
+        return;
+    }
     const range = end - start;
     const increment = range / (duration / 16);
     let current = start;
