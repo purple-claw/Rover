@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixed Window Size Algorithm | DS-Rover</title>
+    <style>
+        /* CSS Variables for consistent theming */
+        :root {
+            --primary-bg: #0d1117;
+            --secondary-bg: #161b22;
+            --card-bg: rgba(30, 38, 54, 0.7);
+            --text-primary: #f0f6fc;
+            --text-secondary: #c9d1d9;
+            --text-muted: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-purple: #bc8cff;
+            --accent-orange: #f78166;
+            --border-color: #30363d;
+            --code-bg: #1e1e1e;
+            --code-comment: #6a9955;
+            --code-keyword: #569cd6;
+            --code-string: #ce9178;
+            --code-function: #dcdcaa;
+            --code-variable: #9cdcfe;
+            --code-number: #b5cea8;
+            --gradient-bg: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --navbar-height: 60px;
+            --animation-speed: 0.3s;
+            --container-width: 1200px;
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--gradient-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            padding-bottom: 3rem;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            margin: 1.5rem 0 1rem;
+            color: var(--text-primary);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+            margin-top: 2.5rem;
+        }
+
+        h3 {
+            font-size: 1.35rem;
+            color: var(--accent-blue);
+        }
+
+        p {
+            margin-bottom: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            transition: color var(--animation-speed) ease;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        ul, ol {
+            padding-left: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Container and Layout */
+        .container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--secondary-bg);
+            height: var(--navbar-height);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+            backdrop-filter: blur(8px);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 100%;
+        }
+
+        .nav-logo {
+            font-weight: 700;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-logo span {
+            color: var(--accent-blue);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-links li a {
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: color var(--animation-speed) ease;
+        }
+
+        .nav-links li a:hover, .nav-links li a.active {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(17, 24, 39, 0.9) 100%);
+            border-radius: var(--radius-lg);
+            padding: 3rem 2rem;
+            margin: 2rem 0;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .hero h1 {
+            background: linear-gradient(to right, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+            font-size: 2.75rem;
+        }
+
+        .hero p {
+            max-width: 800px;
+            margin: 0 auto 1.5rem;
+            font-size: 1.15rem;
+        }
+
+        /* Cards and Content Sections */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(8px);
+            transition: transform var(--animation-speed) ease, box-shadow var(--animation-speed) ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-header .icon {
+            font-size: 1.5rem;
+            color: var(--accent-blue);
+            background: rgba(88, 166, 255, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-header h3 {
+            margin: 0;
+        }
+
+        /* Code Blocks */
+        pre {
+            background: var(--code-bg);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            position: relative;
+            border: 1px solid var(--border-color);
+        }
+
+        pre code {
+            color: var(--text-primary);
+            display: block;
+        }
+
+        .code-title {
+            background: rgba(30, 38, 54, 0.9);
+            color: var(--text-muted);
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.85rem;
+            padding: 0.5rem 1rem;
+            border-top-left-radius: var(--radius-sm);
+            border-top-right-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+        }
+
+        .code-title + pre {
+            margin-top: 0;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+
+        /* Syntax Highlighting */
+        .keyword {
+            color: var(--code-keyword);
+        }
+
+        .function {
+            color: var(--code-function);
+        }
+
+        .string {
+            color: var(--code-string);
+        }
+
+        .comment {
+            color: var(--code-comment);
+        }
+
+        .number {
+            color: var(--code-number);
+        }
+
+        .variable {
+            color: var(--code-variable);
+        }
+
+        /* Callouts and Info Boxes */
+        .callout {
+            border-left: 4px solid var(--accent-blue);
+            background: rgba(88, 166, 255, 0.1);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: var(--radius-sm);
+        }
+
+        .callout-title {
+            font-weight: 600;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .callout p {
+            margin-bottom: 0.5rem;
+        }
+
+        .callout p:last-child {
+            margin-bottom: 0;
+        }
+
+        .callout.warning {
+            border-left-color: var(--accent-orange);
+            background: rgba(247, 129, 102, 0.1);
+        }
+
+        .callout.warning .callout-title {
+            color: var(--accent-orange);
+        }
+
+        .callout.success {
+            border-left-color: var(--accent-green);
+            background: rgba(63, 185, 80, 0.1);
+        }
+
+        .callout.success .callout-title {
+            color: var(--accent-green);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            color: var(--text-secondary);
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--secondary-bg);
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .hero {
+                padding: 2rem 1rem;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary-bg);
+            padding: 2rem 0;
+            margin-top: 3rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Progress bar that shows reading progress */
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: transparent;
+            position: fixed;
+            top: var(--navbar-height);
+            left: 0;
+            z-index: 100;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: var(--accent-blue);
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+
+        /* Simulation Steps */
+        .simulation-steps {
+            counter-reset: step;
+            margin: 2rem 0;
+        }
+
+        .step {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            background: rgba(30, 38, 54, 0.5);
+            border: 1px solid var(--border-color);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .step-number {
+            counter-increment: step;
+            background: var(--accent-blue);
+            color: var(--primary-bg);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+
+        .step-number::before {
+            content: counter(step);
+        }
+
+        .step-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+    
+    <!-- Navigation -->
+    <nav>
+        <div class="container nav-container">
+            <div class="nav-logo">
+                <span>Rover</span>| Fixed Window Algorithm
+            </div>
+            <ul class="nav-links">
+                <li><a href="#fundamentals" class="active">Fundamentals</a></li>
+                <li><a href="#blueprint">Blueprint</a></li>
+                <li><a href="#simulation">Simulation</a></li>
+                <li><a href="#templates">Templates</a></li>
+                <li><a href="#insights">Insights</a></li>
+                <li><a href="#practice">Practice</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <main class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>Fixed Window Size Algorithm</h1>
+            <p>A comprehensive guide to mastering the Fixed Window Size technique in sliding window algorithms. Learn the fundamental concepts, implementation patterns, and optimization strategies.</p>
+        </section>
+        
+        <!-- Fundamentals Section -->
+        <section id="fundamentals">
+            <h2>📜 Fixed Window Size — The Foundation of Consistency</h2>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">🎯</div>
+                    <h3>What is Fixed Window Size?</h3>
+                </div>
+                <p>In Fixed Window Size problems, the window size <code>k</code> remains constant throughout the entire algorithm execution process. You're essentially sliding a frame of fixed size across the array or string, processing the elements within that window at each step.</p>
+                <p>The fixed window approach offers a predictable and efficient way to analyze consecutive subsequences of data with a predetermined length. By maintaining a consistent window size, we can develop optimized algorithms that avoid redundant computations.</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">🧩</div>
+                    <h3>Pattern Recognition</h3>
+                </div>
+                <p>To effectively identify problems suitable for the Fixed Window technique, look for these common patterns in problem descriptions:</p>
+                <ul>
+                    <li>"Maximum/Minimum of all subarrays of size k"</li>
+                    <li>"Average of all subarrays of size k"</li>
+                    <li>"Sliding window maximum/minimum"</li>
+                    <li>"K consecutive elements" problems</li>
+                    <li>Any problem mentioning a "fixed-size subarray" or "fixed-length substring"</li>
+                </ul>
+            </div>
+            
+            <div class="callout">
+                <div class="callout-title">💡 Key Concept</div>
+                <p>The fixed window algorithm achieves its efficiency by reusing computations from previous windows rather than recalculating from scratch for each new position.</p>
+            </div>
+        </section>
+        
+        <!-- Fundamental Concepts Section -->
+        <section id="blueprint">
+            <h2>🔍 Fundamental Concepts — The Fixed Window Principle</h2>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">🪟</div>
+                    <h3>Fixed Window vs Variable Window</h3>
+                </div>
+                <p>Understanding the distinction between fixed and variable window techniques is crucial for algorithm selection:</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Characteristic</th>
+                            <th>Fixed Window</th>
+                            <th>Variable Window</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Size</td>
+                            <td>Constant (k)</td>
+                            <td>Dynamic (varies based on constraints)</td>
+                        </tr>
+                        <tr>
+                            <td>Movement</td>
+                            <td>[0,k-1] → [1,k] → [2,k+1]...</td>
+                            <td>Grows and shrinks as needed</td>
+                        </tr>
+                        <tr>
+                            <td>Optimization</td>
+                            <td>Remove leftmost, add rightmost</td>
+                            <td>Expand/contract based on conditions</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">🎯</div>
+                    <h3>The Key Insight</h3>
+                </div>
+                <p>Since window size is fixed, we only need to:</p>
+                <ol>
+                    <li>Calculate the result for the first window [0, k-1]</li>
+                    <li>Slide the window by removing the leftmost element and adding the new rightmost element</li>
+                    <li>Update the result at each position</li>
+                </ol>
+                <p>This approach eliminates the need for recalculating the entire window at each step, reducing the time complexity from O(n*k) to O(n).</p>
+            </div>
+        </section>
+        
+        <!-- Brute Force vs Optimal Section -->
+        <section>
+            <h2>🧩 Brute Force vs Optimal — The Evolution</h2>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">🚶‍♂️</div>
+                    <h3>Brute Force Approach (O(n*k))</h3>
+                </div>
+                <p>The straightforward but inefficient approach recalculates the entire window at each step:</p>
+                
+                <div class="code-title">Maximum Sum Subarray (Brute Force)</div>
+                <pre><code><span class="keyword">def</span> <span class="function">max_subarray_brute_force</span>(arr, k):
+    <span class="variable">max_sum</span> = <span class="keyword">float</span>(<span class="string">'-inf'</span>)
+    
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="function">len</span>(arr) - k + <span class="number">1</span>):
+        <span class="variable">current_sum</span> = <span class="number">0</span>
+        
+        <span class="comment"># Calculate sum of k elements</span>
+        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="function">range</span>(i, i + k):
+            <span class="variable">current_sum</span> += arr[j]
+            
+        <span class="variable">max_sum</span> = <span class="function">max</span>(<span class="variable">max_sum</span>, <span class="variable">current_sum</span>)
+        
+    <span class="keyword">return</span> <span class="variable">max_sum</span></code></pre>
+                
+                <p>This approach has a time complexity of O(n*k) due to the nested loops. For large inputs, this becomes inefficient.</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">🚀</div>
+                    <h3>Optimal Sliding Window (O(n))</h3>
+                </div>
+                <p>The optimized sliding window approach leverages the overlapping nature of consecutive windows:</p>
+                
+                <div class="code-title">Maximum Sum Subarray (Optimal)</div>
+                <pre><code><span class="keyword">def</span> <span class="function">max_subarray_optimal</span>(arr, k):
+    <span class="comment"># Calculate first window</span>
+    <span class="variable">window_sum</span> = <span class="function">sum</span>(arr[:k])
+    <span class="variable">max_sum</span> = <span class="variable">window_sum</span>
+    
+    <span class="comment"># Slide the window: remove left, add right</span>
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(k, <span class="function">len</span>(arr)):
+        <span class="variable">window_sum</span> = <span class="variable">window_sum</span> - arr[i-k] + arr[i]
+        <span class="variable">max_sum</span> = <span class="function">max</span>(<span class="variable">max_sum</span>, <span class="variable">window_sum</span>)
+    
+    <span class="keyword">return</span> <span class="variable">max_sum</span></code></pre>
+                
+                <p>This approach has a time complexity of O(n) as we process each element exactly twice (once when it enters the window, once when it leaves). The initial window calculation is O(k), but this doesn't affect the overall complexity for large inputs.</p>
+            </div>
+            
+            <div class="callout success">
+                <div class="callout-title">✅ Optimization Achievement</div>
+                <p>By using the sliding window technique, we've reduced the time complexity from O(n*k) to O(n) — a significant improvement, especially when k is large.</p>
+            </div>
+        </section>
+        
+        <!-- Simulation Section -->
+        <section id="simulation">
+            <h2>🎯 Simulation — Visual Algorithm Walkthrough</h2>
+            
+            <p>Let's trace through a concrete example to visualize how the fixed window algorithm works:</p>
+            <p>For array <code>[2, 1, 5, 1, 3, 2]</code> with window size <code>k = 3</code>, let's find the maximum sum subarray.</p>
+            
+            <div class="simulation-steps">
+                <div class="step">
+                    <div class="step-header">
+                        <div class="step-number"></div>
+                        <div class="step-title">Initial Window [0,1,2]: [2, 1, 5]</div>
+                    </div>
+                    <pre><code>Array: [<span class="number">2</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">1</span>, <span class="number">3</span>, <span class="number">2</span>]
+        ↑  ↑  ↑
+        0  1  2
+Sum = <span class="number">2</span> + <span class="number">1</span> + <span class="number">5</span> = <span class="number">8</span>
+Max = <span class="number">8</span></code></pre>
+                </div>
+                
+                <div class="step">
+                    <div class="step-header">
+                        <div class="step-number"></div>
+                        <div class="step-title">Slide to [1,2,3]: [1, 5, 1]</div>
+                    </div>
+                    <pre><code>Array: [<span class="number">2</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">1</span>, <span class="number">3</span>, <span class="number">2</span>]
+           ↑  ↑  ↑
+           1  2  3
+Remove: arr[<span class="number">0</span>] = <span class="number">2</span>
+Add: arr[<span class="number">3</span>] = <span class="number">1</span>
+New Sum = <span class="number">8</span> - <span class="number">2</span> + <span class="number">1</span> = <span class="number">7</span>
+Max = <span class="function">max</span>(<span class="number">8</span>, <span class="number">7</span>) = <span class="number">8</span></code></pre>
+                </div>
+                
+                <div class="step">
+                    <div class="step-header">
+                        <div class="step-number"></div>
+                        <div class="step-title">Slide to [2,3,4]: [5, 1, 3]</div>
+                    </div>
+                    <pre><code>Array: [<span class="number">2</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">1</span>, <span class="number">3</span>, <span class="number">2</span>]
+              ↑  ↑  ↑
+              2  3  4
+Remove: arr[<span class="number">1</span>] = <span class="number">1</span>
+Add: arr[<span class="number">4</span>] = <span class="number">3</span>
+New Sum = <span class="number">7</span> - <span class="number">1</span> + <span class="number">3</span> = <span class="number">9</span>
+Max = <span class="function">max</span>(<span class="number">8</span>, <span class="number">9</span>) = <span class="number">9</span></code></pre>
+                </div>
+                
+                <div class="step">
+                    <div class="step-header">
+                        <div class="step-number"></div>
+                        <div class="step-title">Slide to [3,4,5]: [1, 3, 2]</div>
+                    </div>
+                    <pre><code>Array: [<span class="number">2</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">1</span>, <span class="number">3</span>, <span class="number">2</span>]
+                 ↑  ↑  ↑
+                 3  4  5
+Remove: arr[<span class="number">2</span>] = <span class="number">5</span>
+Add: arr[<span class="number">5</span>] = <span class="number">2</span>
+New Sum = <span class="number">9</span> - <span class="number">5</span> + <span class="number">2</span> = <span class="number">6</span>
+Max = <span class="function">max</span>(<span class="number">9</span>, <span class="number">6</span>) = <span class="number">9</span></code></pre>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="icon">✅</div>
+                        <h3>Final Result</h3>
+                    </div>
+                    <p>The maximum sum of any subarray of size 3 is <strong>9</strong>, which corresponds to the subarray [5, 1, 3].</p>
+                    <p>Notice how we efficiently computed each window's sum by reusing the previous window's computation and only making minor adjustments.</p>
+                </div>
+            </div>
+            
+            <div class="callout">
+                <div class="callout-title">💡 Visual Insight</div>
+                <p>Each window differs from the previous one by exactly two elements: we remove one element from the left and add one element from the right. This pattern of minimal change is what enables the efficiency of the sliding window algorithm.</p>
+            </div>
+        </section>
+        
+        <!-- Template Section -->
+        <section id="templates">
+            <h2>🛠️ Fixed Window Templates — Blueprint for Success</h2>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">🧱</div>
+                    <h3>Universal Fixed Window Structure</h3>
+                </div>
+                <p>The following template provides a universal structure for approaching fixed window problems:</p>
+                
+                <div class="code-title">Fixed Window Template</div>
+                <pre><code><span class="keyword">def</span> <span class="function">fixed_window_template</span>(arr, k):
+    <span class="comment"># 🧮 PHASE 1: Initialize first window</span>
+    <span class="variable">window_value</span> = <span class="function">calculate_initial_window</span>(arr, k)  <span class="comment"># Sum, max, min, etc.</span>
+    <span class="variable">result</span> = <span class="variable">window_value</span>
+    
+    <span class="comment"># 🔄 PHASE 2: Slide the window</span>
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(k, <span class="function">len</span>(arr)):
+        <span class="comment"># 📐 SLIDING FORMULA: Remove left, add right</span>
+        <span class="variable">window_value</span> = <span class="variable">window_value</span> - arr[i-k] + arr[i]   <span class="comment"># For sum</span>
+        <span class="comment"># OR: window_value = update_function(window_value, arr[i-k], arr[i])</span>
+        
+        <span class="comment"># 🎯 UPDATE RESULT: Based on problem requirement</span>
+        <span class="variable">result</span> = <span class="function">update_result_function</span>(<span class="variable">result</span>, <span class="variable">window_value</span>)
+    
+    <span class="keyword">return</span> <span class="variable">result</span>
+
+<span class="keyword">def</span> <span class="function">calculate_initial_window</span>(arr, k):
+    <span class="comment"># Calculate sum/max/min of first k elements</span>
+    <span class="keyword">pass</span>
+
+<span class="keyword">def</span> <span class="function">update_result_function</span>(<span class="variable">current_result</span>, <span class="variable">window_value</span>):
+    <span class="comment"># Return max/min/sum of results</span>
+    <span class="keyword">pass</span></code></pre>
+                
+                <p>This template encapsulates the core principles of the fixed window algorithm:</p>
+                <ol>
+                    <li>Initialize the window with the first k elements</li>
+                    <li>Slide the window by removing the leftmost element and adding the new rightmost element</li>
+                    <li>Update the result based on the problem's requirements</li>
+                </ol>
+            </div>
+            
+            <div class="callout warning">
+                <div class="callout-title">⚠️ Implementation Note</div>
+                <p>The helper functions (<code>calculate_initial_window</code> and <code>update_result_function</code>) should be implemented based on the specific problem requirements. For example, if you're looking for a maximum, you'd use <code>max()</code>; for a minimum, you'd use <code>min()</code>.</p>
+            </div>
+            
+            <h3>Practical Implementation Examples</h3>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">🔄</div>
+                    <h3>Template 1: Maximum Sum of Subarray of Size K</h3>
+                </div>
+                
+                <div class="code-title">Maximum Sum Subarray</div>
+                <pre><code><span class="keyword">def</span> <span class="function">max_sum_subarray</span>(arr, k):
+    <span class="keyword">if</span> <span class="function">len</span>(arr) < k:
+        <span class="keyword">return</span> -<span class="number">1</span>
+    
+    <span class="comment"># Calculate first window sum</span>
+    <span class="variable">window_sum</span> = <span class="function">sum</span>(arr[:k])
+    <span class="variable">max_sum</span> = <span class="variable">window_sum</span>
+    
+    <span class="comment"># Slide the window</span>
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(k, <span class="function">len</span>(arr)):
+        <span class="variable">window_sum</span> = <span class="variable">window_sum</span> - arr[i-k] + arr[i]
+        <span class="variable">max_sum</span> = <span class="function">max</span>(<span class="variable">max_sum</span>, <span class="variable">window_sum</span>)
+    
+    <span class="keyword">return</span> <span class="variable">max_sum</span></code></pre>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">🔄</div>
+                    <h3>Template 2: Minimum Sum of Subarray of Size K</h3>
+                </div>
+                
+                <div class="code-title">Minimum Sum Subarray</div>
+                <pre><code><span class="keyword">def</span> <span class="function">min_sum_subarray</span>(arr, k):
+    <span class="keyword">if</span> <span class="function">len</span>(arr) < k:
+        <span class="keyword">return</span> -<span class="number">1</span>
+    
+    <span class="variable">window_sum</span> = <span class="function">sum</span>(arr[:k])
+    <span class="variable">min_sum</span> = <span class="variable">window_sum</span>
+    
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(k, <span class="function">len</span>(arr)):
+        <span class="variable">window_sum</span> = <span class="variable">window_sum</span> - arr[i-k] + arr[i]
+        <span class="variable">min_sum</span> = <span class="function">min</span>(<span class="variable">min_sum</span>, <span class="variable">window_sum</span>)
+    
+    <span class="keyword">return</span> <span class="variable">min_sum</span></code></pre>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">🔄</div>
+                    <h3>Template 3: Average of All Subarrays of Size K</h3>
+                </div>
+                
+                <div class="code-title">Average of Subarrays</div>
+                <pre><code><span class="keyword">def</span> <span class="function">averages_subarray</span>(arr, k):
+    <span class="keyword">if</span> <span class="function">len</span>(arr) < k:
+        <span class="keyword">return</span> []
+    
+    <span class="variable">result</span> = []
+    <span class="variable">window_sum</span> = <span class="function">sum</span>(arr[:k])
+    <span class="variable">result</span>.append(<span class="variable">window_sum</span> / k)
+    
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(k, <span class="function">len</span>(arr)):
+        <span class="variable">window_sum</span> = <span class="variable">window_sum</span> - arr[i-k] + arr[i]
+        <span class="variable">result</span>.append(<span class="variable">window_sum</span> / k)
+    
+    <span class="keyword">return</span> <span class="variable">result</span></code></pre>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">🔄</div>
+                    <h3>Template 4: Maximum in Each Subarray of Size K (Sliding Window Maximum)</h3>
+                </div>
+                
+                <div class="code-title">Maximum in Subarrays (Using Deque)</div>
+                <pre><code><span class="keyword">from</span> <span class="variable">collections</span> <span class="keyword">import</span> <span class="variable">deque</span>
+
+<span class="keyword">def</span> <span class="function">max_in_subarrays</span>(arr, k):
+    <span class="keyword">if</span> <span class="keyword">not</span> arr <span class="keyword">or</span> k == <span class="number">0</span>:
+        <span class="keyword">return</span> []
+    
+    <span class="variable">dq</span> = <span class="function">deque</span>()  <span class="comment"># Stores indices</span>
+    <span class="variable">result</span> = []
+    
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="function">len</span>(arr)):
+        <span class="comment"># Remove indices that are out of current window</span>
+        <span class="keyword">while</span> <span class="variable">dq</span> <span class="keyword">and</span> <span class="variable">dq</span>[<span class="number">0</span>] <= i - k:
+            <span class="variable">dq</span>.popleft()
+        
+        <span class="comment"># Remove indices whose values are less than current</span>
+        <span class="keyword">while</span> <span class="variable">dq</span> <span class="keyword">and</span> arr[<span class="variable">dq</span>[-<span class="number">1</span>]] <= arr[i]:
+            <span class="variable">dq</span>.pop()
+        
+        <span class="variable">dq</span>.append(i)
+        
+        <span class="comment"># Add max of current window when we have k elements</span>
+        <span class="keyword">if</span> i >= k - <span class="number">1</span>:
+            <span class="variable">result</span>.append(arr[<span class="variable">dq</span>[<span class="number">0</span>]])
+    
+    <span class="keyword">return</span> <span class="variable">result</span></code></pre>
+                <p>This more advanced implementation uses a deque (double-ended queue) to efficiently track the maximum value within each window. The deque maintains indices in a way that the front always has the index of the largest element in the current window.</p>
+            </div>
+        </section>
+        
+        <!-- Mathematical Logic Section -->
+        <section>
+            <h2>🧮 Mathematical Logic — The Sliding Formula</h2>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">📐</div>
+                    <h3>The Sliding Formula</h3>
+                </div>
+                <p>The mathematical foundation of the sliding window technique lies in the transformation that happens when sliding from position i-k to i:</p>
+                
+                <pre><code>Previous window: [arr[i-k], arr[i-k+<span class="number">1</span>], ..., arr[i-<span class="number">1</span>]]
+New window:      [arr[i-k+<span class="number">1</span>], arr[i-k+<span class="number">2</span>], ..., arr[i]]
+
+The transformation:
+  Remove: arr[i-k] (element leaving window)
+  Add:    arr[i]   (element entering window)</code></pre>
+                
+                <p>This leads to the general sliding formula:</p>
+                <div class="callout">
+                    <div class="callout-title">🔍 Sliding Formula</div>
+                    <p><code>new_window_value = old_window_value - removed_element + added_element</code></p>
+                </div>
+                <p>This simple formula is what enables the O(n) time complexity of the sliding window algorithm.</p>
+            </div>
+        </section>
+        
+        <!-- Advanced Insights Section -->
+        <section id="insights">
+            <h2>🧠 Advanced Insights — Professional Tips</h2>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">🔑</div>
+                    <h3>Key Insight 1: The Sliding Formula is Universal</h3>
+                </div>
+                <p>The sliding formula can be adapted for vaRoverus aggregation operations:</p>
+                <ul>
+                    <li><strong>For sum:</strong> <code>window_sum = window_sum - arr[i-k] + arr[i]</code></li>
+                    <li><strong>For product:</strong> <code>window_product = (window_product // arr[i-k]) * arr[i]</code> (Be careful with zeros!)</li>
+                    <li><strong>For max/min:</strong> Use a deque to maintain the maximum/minimum efficiently</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">🔑</div>
+                    <h3>Key Insight 2: Boundary Conditions</h3>
+                </div>
+                <p>Always check for these important boundary conditions:</p>
+                <ul>
+                    <li>Always verify: <code>len(arr) < k</code> → return appropriate value</li>
+                    <li>Loop starts from k, not from 0</li>
+                    <li>First window is [0, k-1], second is [1, k], etc.</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">🔑</div>
+                    <h3>Key Insight 3: Optimization Patterns</h3>
+                </div>
+                <p>Different operations have different optimization strategies:</p>
+                <ul>
+                    <li><strong>Sum:</strong> O(1) update using the sliding formula</li>
+                    <li><strong>Max/Min:</strong> O(k) worst case, but can be optimized with a deque to O(1) amortized</li>
+                    <li><strong>Average:</strong> Just divide the sum by k</li>
+                </ul>
+            </div>
+            
+            <div class="callout">
+                <div class="callout-title">💡 Pro Tip</div>
+                <p>When implementing a sliding window algorithm, always consider if using additional data structures (like deque for max/min operations) can improve the efficiency of your solution.</p>
+            </div>
+        </section>
+        
+        <!-- Variations Section -->
+        <section>
+            <h2>🧩 Variations & Extensions — Expert Repertoire</h2>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">🔄</div>
+                    <h3>Variation 1: Circular Array Fixed Window</h3>
+                </div>
+                
+                <div class="code-title">Maximum Sum in Circular Array</div>
+                <pre><code><span class="keyword">def</span> <span class="function">max_sum_circular</span>(arr, k):
+    <span class="comment"># For circular arrays, consider wrap-around</span>
+    n = <span class="function">len</span>(arr)
+    <span class="keyword">if</span> k >= n:
+        <span class="keyword">return</span> <span class="function">sum</span>(arr)
+    
+    <span class="comment"># Standard approach works for circular too</span>
+    <span class="variable">window_sum</span> = <span class="function">sum</span>(arr[:k])
+    <span class="variable">max_sum</span> = <span class="variable">window_sum</span>
+    
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(k, n + k):  <span class="comment"># Go around once more</span>
+        <span class="variable">window_sum</span> = <span class="variable">window_sum</span> - arr[(i-k) % n] + arr[i % n]
+        <span class="variable">max_sum</span> = <span class="function">max</span>(<span class="variable">max_sum</span>, <span class="variable">window_sum</span>)
+    
+    <span class="keyword">return</span> <span class="variable">max_sum</span></code></pre>
+                <p>This variation handles circular arrays, where the end wraps around to the beginning. The modulo operator (%) ensures that indices stay within the valid range.</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">🔄</div>
+                    <h3>Variation 2: Maximum Average of Subarray Size K</h3>
+                </div>
+                
+                <div class="code-title">Maximum Average Subarray</div>
+                <pre><code><span class="keyword">def</span> <span class="function">max_average_subarray</span>(arr, k):
+    <span class="keyword">if</span> <span class="function">len</span>(arr) < k:
+        <span class="keyword">return</span> <span class="number">0</span>
+    
+    <span class="variable">window_sum</span> = <span class="function">sum</span>(arr[:k])
+    <span class="variable">max_sum</span> = <span class="variable">window_sum</span>
+    
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(k, <span class="function">len</span>(arr)):
+        <span class="variable">window_sum</span> = <span class="variable">window_sum</span> - arr[i-k] + arr[i]
+        <span class="variable">max_sum</span> = <span class="function">max</span>(<span class="variable">max_sum</span>, <span class="variable">window_sum</span>)
+    
+    <span class="keyword">return</span> <span class="variable">max_sum</span> / k</code></pre>
+                
+                <div class="callout">
+                    <div class="callout-title">🧪 Example</div>
+                    <p>Test: arr = [1, 12, -5, -6, 50, 3], k = 4</p>
+                    <ul>
+                        <li>First window: [1, 12, -5, -6] → sum = 2</li>
+                        <li>Slide window: [12, -5, -6, 50] → sum = 51</li>
+                        <li>Slide window: [-5, -6, 50, 3] → sum = 42</li>
+                        <li>Maximum average = 51/4 = 12.75</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Problem Recognition Section -->
+        <section>
+            <h2>🎯 Problem Recognition — When to Use Fixed Window</h2>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">✅</div>
+                    <h3>Use Fixed Window When</h3>
+                </div>
+                <ul>
+                    <li>Window size is constant (given as k)</li>
+                    <li>You need aggregation (sum, average, max, min) of k elements</li>
+                    <li>You need to process all subarrays of size k</li>
+                    <li>The problem mentions "consecutive" or "contiguous" with fixed size</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">🔍</div>
+                    <h3>Pattern Recognition</h3>
+                </div>
+                <p>Look for these phrases in problem descriptions:</p>
+                <ul>
+                    <li>"Maximum sum of k consecutive elements"</li>
+                    <li>"Average of all subarrays of size k"</li>
+                    <li>"Sliding window maximum"</li>
+                    <li>"Find all subarrays of size k with condition"</li>
+                </ul>
+            </div>
+        </section>
+        
+        <!-- Practice Section -->
+        <section id="practice">
+            <h2>📚 Practice Drills — Master through Application</h2>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">🏋️‍♂️</div>
+                    <h3>Beginner Practice Problems</h3>
+                </div>
+                <ol>
+                    <li><strong>Maximum Sum Subarray of Size K:</strong> Find the maximum sum of any consecutive elements of size k in an array.</li>
+                    <li><strong>First Negative Number in Every Window of Size K:</strong> Find the first negative integer in every window of size k.</li>
+                    <li><strong>Count Occurrences of Anagrams:</strong> Count the occurrences of anagrams of a pattern in a string using fixed window of size = pattern length.</li>
+                </ol>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">🏋️‍♂️</div>
+                    <h3>Intermediate Practice Problems</h3>
+                </div>
+                <ol>
+                    <li><strong>Sliding Window Maximum:</strong> Find the maximum element in each sliding window of size k.</li>
+                    <li><strong>Permutation in String:</strong> Check if a string contains any permutation of another string (fixed window of size = pattern length).</li>
+                    <li><strong>Maximum of All Subarrays of Size K:</strong> Find the maximum element in each subarray of size k.</li>
+                </ol>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">🏋️‍♂️</div>
+                    <h3>Advanced Practice Problems</h3>
+                </div>
+                <ol>
+                    <li><strong>Substring with Concatenation of All Words:</strong> Find all starting indices of substring(s) that is a concatenation of each word in a given list exactly once.</li>
+                    <li><strong>Minimum Window Substring:</strong> Find the minimum window in a string which contains all characters of another string.</li>
+                    <li><strong>Sliding Window Median:</strong> Find the median in each sliding window of size k.</li>
+                </ol>
+            </div>
+            
+            <div class="callout success">
+                <div class="callout-title">🔍 Learning Strategy</div>
+                <p>Start with simple problems and work your way up. Implement each solution from scratch without looking at references to solidify your understanding of the fixed window pattern.</p>
+            </div>
+        </section>
+        
+        <!-- Conclusion -->
+        <section>
+            <h2>🏁 Final Wisdom — The Master's Mantra</h2>
+            
+            <div class="callout">
+                <div class="callout-title">💭 Guiding Principle</div>
+                <p>"In the realm of fixed windows, constancy is your strength. The window size remains unchanged, but the elements within dance in perfect rhythm. Remove one, add one, and the calculation continues. The fixed window is not a constraint — it is the foundation upon which efficient computation stands."</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">🧠</div>
+                    <h3>Retention Strategy</h3>
+                </div>
+                <p>To truly master the fixed window algorithm:</p>
+                <ul>
+                    <li><strong>Daily Practice:</strong> Code the sliding formula from memory: window = window - left + right</li>
+                    <li><strong>Weekly Challenge:</strong> Solve 5-7 fixed window problems</li>
+                    <li><strong>Monthly Mastery:</strong> Create your own fixed window problems</li>
+                </ul>
+                <p>You now possess a complete understanding of Fixed Window Size problems — from fundamental concepts to advanced applications, from mathematical logic to practical implementations.</p>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <p>© 2025 DS-Rover | Fixed Window Size Algorithm Tutorial</p>
+        </div>
+    </footer>
+
+    <script>
+        // Simple script to update the progress bar as user scrolls
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("progressBar").style.width = scrolled + "%";
+        };
+    </script>
+</body>
+</html>
+
+  
+
+🔍 STEP 0: FUNDAMENTAL CONCEPTS — THE FIXED WINDOW PRINCIPLE
+------------------------------------------------------------
+
+ 🪟 Fixed Window vs Variable Window:
+
+   Fixed Window: Size = k (constant), window moves: [0,k-1] → [1,k] → [2,k+1]...
+   Variable Window: Size changes based on constraints
+
+ 🎯 The Key Insight:
+
+Since window size is fixed, we only need to:
+
+1.  Calculate the result for the first window [0, k-1]
+2.  Slide the window by removing the leftmost element and adding the new rightmost element
+3.  Update the result at each position
+
+  
+
+🧩 STEP 1: BRUTE FORCE VS OPTIMAL — THE EVOLUTION
+-------------------------------------------------
+
+ 🚶‍♂️ BRUTE FORCE APPROACH (O(n\k)):
+
+    def maxsubarraybruteforce(arr, k):
+        maxsum = float('-inf')
+        for i in range(len(arr) - k + 1):
+            currentsum = 0
+            for j in range(i, i + k):   Calculate sum of k elements
+                currentsum += arr[j]
+            maxsum = max(maxsum, currentsum)
+        return maxsum
+    
+
+ 🚀 OPTIMAL SLIDING WINDOW (O(n)):
+
+    def maxsubarrayoptimal(arr, k):
+         Calculate first window
+        windowsum = sum(arr[:k])
+        maxsum = windowsum
+        
+         Slide the window: remove left, add right
+        for i in range(k, len(arr)):
+            windowsum = windowsum - arr[i-k] + arr[i]
+            maxsum = max(maxsum, windowsum)
+        
+        return maxsum
+    
+
+  
+
+🎯 STEP 2: SIMULATION — Rover MASTER'S VISUALIZATION
+--------------------------------------------------
+
+Let's trace through arr = [2, 1, 5, 1, 3, 2], k = 3:
+
+ Initial Window \[0,1,2\]: [2, 1, 5]
+
+    Array: [2, 1, 5, 1, 3, 2]
+            ↑  ↑  ↑
+            0  1  2
+    Sum = 2 + 1 + 5 = 8
+    Max = 8
+    
+
+ Slide to \[1,2,3\]: [1, 5, 1]
+
+    Array: [2, 1, 5, 1, 3, 2]
+               ↑  ↑  ↑
+               1  2  3
+    Remove: arr[0] = 2
+    Add: arr[3] = 1
+    New Sum = 8 - 2 + 1 = 7
+    Max = max(8, 7) = 8
+    
+
+ Slide to \[2,3,4\]: [5, 1, 3]
+
+    Array: [2, 1, 5, 1, 3, 2]
+                  ↑  ↑  ↑
+                  2  3  4
+    Remove: arr[1] = 1
+    Add: arr[4] = 3
+    New Sum = 7 - 1 + 3 = 9
+    Max = max(8, 9) = 9
+    
+
+ Slide to \[3,4,5\]: [1, 3, 2]
+
+    Array: [2, 1, 5, 1, 3, 2]
+                     ↑  ↑  ↑
+                     3  4  5
+    Remove: arr[2] = 5
+    Add: arr[5] = 2
+    New Sum = 9 - 5 + 2 = 6
+    Max = max(9, 6) = 9
+    
+
+Result: Maximum sum = 9
+
+  
+
+🛠️ STEP 3: Rover'S FIXED WINDOW TEMPLATE
+---------------------------------------
+
+ 🧱 Universal Fixed Window Structure:
+
+    def fixedwindowtemplate(arr, k):
+         🧮 PHASE 1: Initialize first window
+        windowvalue = calculateinitialwindow(arr, k)   Sum, max, min, etc.
+        result = windowvalue
+        
+         🔄 PHASE 2: Slide the window
+        for i in range(k, len(arr)):
+             📐 SLIDING FORMULA: Remove left, add right
+            windowvalue = windowvalue - arr[i-k] + arr[i]   For sum
+             OR: windowvalue = updatefunction(windowvalue, arr[i-k], arr[i])
+            
+             🎯 UPDATE RESULT: Based on problem requirement
+            result = updateresultfunction(result, windowvalue)
+        
+        return result
+    
+    def calculateinitialwindow(arr, k):
+         Calculate sum/max/min of first k elements
+        pass
+    
+    def updateresultfunction(currentresult, windowvalue):
+         Return max/min/sum of results
+        pass
+    
+
+  
+
+💻 STEP 4: PRACTICAL IMPLEMENTATIONS — Rover'S REPERTOIRE
+-------------------------------------------------------
+
+ 🔄 Template 1: Maximum Sum of Subarray of Size K
+
+    def maxsumsubarray(arr, k):
+        if len(arr) < k:
+            return -1
+        
+         Calculate first window sum
+        windowsum = sum(arr[:k])
+        maxsum = windowsum
+        
+         Slide the window
+        for i in range(k, len(arr)):
+            windowsum = windowsum - arr[i-k] + arr[i]
+            maxsum = max(maxsum, windowsum)
+        
+        return maxsum
+    
+
+ 🔄 Template 2: Minimum Sum of Subarray of Size K
+
+    def minsumsubarray(arr, k):
+        if len(arr) < k:
+            return -1
+        
+        windowsum = sum(arr[:k])
+        minsum = windowsum
+        
+        for i in range(k, len(arr)):
+            windowsum = windowsum - arr[i-k] + arr[i]
+            minsum = min(minsum, windowsum)
+        
+        return minsum
+    
+
+ 🔄 Template 3: Average of All Subarrays of Size K
+
+    def averagessubarray(arr, k):
+        if len(arr) < k:
+            return []
+        
+        result = []
+        windowsum = sum(arr[:k])
+        result.append(windowsum / k)
+        
+        for i in range(k, len(arr)):
+            windowsum = windowsum - arr[i-k] + arr[i]
+            result.append(windowsum / k)
+        
+        return result
+    
+
+ 🔄 Template 4: Maximum in Each Subarray of Size K (Sliding Window Maximum)
+
+    def maxinsubarrays(arr, k):
+        if not arr or k == 0:
+            return []
+        
+        from collections import deque
+        dq = deque()   Stores indices
+        result = []
+        
+        for i in range(len(arr)):
+             Remove indices that are out of current window
+            while dq and dq[0] <= i - k:
+                dq.popleft()
+            
+             Remove indices whose values are less than current
+            while dq and arr[dq[-1]] <= arr[i]:
+                dq.pop()
+            
+            dq.append(i)
+            
+             Add max of current window when we have k elements
+            if i >= k - 1:
+                result.append(arr[dq[0]])
+        
+        return result
+    
+
+  
+
+🧮 STEP 5: MATHEMATICAL LOGIC — THE SLIDING FORMULA
+---------------------------------------------------
+
+When sliding from position i-k to i:
+
+   Previous window: [arr[i-k], arr[i-k+1], ..., arr[i-1]]
+   New window: [arr[i-k+1], arr[i-k+2], ..., arr[i]]
+
+The transformation:
+
+   Remove: arr[i-k] (element leaving window)
+   Add: arr[i] (element entering window)
+
+Formula: newwindowvalue = oldwindowvalue - removedelement + addedelement
+
+  
+
+🧠 STEP 6: ADVANCED INSIGHTS — Rover'S PROFESSIONAL TIPS
+------------------------------------------------------
+
+ 🔑 Key Insight 1: The Sliding Formula is Universal
+
+     For sum: windowsum = windowsum - arr[i-k] + arr[i]
+     For product: windowproduct = (windowproduct // arr[i-k])  arr[i]   Be careful with zeros!
+     For max: Use deque to maintain maximum efficiently
+    
+
+ 🔑 Key Insight 2: Boundary Conditions
+
+   Always check: len(arr) < k → return appropriate value
+   Loop starts from k, not from 0
+   First window is [0, k-1], second is [1, k], etc.
+
+ 🔑 Key Insight 3: Optimization Patterns
+
+   Sum: O(1) update using sliding formula
+   Max/Min: O(k) worst case, but can be optimized with deque to O(1) amortized
+   Average: Just divide sum by k
+
+  
+
+🧪 STEP 7: EXTENDED SIMULATIONS — Rover'S COMPREHENSIVE TESTING
+-------------------------------------------------------------
+
+ Example: Maximum Average of Subarray Size K
+
+    def maxaveragesubarray(arr, k):
+        if len(arr) < k:
+            return 0
+        
+        windowsum = sum(arr[:k])
+        maxsum = windowsum
+        
+        for i in range(k, len(arr)):
+            windowsum = windowsum - arr[i-k] + arr[i]
+            maxsum = max(maxsum, windowsum)
+        
+        return maxsum / k
+    
+     Test: arr = [1, 12, -5, -6, 50, 3], k = 4
+     First: [1, 12, -5, -6] → sum = 2
+     Slide: [12, -5, -6, 50] → sum = 51
+     Slide: [-5, -6, 50, 3] → sum = 42
+     Max average = 51/4 = 12.75
+    
+
+  
+
+🎯 STEP 8: PROBLEM RECOGNITION — WHEN TO USE FIXED WINDOW
+---------------------------------------------------------
+
+ ✅ Use Fixed Window When:
+
+   Window size is constant (given as k)
+   You need aggregation (sum, average, max, min) of k elements
+   You need to process all subarrays of size k
+   The problem mentions "consecutive" or "contiguous" with fixed size
+
+ 🔍 Pattern Recognition:
+
+   "Maximum sum of k consecutive elements"
+   "Average of all subarrays of size k"
+   "Sliding window maximum"
+   "Find all subarrays of size k with condition"
+
+  
+
+🧩 STEP 9: VARIATIONS & EXTENSIONS — Rover'S EXPERT REPERTOIRE
+------------------------------------------------------------
+
+ 🔄 Variation 1: With Deque for Maximum/Minimum
+
+    from collections import deque
+    
+    def slidingwindowmaximum(arr, k):
+        dq = deque()   Store indices in decreasing order of values
+        result = []
+        
+        for i in range(len(arr)):
+             Remove out of window elements
+            while dq and dq[0] <= i - k:
+                dq.popleft()
+            
+             Remove smaller elements (for maximum)
+            while dq and arr[dq[-1]] <= arr[i]:
+                dq.pop()
+            
+            dq.append(i)
+            
+            if i >= k - 1:
+                result.append(arr[dq[0]])   Front of deque has maximum
+        
+        return result
+    
+
+ 🔄 Variation 2: Circular Array Fixed Window
+
+    def maxsumcircular(arr, k):
+         For circular arrays, consider wrap-around
+        n = len(arr)
+        if k >= n:
+            return sum(arr)
+        
+         Standard approach works for circular too
+        windowsum = sum(arr[:k])
+        maxsum = windowsum
+        
+        for i in range(k, n + k):   Go around once more
+            windowsum = windowsum - arr[(i-k) % n] + arr[i % n]
+            maxsum = max(maxsum, windowsum)
+        
+        return maxsum
+    
+
+  
+
+🧠 STEP 10: FEYNMAN TECHNIQUE — TEACH IT BACK
+---------------------------------------------
+
+> "Explain fixed window as if teaching a beginner."
+
+Me: "Imagine you have a row of numbers and a frame that can hold exactly 3 numbers. You slide this frame from left to right, and at each position, you calculate something about the 3 numbers in the frame. Instead of recalculating all 3 numbers every time you move, you just remove the number that's no longer in the frame and add the new number that enters the frame. This sliding approach is much more efficient than recalculating everything."
+
+  
+
+📚 STEP 11: RETENTION STRATEGY — HOW Rover MASTERIZES
+---------------------------------------------------
+
+ 🔄 Daily Practice:
+
+   Code the sliding formula from memory: window = window - left + right
+   Trace through 2-3 examples manually
+   Explain the boundary conditions out loud
+
+ 🔄 Weekly Challenge:
+
+   Solve 5-7 fixed window problems
+   Implement variations (deque, circular arrays)
+   Teach the concept to someone else
+
+ 🔄 Monthly Mastery:
+
+   Create your own fixed window problems
+   Optimize edge cases
+   Connect to other algorithms (prefix sums, binary search)
+
+  
+
+🏁 Rover'S FINAL WISDOM — THE MASTER'S MANTRA
+-------------------------------------------
+
+> "In the realm of fixed windows, constancy is your strength. The window size remains unchanged, but the elements within dance in perfect rhythm. Remove one, add one, and the calculation continues. The fixed window is not a constraint — it is the foundation upon which efficient computation stands."
+
+  
+
+You now possess the complete understanding of Fixed Window Size problems — from fundamental concepts to advanced applications, from mathematical proofs to practical implementations.
+
+The fixed window has revealed its secrets. Go forth and slide with purpose.
+

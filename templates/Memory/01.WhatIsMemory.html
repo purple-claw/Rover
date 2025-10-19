@@ -1,0 +1,3597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rover - Memory Part1</title>
+    <style>
+        /* ==================== FONT IMPORT ==================== */
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+
+        /* ==================== GLASSMORPHISM THEME ==================== */
+        :root {
+            /* Pure Black Base */
+            --bg-primary: #000000;
+            --bg-secondary: #0a0a0a;
+            
+            /* Glass Effect Colors */
+            --glass-white: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-highlight: rgba(255, 255, 255, 0.15);
+            
+            /* McLaren Orange */
+            --mclaren-orange: #FF8000;
+            --mclaren-glow: rgba(255, 128, 0, 0.3);
+            --mclaren-light: #FFA040;
+            --mclaren-dark: #CC6600;
+            
+            /* RedBull Red */
+            --redbull-red: #DC0000;
+            --redbull-blue: #1E41FF;
+            --redbull-glow: rgba(220, 0, 0, 0.3);
+            --redbull-light: #FF3333;
+            
+            /* Meta Blue */
+            --meta-blue: #0081FB;
+            --meta-glow: rgba(0, 129, 251, 0.3);
+            --meta-light: #33A3FF;
+            --meta-dark: #0066CC;
+            
+            /* Text Colors - Ultra White */
+            --text-primary: #FFFFFF;
+            --text-secondary: #FFFFFF;
+            --text-muted: rgba(255, 255, 255, 0.9);
+            --text-dim: rgba(255, 255, 255, 0.7);
+            
+            /* Code Syntax */
+            --code-bg: rgba(20, 20, 20, 0.6);
+            --code-keyword: #FF8000;
+            --code-function: #0081FB;
+            --code-string: #3fb950;
+            --code-comment: rgba(255, 255, 255, 0.4);
+            --code-number: #DC0000;
+            --code-variable: #FFA040;
+            
+            /* Layout */
+            --container-width: 1100px;
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 2.5rem;
+            --spacing-2xl: 3rem;
+            
+            /* Border Radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            
+            /* Animations */
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+            line-height: 1.7;
+            overflow-x: hidden;
+            position: relative;
+            font-size: 16px;
+            font-weight: 400;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+        }
+
+        code, pre {
+            font-family: 'Courier New', monospace;
+            font-weight: 400;
+        }
+
+        /* Progress Bar */
+        #reading-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--mclaren-orange), var(--mclaren-light));
+            box-shadow: 0 0 10px var(--mclaren-glow);
+            z-index: 9999;
+            transition: width 0.1s ease;
+        }
+
+        /* Glass Container */
+        .container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Navigation */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 0.75rem 0;
+            box-shadow: 
+                0 1px 3px rgba(0, 0, 0, 0.5),
+                0 1px 20px rgba(255, 128, 0, 0.1),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        nav::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent,
+                rgba(255, 128, 0, 0.3) 20%,
+                rgba(255, 128, 0, 0.5) 50%,
+                rgba(255, 128, 0, 0.3) 80%,
+                transparent
+            );
+            opacity: 0.8;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+            padding: 0 var(--spacing-lg);
+            max-width: var(--container-width);
+            margin: 0 auto;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--mclaren-orange);
+            text-decoration: none;
+            letter-spacing: 0.1em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all var(--transition-fast);
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-link:hover {
+            color: var(--mclaren-orange);
+            text-shadow: 0 0 20px var(--mclaren-glow);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--mclaren-orange);
+            box-shadow: 0 0 10px var(--mclaren-glow);
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            z-index: 1001;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 25px;
+            height: 2px;
+            background: var(--mclaren-orange);
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(7px, 7px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .mobile-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: var(--spacing-2xl) 0;
+            text-align: center;
+            position: relative;
+            margin-bottom: var(--spacing-xl);
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--mclaren-orange);
+            background: linear-gradient(135deg, 
+                var(--mclaren-orange) 0%, 
+                var(--mclaren-light) 50%, 
+                var(--mclaren-orange) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        /* Fallback for browsers that don't support background-clip */
+        @supports not (background-clip: text) {
+            .hero h1 {
+                color: var(--mclaren-orange) !important;
+                -webkit-text-fill-color: var(--mclaren-orange) !important;
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+            opacity: 1;
+        }
+
+        /* Table of Contents */
+        .toc {
+            background: var(--glass-white);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-xl) 0;
+            position: relative;
+        }
+
+        .toc h2 {
+            font-size: 1.5rem;
+            margin-bottom: var(--spacing-md);
+            color: var(--mclaren-orange);
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .toc li {
+            margin: var(--spacing-sm) 0;
+            padding-left: var(--spacing-md);
+            border-left: 2px solid transparent;
+            transition: all var(--transition-fast);
+        }
+
+        .toc li:hover {
+            border-left-color: var(--mclaren-orange);
+            padding-left: calc(var(--spacing-md) + 5px);
+        }
+
+        .toc a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+
+        .toc a:hover {
+            color: var(--mclaren-orange);
+        }
+
+        /* Section Styling */
+        .section {
+            margin-bottom: var(--spacing-2xl);
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-header {
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 1px solid var(--glass-border);
+            position: relative;
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+        }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* Explanatory Blocks */
+        .practical-approach {
+            background: linear-gradient(135deg, 
+                rgba(0, 129, 251, 0.1), 
+                rgba(0, 129, 251, 0.05));
+            border: 1px solid var(--meta-blue);
+            border-left: 4px solid var(--meta-blue);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-md);
+            margin: var(--spacing-lg) 0;
+        }
+
+        .practical-approach h3 {
+            color: var(--meta-blue);
+            font-size: 1.2rem;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .practical-approach ul {
+            margin-left: var(--spacing-lg);
+            margin-top: var(--spacing-sm);
+        }
+
+        .practical-approach li {
+            margin: var(--spacing-xs) 0;
+            line-height: 1.8;
+        }
+
+        .theoretical-dive {
+            background: linear-gradient(135deg, 
+                rgba(255, 128, 0, 0.1), 
+                rgba(255, 128, 0, 0.05));
+            border: 1px solid var(--mclaren-orange);
+            border-left: 4px solid var(--mclaren-orange);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-md);
+            margin: var(--spacing-lg) 0;
+        }
+
+        .theoretical-dive h3 {
+            color: var(--mclaren-orange);
+            font-size: 1.2rem;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .theoretical-dive p {
+            margin: var(--spacing-sm) 0;
+            line-height: 1.8;
+        }
+
+        /* Content Blocks */
+        .content-block {
+            background: var(--glass-white);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-md) 0;
+        }
+
+        .content-block h3 {
+            font-size: 1.7rem;
+            margin-bottom: var(--spacing-md);
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .content-block h4 {
+            font-size: 1.35rem;
+            margin: var(--spacing-md) 0 var(--spacing-sm) 0;
+            color: var(--mclaren-light);
+            font-weight: 600;
+        }
+
+        .content-block p {
+            margin: var(--spacing-sm) 0;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .content-block ul, .content-block ol {
+            margin-left: var(--spacing-lg);
+            margin-top: var(--spacing-sm);
+        }
+
+        .content-block li {
+            margin: var(--spacing-xs) 0;
+            line-height: 1.8;
+        }
+
+        /* Code Block Styling */
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-md);
+            margin: var(--spacing-md) 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .code-block pre {
+            margin: 0;
+            white-space: pre;
+        }
+
+        .code-block code {
+            color: var(--text-primary);
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: transparent;
+            border: 1px solid rgba(255, 128, 0, 0.4);
+            border-radius: 6px;
+            padding: 0.4rem 0.9rem;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--mclaren-orange);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 128, 0, 0.1);
+            border-color: var(--mclaren-orange);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(255, 128, 0, 0.2);
+        }
+
+        .copy-btn:active {
+            transform: translateY(0);
+            color: white;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: var(--spacing-md) 0;
+            background: var(--glass-white);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+
+        table th {
+            background: rgba(255, 128, 0, 0.2);
+            color: var(--text-primary);
+            padding: var(--spacing-sm);
+            text-align: left;
+            font-weight: 600;
+        }
+
+        table td {
+            padding: var(--spacing-sm);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        table tr:last-child td {
+            border-bottom: none;
+        }
+
+        table tr:hover {
+            background: rgba(255, 128, 0, 0.05);
+        }
+
+        /* Info/Warning Boxes */
+        .info-box {
+            background: linear-gradient(135deg, 
+                rgba(0, 129, 251, 0.1), 
+                rgba(0, 129, 251, 0.05));
+            border: 1px solid var(--meta-blue);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-md);
+            margin: var(--spacing-md) 0;
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .info-box::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 60%;
+            background: var(--meta-blue);
+            border-radius: 3px;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, 
+                rgba(220, 0, 0, 0.1), 
+                rgba(220, 0, 0, 0.05));
+            border: 1px solid var(--redbull-red);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-md);
+            margin: var(--spacing-md) 0;
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .warning-box::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 60%;
+            background: var(--redbull-red);
+            border-radius: 3px;
+        }
+
+        /* Collapsible Case Study */
+        .case-study {
+            background: var(--glass-white);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            margin: var(--spacing-md) 0;
+            overflow: hidden;
+        }
+
+        .case-study-header {
+            background: rgba(255, 128, 0, 0.1);
+            padding: var(--spacing-md);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background var(--transition-fast);
+        }
+
+        .case-study-header:hover {
+            background: rgba(255, 128, 0, 0.15);
+        }
+
+        .case-study-header h4 {
+            margin: 0;
+            color: var(--mclaren-orange);
+        }
+
+        .case-study-content {
+            padding: var(--spacing-md);
+            display: none;
+        }
+
+        .case-study.open .case-study-content {
+            display: block;
+        }
+
+        .case-study-toggle {
+            color: var(--mclaren-orange);
+            font-size: 1.5rem;
+            transition: transform var(--transition-normal);
+        }
+
+        .case-study.open .case-study-toggle {
+            transform: rotate(180deg);
+        }
+
+        /* Checkpoint Timeline */
+        .checkpoint-timeline {
+            background: var(--glass-white);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-xl) 0;
+        }
+
+        .checkpoint-timeline h2 {
+            color: var(--mclaren-orange);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .checkpoint-item {
+            padding: var(--spacing-sm);
+            margin: var(--spacing-sm) 0;
+            border-left: 3px solid var(--mclaren-orange);
+            padding-left: var(--spacing-md);
+            transition: all var(--transition-fast);
+        }
+
+        .checkpoint-item:hover {
+            background: rgba(255, 128, 0, 0.05);
+            padding-left: calc(var(--spacing-md) + 5px);
+        }
+
+        /* Cheat Sheet */
+        .cheat-sheet {
+            background: var(--glass-white);
+            border: 2px solid var(--mclaren-orange);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-xl) 0;
+        }
+
+        .cheat-sheet h2 {
+            color: var(--mclaren-orange);
+            margin-bottom: var(--spacing-md);
+            text-align: center;
+        }
+
+        .cheat-sheet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+
+        .cheat-item {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-sm);
+        }
+
+        .cheat-item strong {
+            color: var(--mclaren-orange);
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        /* Further Reading */
+        .further-reading {
+            background: var(--glass-white);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-xl) 0;
+        }
+
+        .further-reading h2 {
+            color: var(--meta-blue);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .further-reading ul {
+            list-style: none;
+        }
+
+        .further-reading li {
+            margin: var(--spacing-sm) 0;
+            padding-left: var(--spacing-md);
+            position: relative;
+        }
+
+        .further-reading li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--meta-blue);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: var(--spacing-xl) 0;
+            margin-top: var(--spacing-2xl);
+            border-top: 1px solid var(--glass-border);
+            color: var(--text-dim);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .nav-container {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: center;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .cheat-sheet-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Fade-in Animation - Fixed to be visible by default */
+        .fade-in {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-delay-1 { animation-delay: 0.2s; }
+        .fade-in-delay-2 { animation-delay: 0.4s; }
+        .fade-in-delay-3 { animation-delay: 0.6s; }
+
+        /* Diagram Placeholder */
+        figure {
+            background: var(--glass-white);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-md);
+            margin: var(--spacing-md) 0;
+            text-align: center;
+        }
+
+        figcaption {
+            margin-top: var(--spacing-sm);
+            color: var(--text-dim);
+            font-style: italic;
+        }
+
+        /* Feynman-Style Deep Dive Sections - Compact */
+        .feynman-dive {
+            background: linear-gradient(135deg, 
+                rgba(255, 128, 0, 0.03), 
+                rgba(220, 0, 0, 0.03));
+            border: 1px solid rgba(255, 128, 0, 0.3);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-lg) 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feynman-dive::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 4rem;
+            opacity: 0.1;
+        }
+
+        .feynman-dive h3 {
+            color: var(--mclaren-orange);
+            font-size: 1.8rem;
+            margin-bottom: var(--spacing-lg);
+            text-shadow: 0 0 20px var(--mclaren-glow);
+        }
+
+        .feynman-dive h4 {
+            color: var(--mclaren-light);
+            font-size: 1.3rem;
+            margin-top: var(--spacing-lg);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .feynman-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .feynman-intro {
+            font-size: 1.1rem;
+            font-style: italic;
+            color: var(--text-muted);
+            margin-bottom: var(--spacing-lg);
+            padding: var(--spacing-md);
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid var(--mclaren-orange);
+            border-radius: var(--radius-sm);
+        }
+
+        .feynman-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .feynman-list li {
+            padding: var(--spacing-sm);
+            margin: var(--spacing-sm) 0;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--radius-sm);
+            border-left: 3px solid var(--meta-blue);
+            transition: all var(--transition-normal);
+        }
+
+        .feynman-list li:hover {
+            background: rgba(255, 128, 0, 0.1);
+            border-left-color: var(--mclaren-orange);
+            transform: translateX(5px);
+        }
+
+        .feynman-conclusion {
+            margin-top: var(--spacing-xl);
+            padding: var(--spacing-lg);
+            background: linear-gradient(135deg, 
+                rgba(0, 129, 251, 0.15), 
+                rgba(255, 128, 0, 0.15));
+            border-radius: var(--radius-md);
+            border: 1px solid var(--meta-blue);
+            font-size: 1.05rem;
+        }
+
+        /* Interactive Demo Sections - Compact & Sleek */
+        .interactive-demo {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .interactive-demo:hover {
+            border-color: rgba(255, 128, 0, 0.2);
+            box-shadow: 0 4px 20px rgba(255, 128, 0, 0.05);
+        }
+
+        .interactive-demo h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--mclaren-orange);
+            font-weight: 600;
+        }
+
+        .demo-desc {
+            color: var(--text-dim);
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+            font-weight: 400;
+        }
+
+        .demo-controls {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+        }
+
+        /* Modern Button Base Style */
+        .btn {
+            padding: 0.6rem 1.2rem;
+            font-size: 13px;
+            font-weight: 600;
+            background: transparent;
+            border: 1px solid rgba(255, 128, 0, 0.3);
+            color: var(--mclaren-orange);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Quicksand', sans-serif;
+            letter-spacing: 0.3px;
+        }
+
+        .btn:hover {
+            background: rgba(255, 128, 0, 0.1);
+            border-color: var(--mclaren-orange);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 128, 0, 0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Demo Button Variant - inherits from .btn */
+
+        .playground-canvas {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            padding: 1.25rem;
+            min-height: 300px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .playground-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            background: rgba(255, 128, 0, 0.05);
+            border-color: rgba(255, 128, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .stat-label {
+            display: block;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            display: block;
+            color: var(--mclaren-orange);
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        /* Memory Byte Visualization */
+        .memory-byte {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 5px;
+            position: relative;
+        }
+
+        .byte-address {
+            font-size: 10px;
+            color: var(--text-dim);
+            font-family: 'Courier New', monospace;
+            margin-bottom: 3px;
+        }
+
+        .byte-container {
+            display: flex;
+            gap: 2px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--glass-border);
+        }
+
+        .bit {
+            width: 20px;
+            height: 25px;
+            background: var(--code-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .bit.on {
+            background: linear-gradient(135deg, var(--mclaren-orange), var(--mclaren-dark));
+            color: white;
+            box-shadow: 0 0 10px var(--mclaren-glow);
+        }
+
+        .bit.off {
+            background: var(--code-bg);
+            color: var(--text-dim);
+        }
+
+        .bit:hover {
+            transform: scale(1.1);
+            z-index: 10;
+        }
+
+        .byte-value {
+            font-size: 11px;
+            color: var(--meta-blue);
+            margin-top: 3px;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Animated Memory Access */
+        @keyframes memoryPulse {
+            0%, 100% { 
+                box-shadow: 0 0 0 rgba(255, 128, 0, 0);
+            }
+            50% { 
+                box-shadow: 0 0 20px var(--mclaren-glow);
+            }
+        }
+
+        .memory-access-active {
+            animation: memoryPulse 1s ease-in-out infinite;
+        }
+
+        /* Hierarchy Pyramid */
+        .hierarchy-pyramid {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: var(--spacing-xl);
+        }
+
+        .pyramid-level {
+            background: linear-gradient(135deg, var(--meta-blue), var(--meta-dark));
+            border: 2px solid var(--meta-light);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            text-align: center;
+            transition: all var(--transition-normal);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .pyramid-level:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px var(--meta-glow);
+            z-index: 10;
+        }
+
+        .pyramid-level-0 { width: 150px; }
+        .pyramid-level-1 { width: 250px; }
+        .pyramid-level-2 { width: 350px; }
+        .pyramid-level-3 { width: 450px; }
+        .pyramid-level-4 { width: 550px; }
+        .pyramid-level-5 { width: 650px; }
+        .pyramid-level-6 { width: 750px; }
+
+        .level-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .level-details {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Cache Line Visualization */
+        .cache-line-demo {
+            background: rgba(0, 0, 0, 0.3);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-md);
+            margin: var(--spacing-lg) 0;
+        }
+
+        .cache-line {
+            display: flex;
+            gap: 2px;
+            margin: var(--spacing-md) 0;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+        }
+
+        .cache-block {
+            min-width: 40px;
+            height: 40px;
+            background: var(--code-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .cache-block.hit {
+            background: linear-gradient(135deg, #3fb950, #2ea043);
+            box-shadow: 0 0 15px rgba(63, 185, 80, 0.5);
+        }
+
+        .cache-block.miss {
+            background: linear-gradient(135deg, var(--redbull-red), #AA0000);
+            box-shadow: 0 0 15px var(--redbull-glow);
+        }
+
+        .cache-block.accessing {
+            animation: blockAccess 0.5s ease-in-out;
+        }
+
+        @keyframes blockAccess {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+
+        /* ==================== ANIMATED COLLAPSIBLE SECTIONS ==================== */
+        .collapsible-section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            margin: 1rem 0;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .collapsible-section:hover {
+            border-color: rgba(255, 128, 0, 0.2);
+        }
+
+        .collapsible-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+
+        .collapsible-header:hover {
+            background: rgba(255, 128, 0, 0.05);
+        }
+
+        .collapsible-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .collapsible-icon {
+            font-size: 1.25rem;
+        }
+
+        .collapsible-arrow {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+            color: var(--mclaren-orange);
+        }
+
+        .collapsible-section.open .collapsible-arrow {
+            transform: rotate(180deg);
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .collapsible-section.open .collapsible-content {
+            max-height: 5000px;
+        }
+
+        .collapsible-inner {
+            padding: 0 1.5rem 1.5rem;
+            animation: fadeInContent 0.4s ease;
+        }
+
+        @keyframes fadeInContent {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Animated List Items */
+        .animated-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .animated-list-item {
+            padding: 0.75rem 1rem;
+            margin: 0.5rem 0;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            animation: slideInItem 0.5s ease both;
+        }
+
+        .animated-list-item:nth-child(1) { animation-delay: 0.05s; }
+        .animated-list-item:nth-child(2) { animation-delay: 0.1s; }
+        .animated-list-item:nth-child(3) { animation-delay: 0.15s; }
+        .animated-list-item:nth-child(4) { animation-delay: 0.2s; }
+        .animated-list-item:nth-child(5) { animation-delay: 0.25s; }
+        .animated-list-item:nth-child(6) { animation-delay: 0.3s; }
+
+        @keyframes slideInItem {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .animated-list-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background: var(--mclaren-orange);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .animated-list-item:hover {
+            background: rgba(255, 128, 0, 0.08);
+            border-color: rgba(255, 128, 0, 0.2);
+            transform: translateX(8px);
+            box-shadow: 0 2px 12px rgba(255, 128, 0, 0.1);
+        }
+
+        .animated-list-item:hover::before {
+            transform: scaleY(1);
+        }
+
+        /* Speed Control Styling */
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+
+        .speed-control label {
+            font-size: 13px;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+
+        .speed-slider {
+            width: 120px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            -webkit-appearance: none;
+            appearance: none;
+            outline: none;
+        }
+
+        .speed-slider::-webkit-slider-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+
+        .speed-slider::-moz-range-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+
+        .speed-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            background: var(--mclaren-orange);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(255, 128, 0, 0.3);
+        }
+
+        .speed-slider::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            background: var(--mclaren-orange);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px rgba(255, 128, 0, 0.3);
+        }
+
+        .speed-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 12px var(--mclaren-glow);
+        }
+
+        .speed-slider::-moz-range-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 12px var(--mclaren-glow);
+        }
+
+        .speed-control span {
+            font-size: 12px;
+            color: var(--mclaren-orange);
+            font-weight: 600;
+            min-width: 50px;
+        }
+
+        /* ==================== RESPONSIVE DESIGN ==================== */
+        @media (max-width: 1024px) {
+            :root {
+                --container-width: 100%;
+            }
+
+            .container {
+                padding: 0 1.5rem;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            /* Hide desktop nav, show hamburger */
+            .hamburger {
+                display: flex;
+            }
+
+            nav {
+                position: sticky;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                height: 100vh;
+                width: 85%;
+                max-width: 320px;
+                background: rgba(0, 0, 0, 0.98);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 5rem 2rem 2rem;
+                gap: 0;
+                transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                border-left: 1px solid var(--glass-border);
+                z-index: 1000;
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .nav-link {
+                font-size: 16px;
+                padding: 1rem 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                width: 100%;
+            }
+
+            .nav-link.active::after {
+                display: none;
+            }
+
+            .hero {
+                padding: 2rem 0;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .interactive-demo {
+                padding: 1rem;
+                margin: 1rem 0;
+            }
+
+            .demo-controls {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.5rem;
+            }
+
+            .demo-btn {
+                width: 100%;
+                text-align: center;
+            }
+
+            .playground-canvas {
+                padding: 1rem;
+                min-height: 250px;
+            }
+
+            .playground-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+
+            .feynman-dive {
+                padding: 1rem;
+            }
+
+            .feynman-dive h3 {
+                font-size: 1.3rem;
+            }
+
+            .feynman-dive h4 {
+                font-size: 1.1rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .toc {
+                padding: 1rem;
+            }
+
+            .toc ul {
+                padding-left: 1rem;
+            }
+
+            .checkpoint-timeline {
+                padding: 1rem;
+            }
+
+            .checkpoint-item {
+                font-size: 0.9rem;
+                padding: 0.75rem;
+            }
+
+            .code-block {
+                font-size: 12px;
+                padding: 1rem;
+            }
+
+            .array-visual {
+                overflow-x: auto;
+                padding: 0.75rem;
+            }
+
+            .array-element {
+                min-width: 50px;
+                height: 50px;
+                font-size: 14px;
+            }
+
+            .hierarchy-pyramid {
+                padding: 1rem;
+            }
+
+            .pyramid-level {
+                max-width: 100%;
+                font-size: 0.85rem;
+                padding: 0.75rem;
+            }
+
+            .pyramid-level-0,
+            .pyramid-level-1,
+            .pyramid-level-2,
+            .pyramid-level-3,
+            .pyramid-level-4,
+            .pyramid-level-5,
+            .pyramid-level-6 {
+                width: 90% !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                font-size: 15px;
+            }
+
+            .hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .hero p {
+                font-size: 0.95rem;
+            }
+
+            .demo-controls {
+                padding: 0.75rem;
+            }
+
+            .playground-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-item {
+                padding: 0.75rem;
+            }
+
+            .nav-links {
+                width: 100%;
+                max-width: none;
+            }
+
+            .interactive-demo h3 {
+                font-size: 1.1rem;
+            }
+
+            .byte-container {
+                gap: 1px;
+                padding: 3px;
+            }
+
+            .bit {
+                width: 18px;
+                height: 22px;
+                font-size: 11px;
+            }
+
+            .cache-block {
+                min-width: 35px;
+                height: 35px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Reading Progress Bar -->
+    <div id="reading-progress"></div>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="/" class="nav-logo">ROVER</a>
+            
+            <div class="nav-links" id="navLinks">
+                <a href="#intro" class="nav-link">What is Memory?</a>
+                <a href="#fundamental-unit" class="nav-link">Bytes & Data Types</a>
+                <a href="#pointers" class="nav-link">Pointers</a>
+                <a href="#memory-hierarchy" class="nav-link">Memory Hierarchy</a>
+                <a href="#cache" class="nav-link">Cache & Optimization</a>
+                <a href="#dsa-matters" class="nav-link">Why It Matters</a>
+            </div>
+
+            <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="container">
+            <h1 class="fade-in">What the Actual Heck is Memory???</h1
+            <p class="fade-in fade-in-delay-1">
+                Memory is where your program puts all its stuff like numbers, text, and more while it’s running. Some memory is super fast and close to the CPU (registers and cache), and some is slow but big (like your hard disk). If you use memory the wrong way, even the best code turns slow, because computers care a lot about where things are stored. So, understanding memory isn’t just technical it makes your code work better, and saves you from a lot of headaches!
+            </p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+
+        <!-- Checkpoint Timeline -->
+        <!-- <section class="checkpoint-timeline">
+            <h2>Learning Checkpoints</h2>
+            <div class="checkpoint-item">[0-12 min] What Is Memory? - The Complete Picture</div>
+            <div class="checkpoint-item">[12-24 min] Memory Hierarchy - From Registers to Hard Disk</div>
+            <div class="checkpoint-item">[24-36 min] Stack vs Heap - The Two Kingdoms</div>
+            <div class="checkpoint-item">[36-48 min] Memory Layout of Programs & Data Structures</div>
+            <div class="checkpoint-item">[48-60 min] Cache Optimization & Memory-Efficient Programming</div>
+        </section> -->
+
+        <!-- Table of Contents - Collapsible -->
+        <div class="collapsible-section open" id="toc-section">
+            <div class="collapsible-header" onclick="toggleCollapsible('toc-section')">
+                <div class="collapsible-title">
+                    <span class="collapsible-icon"></span>
+                    <span>Table of Contents</span>
+                </div>
+                <div class="collapsible-arrow">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+            </div>
+            <div class="collapsible-content">
+                <div class="collapsible-inner">
+                    <ul class="animated-list">
+                        <li class="animated-list-item"><a href="#intro" style="color: inherit; text-decoration: none;">What IS Memory? - Building From Zero</a></li>
+                        <li class="animated-list-item"><a href="#library-analogy" style="color: inherit; text-decoration: none;">The Library Analogy</a></li>
+                        <li class="animated-list-item"><a href="#what-exactly" style="color: inherit; text-decoration: none;">What Exactly IS Memory?</a></li>
+                        <li class="animated-list-item"><a href="#fundamental-unit" style="color: inherit; text-decoration: none;">The Fundamental Unit: The Byte</a></li>
+                        <li class="animated-list-item"><a href="#data-types" style="color: inherit; text-decoration: none;">How Data Types Use Bytes</a></li>
+                        <li class="animated-list-item"><a href="#memory-addresses" style="color: inherit; text-decoration: none;">Memory Addresses - The GPS of Your Computer</a></li>
+                        <li class="animated-list-item"><a href="#pointers" style="color: inherit; text-decoration: none;">Pointers - Addresses as Data</a></li>
+                        <li class="animated-list-item"><a href="#memory-access" style="color: inherit; text-decoration: none;">What Happens When You Access Memory</a></li>
+                        <li class="animated-list-item"><a href="#memory-hierarchy" style="color: inherit; text-decoration: none;">Memory Hierarchy - The Speed Pyramid</a></li>
+                        <li class="animated-list-item"><a href="#registers" style="color: inherit; text-decoration: none;">Level 1: CPU Registers</a></li>
+                        <li class="animated-list-item"><a href="#cache" style="color: inherit; text-decoration: none;">Level 2-4: Cache (L1, L2, L3)</a></li>
+                        <li class="animated-list-item"><a href="#ram" style="color: inherit; text-decoration: none;">Level 5: Main Memory (RAM)</a></li>
+                        <li class="animated-list-item"><a href="#storage" style="color: inherit; text-decoration: none;">Level 6-7: Storage (SSD/HDD)</a></li>
+                        <li class="animated-list-item"><a href="#dsa-matters" style="color: inherit; text-decoration: none;">Why This Matters for DSA</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: What IS Memory? -->
+        <article id="intro" class="section">
+            <div class="section-header">
+                <h2 class="section-title"> WHAT IS MEMORY? - BUILDING FROM ZERO</h2>
+            </div>
+
+            <!-- Feynman-Style Sarcastic Deep Dive -->
+            <div class="feynman-dive">
+                <h3>The "I'm Explaining This to My Rubber Duck" Deep Dive</h3>
+                <div class="feynman-content">
+                    <p class="feynman-intro">
+                        Okay, look. If you can't explain memory to a six-year-old, you don't understand it yourself. So let's pretend I'm that six-year-old—except this six-year-old has seen some things and isn't impressed by your buzzwords.
+                    </p>
+                    
+                    <h4>What Memory REALLY Is (Spoiler: It's Numbingly Simple)</h4>
+                    <p>
+                        Memory is a <strong>giant numbered array</strong>. That's it. I'm serious. Every computer scientist overcomplicate this, but at its core, it's literally just:
+                    </p>
+                    <ul class="animated-list">
+                        <li class="animated-list-item"><strong>A bunch of boxes</strong> (bytes, each 8 bits)</li>
+                        <li class="animated-list-item"><strong>Each box has a number</strong> (address, like 0x7FFF...)</li>
+                        <li class="animated-list-item"><strong>You can put stuff in boxes</strong> (write data)</li>
+                        <li class="animated-list-item"><strong>You can read stuff from boxes</strong> (read data)</li>
+                        <li class="animated-list-item"><strong>That's literally it.</strong> Don't let anyone tell you otherwise.</li>
+                    </ul>
+                    
+                    <p>
+                        "But wait," you say, "what about virtual memory? Page tables? The MMU?" Yeah, we'll get there. But here's the secret: <strong>those are all just fancy lies</strong> the operating system tells your program so multiple programs can pretend they each own all the memory. It's like Disneyland telling every kid they're the special birthday child.
+                    </p>
+                    
+                    <h4>The Von Neumann Plot Twist Nobody Talks About</h4>
+                    <p>
+                        Here's where it gets wild. In your computer, <strong>programs ARE data</strong>. Mind = blown? The instruction "ADD 5, 10" is just bytes sitting in memory, same as your cat photo. The CPU reads these instruction-bytes and goes "oh, they want me to add numbers." This is why you can have programs that modify themselves (terrifying) or why buffer overflows can make your program execute your cat photo as code (even more terrifying).
+                    </p>
+                    
+                    <p>
+                        The CPU doesn't care. It's a mindless automaton that goes: <em>"Read byte at address. Is it instruction? Execute. Is it data? Process. Repeat until heat death of universe or segfault, whichever comes first."</em>
+                    </p>
+                    
+                    <h4>The Memory Management Unit: A Magician's Assistant</h4>
+                    <p>
+                        The MMU is like a shady translator at a tourist trap. Your program says "Give me data at address 0x1000" and the MMU quietly swaps that with the REAL address 0x8A3F2000 in physical RAM. Why? Because your program is running in a <strong>fantasy land</strong> where it thinks it owns all 16 exabytes of address space.
+                    </p>
+                    
+                    <p>
+                        This happens through <strong>page tables</strong>—basically a massive lookup table that maps your fantasy addresses to reality. Each "page" is usually 4KB. Think of it like this: you ask for apartment 0x1000 in "Virtual City" and the MMU checks its phonebook and says "ah yes, that's actually apartment 0x8A3F2000 in Physical RAM Town."
+                    </p>
+                    
+                    <h4>Why Alignment Isn't Just OCD</h4>
+                    <p>
+                        Your CPU is lazy. It wants to read memory in nice, even chunks—4 bytes or 8 bytes at a time. If you tell it to read a 4-byte integer starting at address 0x1001 (odd address), it has to do TWO reads: grab bytes from 0x1000-0x1003, then bytes from 0x1004-0x1007, then mash them together like a sandwich. <strong>This is slow and the CPU hates you for it.</strong>
+                    </p>
+                    
+                    <p>
+                        So compilers secretly add padding bytes (wasted space) to make sure everything starts at "nice" addresses. This is why your 3-byte struct might actually take 4 or 8 bytes. It's not a bug—it's the compiler protecting you from your CPU's passive-aggressive performance penalties.
+                    </p>
+                    
+                    <h4>Endianness: The Dumbest Religious War in Computer Science</h4>
+                    <p>
+                        Should multi-byte numbers be stored with the big end first or little end first? <strong>WHO CARES?</strong> But oh boy, do computer architectures care. x86 decided "little-endian" (least significant byte first). Networks use "big-endian." ARM does whatever it wants. The result? You have to byteswap when sending data over networks. We've been doing this for 50 years and nobody's fixed it because everyone's too invested in their choice.
+                    </p>
+                    
+                    <p class="feynman-conclusion">
+                        <strong>The Feynman Test:</strong> If you can't draw memory as a simple array of numbered boxes and explain why your code works using just that model, you're overcomplicating it. Everything else—virtual memory, caching, alignment—is just performance tricks and safety rails built on top of that stupid-simple array.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Interactive Memory Playground -->
+            <div class="interactive-demo" id="memory-playground">
+                <h3>Interactive Memory Playground</h3>
+                <p class="demo-desc">Play with memory concepts in real-time. Watch bytes flip, addresses calculate, and data flow!</p>
+                
+                <div class="demo-controls">
+                    <button class="btn demo-btn" onclick="memoryPlayground.reset()">Reset</button>
+                    <button class="btn demo-btn" onclick="memoryPlayground.randomize()">Randomize</button>
+                    <button class="btn demo-btn" onclick="memoryPlayground.toggleAnimation()">
+                        <span id="anim-toggle-text">Pause Animation</span>
+                    </button>
+                    <div class="speed-control">
+                        <label>Animation Speed:</label>
+                        <input type="range" min="1" max="100" value="50" class="speed-slider" 
+                               oninput="memoryPlayground.setSpeed(this.value)">
+                        <span id="speed-display">50%</span>
+                    </div>
+                </div>
+                
+                <div class="playground-canvas" id="playground-canvas">
+                    <!-- Canvas will be populated by JavaScript -->
+                </div>
+                
+                <div class="playground-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Total Memory:</span>
+                        <span class="stat-value" id="stat-total">256 bytes</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Allocated:</span>
+                        <span class="stat-value" id="stat-allocated">0 bytes</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Free:</span>
+                        <span class="stat-value" id="stat-free">256 bytes</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Fragmentation:</span>
+                        <span class="stat-value" id="stat-frag">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- The Library Analogy -->
+            <div id="library-analogy" class="content-block">
+                <h3>The Library Analogy - Your First Mental Model</h3>
+                <p>Imagine you're in a massive library with millions of books. This is your computer's memory.</p>
+                <ul class="animated-list">
+                    <li class="animated-list-item">Each shelf location = Memory address (like 0x7fff5fbff710)</li>
+                    <li class="animated-list-item">Each book = A piece of data (number, character, etc.)</li>
+                    <li class="animated-list-item">The librarian = The CPU (processes data)</li>
+                    <li class="animated-list-item">Your notes = Registers (fastest access)</li>
+                    <li class="animated-list-item">Your desk = Cache (quick access to recent books)</li>
+                    <li class="animated-list-item">The shelves = RAM (main memory)</li>
+                    <li class="animated-list-item">The warehouse = Hard disk (slowest, permanent storage)</li>
+                </ul>
+            </div>
+
+            <!-- What Exactly IS Memory? -->
+            <div id="what-exactly" class="content-block">
+                <h3>What Exactly IS Memory?</h3>
+                <p>Let me explain like you're 5, then like you're a programmer.</p>
+                
+                <h4>5-Year-Old Explanation:</h4>
+                <p>Memory is like a giant box of numbered drawers. Each drawer has a number (address), and you can put one toy (data) in each drawer. When you want a toy, you tell the computer the drawer number, and it gets it for you instantly.</p>
+                
+                <h4>Programmer Explanation:</h4>
+                <p>Memory is a large array of bytes, where each byte has a unique address. When you create a variable, you're asking the operating system to reserve one or more bytes at a specific address to store your data.</p>
+            </div>
+
+            <!-- The Fundamental Unit: The Byte -->
+            <div id="fundamental-unit" class="content-block">
+                <h3>The Fundamental Unit: The Byte</h3>
+                <p>A byte is 8 bits. A bit is either 0 or 1.</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>1 Bit  = 0 or 1
+1 Byte = 8 bits = can hold values 0 to 255 (2^8 possibilities)</code></pre>
+                </div>
+
+                <p>Example of a byte:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>10110101
+↑↑↑↑↑↑↑↑
+||||||||_ Position 0 (2^0 = 1)
+|||||||_ Position 1 (2^1 = 2)
+||||||_ Position 2 (2^2 = 4)
+|||||_ Position 3 (2^3 = 8)
+||||_ Position 4 (2^4 = 16)
+|||_ Position 5 (2^5 = 32)
+||_ Position 6 (2^6 = 64)
+|_ Position 7 (2^7 = 128)
+
+
+Value = 1+4+16+32+64+128 = 245</code></pre>
+                </div>
+            </div>
+
+            <!-- Interactive Byte Demo -->
+            <div class="interactive-demo" id="byte-demo">
+                <h3>Interactive Bit Flipper</h3>
+                <p class="demo-desc">Click on any bit to flip it between 0 and 1. Watch the decimal value update in real-time!</p>
+                
+                <div class="demo-controls">
+                    <button class="btn demo-btn" onclick="byteDemo.reset()">Reset to 0</button>
+                    <button class="btn demo-btn" onclick="byteDemo.setMax()">Set to 255</button>
+                    <button class="btn demo-btn" onclick="byteDemo.randomize()">Randomize</button>
+                    <button class="btn demo-btn" onclick="byteDemo.animate()">Animate Count</button>
+                </div>
+                
+                <div class="playground-canvas" id="byte-canvas" style="min-height: 250px;">
+                    <!-- Populated by JavaScript -->
+                </div>
+                
+                <div class="playground-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Decimal Value</span>
+                        <span class="stat-value" id="byte-decimal">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Hexadecimal</span>
+                        <span class="stat-value" id="byte-hex">0x00</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">ASCII Character</span>
+                        <span class="stat-value" id="byte-ascii">NUL</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Bits Set</span>
+                        <span class="stat-value" id="bits-set">0/8</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- How Data Types Use Bytes -->
+            <div id="data-types" class="content-block">
+                <h3>How Data Types Use Bytes</h3>
+                <p>Different data types need different amounts of memory:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code># In most systems:
+bool    → 1 byte  (can store True/False)
+char    → 1 byte  (can store one character like 'A')
+int     → 4 bytes (can store -2,147,483,648 to 2,147,483,647)
+float   → 4 bytes (can store decimal numbers)
+long    → 8 bytes (larger integers)
+double  → 8 bytes (larger decimals)
+pointer → 8 bytes (on 64-bit systems)</code></pre>
+                </div>
+
+                <h4>Why does int need 4 bytes?</h4>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>4 bytes = 32 bits
+32 bits can represent 2^32 different values
+= 4,294,967,296 different numbers
+
+Since we want negative numbers too, we split it:
+Half for negative: -2,147,483,648 to -1
+Half for positive: 0 to 2,147,483,647</code></pre>
+                </div>
+            </div>
+
+            <!-- Memory Addresses -->
+            <div id="memory-addresses" class="content-block">
+                <h3>Memory Addresses - The GPS of Your Computer</h3>
+                <p>Every byte in memory has an address. Think of it like house numbers on a street.</p>
+                
+                <h4>Memory Visualization:</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Address</th>
+                            <th>Data</th>
+                            <th>What it represents</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>0x1000</td>
+                            <td>00000101</td>
+                            <td>int x (byte 1/4)</td>
+                        </tr>
+                        <tr>
+                            <td>0x1001</td>
+                            <td>00000000</td>
+                            <td>int x (byte 2/4)</td>
+                        </tr>
+                        <tr>
+                            <td>0x1002</td>
+                            <td>00000000</td>
+                            <td>int x (byte 3/4)</td>
+                        </tr>
+                        <tr>
+                            <td>0x1003</td>
+                            <td>00000000</td>
+                            <td>int x (byte 4/4)</td>
+                        </tr>
+                        <tr>
+                            <td>0x1004</td>
+                            <td>01000001</td>
+                            <td>char y = 'A'</td>
+                        </tr>
+                        <tr>
+                            <td>0x1005</td>
+                            <td>00001010</td>
+                            <td>char z = '\n'</td>
+                        </tr>
+                        <tr>
+                            <td>0x1006</td>
+                            <td>????????</td>
+                            <td>Unallocated</td>
+                        </tr>
+                        <tr>
+                            <td>0x1007</td>
+                            <td>????????</td>
+                            <td>Unallocated</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p>When you write:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>int x = 5;</code></pre>
+                </div>
+
+                <p>Here's what happens step by step:</p>
+                <ol>
+                    <li>Compiler sees "int" → "I need 4 consecutive bytes"</li>
+                    <li>Operating System allocates → "Here, use addresses 0x1000-0x1003"</li>
+                    <li>CPU stores value 5 → Converts 5 to binary (00000000 00000000 00000000 00000101)</li>
+                    <li>Memory updated → Those 4 bytes now contain the binary representation</li>
+                </ol>
+            </div>
+
+            <!-- Pointers -->
+            <div id="pointers" class="content-block">
+                <h3>Pointers - Addresses as Data</h3>
+                <p>A pointer is a variable that stores a memory address.</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>int x = 42;        // x is at address 0x1000
+int* ptr = &x;     // ptr stores the address 0x1000
+
+// Visualization:</code></pre>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Address</th>
+                            <th>Variable</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>0x1000</td>
+                            <td>x</td>
+                            <td>42</td>
+                        </tr>
+                        <tr>
+                            <td>0x2000</td>
+                            <td>ptr</td>
+                            <td>0x1000  (points to x)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p>Why pointers matter in DSA:</p>
+                <ul class="animated-list">
+                    <li class="animated-list-item">Linked lists use pointers to connect nodes</li>
+                    <li class="animated-list-item">Trees use pointers to connect parent-child</li>
+                    <li class="animated-list-item">Dynamic arrays resize by allocating new memory and updating pointer</li>
+                    <li class="animated-list-item">Graphs use pointers/references to represent edges</li>
+                </ul>
+            </div>
+
+            <!-- Interactive Pointer Demo -->
+            <div class="interactive-demo" id="pointer-demo">
+                <h3>Interactive Pointer Visualizer</h3>
+                <p class="demo-desc">Create variables, pointers, and watch how they reference memory addresses!</p>
+                
+                <div class="demo-controls">
+                    <button class="btn demo-btn" onclick="pointerDemo.createVariable()">Create Variable</button>
+                    <button class="btn demo-btn" onclick="pointerDemo.createPointer()">Create Pointer</button>
+                    <button class="btn demo-btn" onclick="pointerDemo.dereference()">Dereference Pointer</button>
+                    <button class="btn demo-btn" onclick="pointerDemo.reset()">Reset</button>
+                </div>
+                
+                <div class="playground-canvas" id="pointer-canvas" style="min-height: 400px;">
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px;">
+                            <h4 style="margin-bottom: 15px; color: var(--mclaren-orange);">Memory Map</h4>
+                            <div id="memory-map" style="display: flex; flex-direction: column; gap: 8px;">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px;">
+                            <h4 style="margin-bottom: 15px; color: var(--meta-blue);">Variable Table</h4>
+                            <table style="width: 100%; color: white;">
+                                <thead>
+                                    <tr style="border-bottom: 2px solid var(--glass-border);">
+                                        <th style="padding: 10px; text-align: left;">Name</th>
+                                        <th style="padding: 10px; text-align: left;">Type</th>
+                                        <th style="padding: 10px; text-align: left;">Address</th>
+                                        <th style="padding: 10px; text-align: left;">Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="variable-table">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="playground-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Variables</span>
+                        <span class="stat-value" id="var-count">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Pointers</span>
+                        <span class="stat-value" id="ptr-count">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Memory Used</span>
+                        <span class="stat-value" id="mem-used">0 bytes</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Pointer Chains</span>
+                        <span class="stat-value" id="ptr-chains">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- What Happens When You Access Memory -->
+            <div id="memory-access" class="content-block">
+                <h3>What Happens When You Access Memory</h3>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>arr = [10, 20, 30, 40, 50]
+value = arr[3]  # Getting the 4th element</code></pre>
+                </div>
+
+                <p>Step-by-step breakdown:</p>
+                <ol>
+                    <li>CPU receives instruction: "Get arr[3]"</li>
+                    <li>Calculate memory address:
+                        <ul>
+                            <li>arr starts at address 0x5000</li>
+                            <li>Each int is 4 bytes</li>
+                            <li>arr[3] is at: 0x5000 + (3 × 4) = 0x500C</li>
+                        </ul>
+                    </li>
+                    <li>CPU sends address 0x500C to memory controller</li>
+                    <li>Memory controller:
+                        <ul>
+                            <li>Checks L1 cache (2-4 CPU cycles)</li>
+                            <li>If not in L1, checks L2 cache (10-20 cycles)</li>
+                            <li>If not in L2, checks L3 cache (40-75 cycles)</li>
+                            <li>If not in L3, checks RAM (100-300 cycles)</li>
+                        </ul>
+                    </li>
+                    <li>Data retrieved: value = 40</li>
+                    <li>Data stored in register for immediate use</li>
+                </ol>
+
+                <div class="info-box">
+                    This is why array access is O(1) - it's just arithmetic!
+                </div>
+            </div>
+        </article>
+
+        <!-- SECTION: Memory Hierarchy -->
+        <article id="memory-hierarchy" class="section">
+            <div class="section-header">
+                <h2 class="section-title">[MINUTE 12-24] MEMORY HIERARCHY - THE SPEED PYRAMID</h2>
+            </div>
+
+            <!-- Feynman-Style Sarcastic Deep Dive for Memory Hierarchy -->
+            <div class="feynman-dive">
+                <h3>The "Why Your Computer Has Trust Issues" Deep Dive</h3>
+                <div class="feynman-content">
+                    <p class="feynman-intro">
+                        Your computer is basically a paranoid hoarder with severe attachment issues. It keeps multiple copies of the same data in different places, just in case. Let me explain why this neurotic behavior is actually genius.
+                    </p>
+                    
+                    <h4>The Speed-vs-Money Drama</h4>
+                    <p>
+                        Here's the tragic love triangle: You want memory that's FAST, BIG, and CHEAP. Physics says: <strong>"Pick two, buddy."</strong> It's like the old joke about project management—fast, good, cheap: choose two.
+                    </p>
+                    <ul class="animated-list">
+                        <li class="animated-list-item"><strong>SRAM (registers/cache)</strong>: Fast & reliable, but costs more than your kidney per gigabyte. Uses 6 transistors per bit like it's made of money.</li>
+                        <li class="animated-list-item"><strong>DRAM (RAM)</strong>: Cheaper & bigger, but slower and has amnesia (forgets data without constant refresh). Uses 1 transistor + 1 leaky capacitor.</li>
+                        <li class="animated-list-item"><strong>Flash (SSD)</strong>: Even cheaper & bigger, but slower still. Also dies a little every time you write to it (limited write cycles).</li>
+                        <li class="animated-list-item"><strong>Hard disks</strong>: Dirt cheap per gigabyte, massive storage, but slower than a snail doing taxes. Literally uses spinning metal platters like it's 1956.</li>
+                    </ul>
+                    
+                    <h4>The Cache: Your Computer's Predictive Anxiety</h4>
+                    <p>
+                        The cache is your CPU trying to be psychic. It goes: <em>"Hmm, you accessed this data once. I bet you'll want it again! Let me keep it nearby just in case!"</em> And it's right like 95% of the time for well-written code. This is called <strong>locality of reference</strong>, which is a fancy way of saying "programmers are predictable creatures of habit."
+                    </p>
+                    
+                    <p>
+                        There are TWO types of locality your CPU bets on:
+                    </p>
+                    <ul class="animated-list">
+                        <li class="animated-list-item"><strong>Temporal locality</strong>: "You used this recently, so you'll probably use it again soon." (True for loop variables, function calls, etc.)</li>
+                        <li class="animated-list-item"><strong>Spatial locality</strong>: "You used this memory address, so you'll probably want the NEXT address too." (True for arrays, sequential data)</li>
+                    </ul>
+                    
+                    <h4>The 64-Byte Cache Line Conspiracy</h4>
+                    <p>
+                        When you ask for ONE byte from RAM, your CPU says <strong>"Screw that, I'm grabbing 64 bytes!"</strong> It loads an entire "cache line" of 64 consecutive bytes. Why? Because spatial locality. If you're reading an array, you'll probably want the next element, and the next, and the next...
+                    </p>
+                    
+                    <p>
+                        This is why sequential array access is FAST but random access is SLOW. Sequential: you use all 64 bytes of that cache line (95%+ cache hits). Random: you use 1 byte then jump elsewhere, wasting the other 63 bytes (20% cache hits). <strong>It's like buying a 64-pack of toilet paper rolls and only using one before throwing it away.</strong>
+                    </p>
+                    
+                    <h4>The Matrix Traversal Massacre</h4>
+                    <p>
+                        This is where it gets hilarious. Consider a 1000x1000 matrix. Memory stores it row-by-row (row-major order). If you access it column-by-column, you're jumping through memory like a drunk kangaroo, missing cache lines constantly. Same O(n²) algorithm, <strong>but 10-100x slower in practice</strong> just because you went against the grain. This is the difference between theoretical complexity and real-world performance.
+                    </p>
+                    
+                    <h4>LRU: The "Use It or Lose It" Eviction Policy</h4>
+                    <p>
+                        Cache is tiny (64KB for L1). When it's full and you need new data, something's gotta go. Most caches use LRU (Least Recently Used): evict whatever you haven't touched in the longest time. It's like how your brain forgets your childhood friend's phone number but remembers the lyrics to that stupid song from yesterday.
+                    </p>
+                    
+                    <p class="feynman-conclusion">
+                        <strong>The Feynman Test:</strong> If you can't explain why accessing an array backwards is slower than forwards, even though you do the same number of operations, you don't understand caching. The answer: cache lines load 64 bytes at a time, and going backwards wastes most of that prefetched data. It's all about physics and economics, not magic.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Interactive Memory Hierarchy Pyramid -->
+            <div class="interactive-demo" id="hierarchy-demo">
+                <h3>Interactive Memory Hierarchy Pyramid</h3>
+                <p class="demo-desc">Click on each level to see detailed stats. Watch data flow through the hierarchy in real-time!</p>
+                
+                <div class="demo-controls">
+                    <button class="btn demo-btn" onclick="hierarchyDemo.simulateAccess()">Simulate Memory Access</button>
+                    <button class="btn demo-btn" onclick="hierarchyDemo.benchmarkSpeed()">Run Speed Benchmark</button>
+                    <button class="btn demo-btn" onclick="hierarchyDemo.showCostComparison()">Cost Comparison</button>
+                    <button class="btn demo-btn" onclick="hierarchyDemo.reset()">Reset</button>
+                </div>
+                
+                <div class="playground-canvas" id="hierarchy-canvas" style="min-height: 500px;">
+                    <div class="hierarchy-pyramid">
+                        <div class="pyramid-level pyramid-level-0" onclick="hierarchyDemo.selectLevel(0)" data-level="0">
+                            <div class="level-name">Registers</div>
+                            <div class="level-details">~1 KB | &lt;1 ns | $$$$$$$</div>
+                        </div>
+                        <div class="pyramid-level pyramid-level-1" onclick="hierarchyDemo.selectLevel(1)" data-level="1">
+                            <div class="level-name">L1 Cache</div>
+                            <div class="level-details">~64 KB | 1-2 ns | $$$$$$</div>
+                        </div>
+                        <div class="pyramid-level pyramid-level-2" onclick="hierarchyDemo.selectLevel(2)" data-level="2">
+                            <div class="level-name">L2 Cache</div>
+                            <div class="level-details">~256 KB | 5-10 ns | $$$$$</div>
+                        </div>
+                        <div class="pyramid-level pyramid-level-3" onclick="hierarchyDemo.selectLevel(3)" data-level="3">
+                            <div class="level-name">L3 Cache</div>
+                            <div class="level-details">~8 MB | 20-40 ns | $$$$</div>
+                        </div>
+                        <div class="pyramid-level pyramid-level-4" onclick="hierarchyDemo.selectLevel(4)" data-level="4">
+                            <div class="level-name">Main RAM</div>
+                            <div class="level-details">8-64 GB | 100 ns | $$$</div>
+                        </div>
+                        <div class="pyramid-level pyramid-level-5" onclick="hierarchyDemo.selectLevel(5)" data-level="5">
+                            <div class="level-name">SSD</div>
+                            <div class="level-details">256GB-2TB | 50-100 μs | $$</div>
+                        </div>
+                        <div class="pyramid-level pyramid-level-6" onclick="hierarchyDemo.selectLevel(6)" data-level="6">
+                            <div class="level-name">Hard Disk</div>
+                            <div class="level-details">1-10 TB | 5-10 ms | $</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="playground-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Selected Level</span>
+                        <span class="stat-value" id="hierarchy-level">None</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Access Time</span>
+                        <span class="stat-value" id="hierarchy-time">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Typical Size</span>
+                        <span class="stat-value" id="hierarchy-size">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Cost/GB</span>
+                        <span class="stat-value" id="hierarchy-cost">-</span>
+                    </div>
+                </div>
+                
+                <div id="hierarchy-info" class="info-box" style="display: none; margin-top: 20px;">
+                    <!-- Info populated by JS -->
+                </div>
+            </div>
+
+            <!-- Deep theoretical dive (keeping original for reference) -->
+            <div class="theoretical-dive" style="display: none;">
+                <h3>Deep theoretical dive</h3>
+                <p>
+                    The memory hierarchy exists because of the fundamental <strong>tradeoff between speed, size, and cost</strong> in semiconductor physics. SRAM (used in caches and registers) uses 6 transistors per bit and maintains state as long as power is supplied, making it extremely fast (sub-nanosecond access) but expensive and space-consuming. DRAM (used in main memory) uses 1 transistor + 1 capacitor per bit, achieving much higher density but requiring periodic refresh cycles (every 64ms) to maintain data, introducing latency.
+                </p>
+                <p>
+                    Modern CPUs implement a <strong>multi-level cache hierarchy</strong> based on the principle of locality: temporal locality (recently accessed data will likely be accessed again) and spatial locality (nearby data will likely be accessed together). The cache controller automatically manages this—when you access a memory address, an entire cache line (typically 64 bytes) is loaded from the next level. This is why sequential array access achieves 95%+ cache hit rates while random access drops to 20%.
+                </p>
+                <p>
+                    <strong>Cache coherence protocols</strong> like MESI (Modified, Exclusive, Shared, Invalid) ensure that when multiple CPU cores share data, they maintain a consistent view of memory. When core A modifies data in its L1 cache, the cache controller broadcasts an invalidation signal to other cores, forcing them to reload the updated value from main memory. This inter-core communication overhead is why multithreaded programs can exhibit unexpected slowdowns when threads share data—a phenomenon called "false sharing" when unrelated variables occupy the same cache line.
+                </p>
+                <p>
+                    The <strong>memory bandwidth wall</strong> is a critical bottleneck: while CPU speeds have increased ~1000x since 1980, memory latency has improved only ~10x. This growing disparity makes cache optimization increasingly critical for performance. Modern techniques like prefetching (CPU predicts access patterns and loads data ahead of time), out-of-order execution, and SIMD (processing multiple data elements in parallel) all aim to hide memory latency and maximize throughput.
+                </p>
+            </div>
+
+            <!-- The Complete Hierarchy -->
+            <div class="content-block">
+                <h3>The Complete Hierarchy</h3>
+                
+                <figure>
+                    <div class="code-block">
+                        <pre><code>        SPEED        SIZE         COST/BYTE
+     ↑                         
+ Registers    ~1 KB          $$$$$$$
+     |
+ L1 Cache     ~64 KB         $$$$$$
+     |
+ L2 Cache     ~256 KB        $$$$$
+     |
+ L3 Cache     ~8 MB          $$$$
+     |
+ Main RAM     8-64 GB        $$$
+     |
+ SSD          256GB-2TB      $$
+     |
+ Hard Disk    1-10 TB        $
+     ↓</code></pre>
+                    </div>
+                    <figcaption>[Image referenced in source: Memory Hierarchy Pyramid]</figcaption>
+                </figure>
+            </div>
+
+            <!-- Level 1: CPU Registers -->
+            <div id="registers" class="content-block">
+                <h3>Level 1: CPU Registers (Fastest - ~1 Nanosecond)</h3>
+                
+                <h4>What are they?</h4>
+                <p>Registers are tiny storage locations INSIDE the CPU itself. They're built directly into the processor chip.</p>
+                
+                <ul>
+                    <li>Size: Modern CPUs have 16-32 general-purpose registers, each 8 bytes (64 bits)</li>
+                    <li>Analogy: The notepad in your hand while doing calculations</li>
+                </ul>
+
+                <h4>Common Registers:</h4>
+                <ul>
+                    <li>RAX, RBX, RCX, RDX: General purpose arithmetic</li>
+                    <li>RSP: Stack pointer (where is the top of the stack?)</li>
+                    <li>RIP: Instruction pointer (what instruction to execute next?)</li>
+                </ul>
+
+                <p>When your code runs:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>int a = 5;
+int b = 10;
+int c = a + b;</code></pre>
+                </div>
+
+                <p>Behind the scenes:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>MOV RAX, 5      ; Load 5 into register RAX
+MOV RBX, 10     ; Load 10 into register RBX
+ADD RAX, RBX    ; Add RAX and RBX, store in RAX
+MOV [c], RAX    ; Store result in memory location c</code></pre>
+                </div>
+
+                <p>Why you care:</p>
+                <ul>
+                    <li>Variables in tight loops often stay in registers</li>
+                    <li>Fewer variables = more fit in registers = faster code</li>
+                    <li>This is why i++ is so fast</li>
+                </ul>
+            </div>
+
+            <!-- Level 2-4: Cache -->
+            <div id="cache" class="content-block">
+                <h3>Level 2-4: Cache (L1, L2, L3) - (~1-100 Nanoseconds)</h3>
+                
+                <h4>What is cache?</h4>
+                <p>Cache is super-fast memory that stores copies of frequently used data from RAM.</p>
+                
+                <h4>The Three Levels:</h4>
+                
+                <div class="case-study">
+                    <div class="case-study-header" onclick="toggleCaseStudy(this)">
+                        <h4>L1 Cache (Level 1)</h4>
+                        <span class="case-study-toggle">▼</span>
+                    </div>
+                    <div class="case-study-content">
+                        <ul>
+                            <li>Location: Inside each CPU core</li>
+                            <li>Size: ~32-64 KB per core</li>
+                            <li>Speed: 2-4 CPU cycles (~1 nanosecond)</li>
+                            <li>Split into: L1i (instructions) and L1d (data)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="case-study">
+                    <div class="case-study-header" onclick="toggleCaseStudy(this)">
+                        <h4>L2 Cache (Level 2)</h4>
+                        <span class="case-study-toggle">▼</span>
+                    </div>
+                    <div class="case-study-content">
+                        <ul>
+                            <li>Location: Inside each CPU core (not shared)</li>
+                            <li>Size: ~256-512 KB per core</li>
+                            <li>Speed: 10-20 CPU cycles (~5 nanoseconds)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="case-study">
+                    <div class="case-study-header" onclick="toggleCaseStudy(this)">
+                        <h4>L3 Cache (Level 3)</h4>
+                        <span class="case-study-toggle">▼</span>
+                    </div>
+                    <div class="case-study-content">
+                        <ul>
+                            <li>Location: Shared by all cores</li>
+                            <li>Size: ~8-32 MB (entire CPU)</li>
+                            <li>Speed: 40-75 CPU cycles (~20 nanoseconds)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h4>How Cache Works - The Line & Block System</h4>
+                <p>Memory isn't loaded byte-by-byte into cache. It's loaded in cache lines.</p>
+                
+                <div class="info-box">
+                    Cache Line = 64 bytes (typically)<br><br>
+                    When you access arr[0], the CPU loads:<br>
+                    arr[0], arr[1], arr[2], ..., arr[15]  (assuming 4-byte ints)<br><br>
+                    All into one cache line!<br><br>
+                    This is CRITICAL for DSA optimization.
+                </div>
+
+                <h4>Example - Why arrays are cache-friendly:</h4>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>// Array: Elements are contiguous
+int arr[1000];
+
+// Access pattern 1: Sequential (FAST)
+for (int i = 0; i < 1000; i++) {
+    sum += arr[i];  // Each cache line loads 16 ints at once
+}
+// Cache hits: ~95%+
+// Time: Fast
+
+
+// Access pattern 2: Random (SLOW)
+for (int i = 0; i < 1000; i++) {
+    sum += arr[rand() % 1000];  // Random access
+}
+// Cache hits: ~20%
+// Time: 4-5x slower</code></pre>
+                </div>
+
+            <!-- Interactive Cache Line Demo -->
+            <div class="interactive-demo" id="cache-demo">
+                <h3>Cache Line Access Simulator</h3>
+                <p class="demo-desc">Compare sequential vs random access patterns. Watch cache hits (green) vs misses (red) in real-time!</p>
+                
+                <div class="demo-controls">
+                    <button class="btn demo-btn" onclick="cacheDemo.runSequential()">Run Sequential Access</button>
+                    <button class="btn demo-btn" onclick="cacheDemo.runRandom()">Run Random Access</button>
+                    <button class="btn demo-btn" onclick="cacheDemo.runCustom()">Custom Pattern</button>
+                    <button class="btn demo-btn" onclick="cacheDemo.reset()">Reset</button>
+                    <div class="speed-control">
+                        <label>Speed:</label>
+                        <input type="range" min="10" max="200" value="100" class="speed-slider" 
+                               oninput="cacheDemo.setSpeed(this.value)">
+                        <span id="cache-speed-display">100ms</span>
+                    </div>
+                </div>
+                
+                <div class="playground-canvas" id="cache-canvas" style="min-height: 350px;">
+                    <div style="margin-bottom: 20px;">
+                        <strong>Cache (4 lines, 64 bytes each):</strong>
+                        <div id="cache-lines" class="cache-line-demo">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                    <div>
+                        <strong>Main Memory Array (64 elements):</strong>
+                        <div id="memory-array" class="cache-line">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                    <div id="access-log" style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 8px; max-height: 150px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 12px;">
+                        <div style="color: var(--text-dim);">Access log will appear here...</div>
+                    </div>
+                </div>
+                
+                <div class="playground-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Cache Hits</span>
+                        <span class="stat-value" id="cache-hits" style="color: #3fb950;">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Cache Misses</span>
+                        <span class="stat-value" id="cache-misses" style="color: var(--redbull-red);">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Hit Rate</span>
+                        <span class="stat-value" id="cache-hit-rate">0%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Total Accesses</span>
+                        <span class="stat-value" id="total-accesses">0</span>
+                    </div>
+                </div>
+            </div>
+
+                <h4>Cache Replacement Policies</h4>
+                <p>When cache is full, something must be evicted. Most common: LRU (Least Recently Used)</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>Cache state: [A, B, C, D] (full, size 4)
+
+Access E:
+
+1. Check cache: E not found (cache miss)
+2. Load E from RAM
+3. Evict least recently used (say A)
+4. New state: [B, C, D, E]</code></pre>
+                </div>
+
+                <p>Why this matters:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code># BAD: Column-major access (for row-major storage)
+for col in range(1000):
+    for row in range(1000):
+        matrix[row][col] += 1  # Jumps around memory
+
+GOOD: Row-major access
+
+for row in range(1000):
+    for col in range(1000):
+        matrix[row][col] += 1  # Sequential access</code></pre>
+                </div>
+
+                <div class="warning-box">
+                    The good version can be 10-100x faster on large matrices!
+                </div>
+            </div>
+
+            <!-- Level 5: Main Memory (RAM) -->
+            <div id="ram" class="content-block">
+                <h3>Level 5: Main Memory (RAM) - (~100 Nanoseconds)</h3>
+                
+                <h4>What is RAM?</h4>
+                <p>RAM (Random Access Memory) is your computer's primary working memory. It's volatile (data lost when power off).</p>
+                
+                <h4>Structure:</h4>
+                <ul>
+                    <li>RAM chip contains millions of capacitors</li>
+                    <li>Each capacitor = 1 bit (charged = 1, discharged = 0)</li>
+                    <li>Organized in a grid:
+                        <ul>
+                            <li>Rows and columns</li>
+                            <li>Row decoder + Column decoder = address</li>
+                            <li>Sense amplifiers read the charge</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h4>Timing:</h4>
+                <div class="code-block">
+                    <pre><code>RAM access breakdown:
+1. Send address to RAM: ~10ns
+2. Row activation: ~15ns
+3. Column selection: ~15ns
+4. Data retrieval: ~15ns
+5. Transfer to CPU: ~15ns
+Total: ~70-100ns</code></pre>
+                </div>
+
+                <h4>RAM Types:</h4>
+                
+                <div class="case-study">
+                    <div class="case-study-header" onclick="toggleCaseStudy(this)">
+                        <h4>DDR4 (most common in 2020s)</h4>
+                        <span class="case-study-toggle">▼</span>
+                    </div>
+                    <div class="case-study-content">
+                        <ul>
+                            <li>Speed: 2400-3200 MHz</li>
+                            <li>Bandwidth: 19.2-25.6 GB/s</li>
+                            <li>Latency: CAS 15-19 (~10-15ns)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="case-study">
+                    <div class="case-study-header" onclick="toggleCaseStudy(this)">
+                        <h4>DDR5 (newer)</h4>
+                        <span class="case-study-toggle">▼</span>
+                    </div>
+                    <div class="case-study-content">
+                        <ul>
+                            <li>Speed: 4800-6400 MHz</li>
+                            <li>Bandwidth: 38.4-51.2 GB/s</li>
+                            <li>Latency: CAS 40-46 (~12-15ns)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Level 6-7: Storage -->
+            <div id="storage" class="content-block">
+                <h3>Level 6-7: Storage (SSD/HDD) - (Microseconds to Milliseconds)</h3>
+                
+                <h4>SSD (Solid State Drive):</h4>
+                <ul>
+                    <li>Read: ~50-100 microseconds</li>
+                    <li>Write: ~100-1000 microseconds</li>
+                    <li>No moving parts (uses NAND flash memory)</li>
+                </ul>
+
+                <h4>HDD (Hard Disk Drive):</h4>
+                <ul>
+                    <li>Read: ~5-10 milliseconds</li>
+                    <li>Write: ~5-10 milliseconds</li>
+                    <li>Mechanical: spinning platters + moving read/write head</li>
+                </ul>
+
+                <h4>Speed comparison:</h4>
+                <div class="code-block">
+                    <pre><code>Register:   1 ns       = 1 second in analogy
+L1 Cache:   2 ns       = 2 seconds
+L2 Cache:   10 ns      = 10 seconds
+L3 Cache:   40 ns      = 40 seconds
+RAM:        100 ns     = 1.5 minutes
+SSD:        100 μs     = ~1 day
+HDD:        10 ms      = ~4 months</code></pre>
+                </div>
+            </div>
+
+            <!-- Why This Matters for DSA -->
+            <div id="dsa-matters" class="content-block">
+                <h3>Why This Matters for DSA</h3>
+                <p>Example: Searching in sorted array vs binary tree</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code># Sorted array: Cache-friendly
+arr = [1, 2, 3, 4, 5, ..., 1000000]  # Contiguous memory
+
+def binary_search_array(arr, target):
+    left, right = 0, len(arr) - 1
+    while left <= right:
+        mid = (left + right) // 2
+        # Cache loads arr[mid] and surrounding elements
+        if arr[mid] == target:
+            return mid
+        # ...</code></pre>
+                </div>
+
+                <p>vs</p>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code># Binary Search Tree: Cache-unfriendly
+class Node:
+    def __init__(self, val):
+        self.val = val
+        self.left = None   # Pointer to arbitrary memory location
+        self.right = None  # Another arbitrary memory location
+
+def search_bst(root, target):
+    # Each node access is a potential cache miss
+    # Nodes scattered across memory
+    if not root:
+        return None
+    if root.val == target:
+        return root
+    # ...</code></pre>
+                </div>
+
+                <p>Result:</p>
+                <ul>
+                    <li>Array binary search: ~50% faster despite same O(log n) complexity</li>
+                    <li>Why? Better cache utilization</li>
+                </ul>
+            </div>
+        </article>
+
+        <!-- Further Reading & References -->
+        <section class="further-reading">
+            <h2>Further Reading & References</h2>
+            <ul>
+                <li><strong>Computer Architecture:</strong> "Computer Organization and Design" by Patterson & Hennessy - The definitive guide to hardware fundamentals</li>
+                <li><strong>Memory Systems:</strong> "What Every Programmer Should Know About Memory" by Ulrich Drepper - Deep dive into cache optimization</li>
+                <li><strong>Virtual Memory:</strong> "Operating Systems: Three Easy Pieces" (Chapter 13-23) - Understanding OS memory management</li>
+                <li><strong>Cache Performance:</strong> Intel's "Optimization Reference Manual" - Architecture-specific cache optimization techniques</li>
+                <li><strong>Data Structures:</strong> "Algorithms in C++" by Sedgewick - Practical performance considerations for DSA</li>
+                <li><strong>Performance Analysis:</strong> "Systems Performance" by Brendan Gregg - Tools and techniques for measuring memory performance</li>
+                <li><strong>Assembly & Registers:</strong> "Programming from the Ground Up" - Understanding low-level memory operations</li>
+                <li><strong>Memory Alignment:</strong> "The Lost Art of Structure Packing" by Eric S. Raymond - Practical guide to memory layout optimization</li>
+            </ul>
+        </section>
+
+        <!-- Quick Cheat Sheet -->
+        <section class="cheat-sheet">
+            <h2>Quick Cheat Sheet</h2>
+            <div class="cheat-sheet-grid">
+                <div class="cheat-item">
+                    <strong>Byte</strong>
+                    8 bits; can hold values 0-255
+                </div>
+                <div class="cheat-item">
+                    <strong>Memory Address</strong>
+                    Unique identifier for each byte location
+                </div>
+                <div class="cheat-item">
+                    <strong>Pointer</strong>
+                    Variable storing a memory address
+                </div>
+                <div class="cheat-item">
+                    <strong>int (4 bytes)</strong>
+                    -2,147,483,648 to 2,147,483,647
+                </div>
+                <div class="cheat-item">
+                    <strong>Registers</strong>
+                    ~1 KB, ~1 ns access, inside CPU
+                </div>
+                <div class="cheat-item">
+                    <strong>L1 Cache</strong>
+                    ~64 KB, ~1 ns, per-core
+                </div>
+                <div class="cheat-item">
+                    <strong>L2 Cache</strong>
+                    ~256 KB, ~5 ns, per-core
+                </div>
+                <div class="cheat-item">
+                    <strong>L3 Cache</strong>
+                    ~8 MB, ~20 ns, shared
+                </div>
+                <div class="cheat-item">
+                    <strong>RAM</strong>
+                    8-64 GB, ~100 ns, volatile
+                </div>
+                <div class="cheat-item">
+                    <strong>SSD</strong>
+                    256GB-2TB, ~100 μs
+                </div>
+                <div class="cheat-item">
+                    <strong>HDD</strong>
+                    1-10 TB, ~10 ms, mechanical
+                </div>
+                <div class="cheat-item">
+                    <strong>Cache Line</strong>
+                    Typically 64 bytes loaded at once
+                </div>
+                <div class="cheat-item">
+                    <strong>Array Access</strong>
+                    O(1): Base + (Index × ElementSize)
+                </div>
+                <div class="cheat-item">
+                    <strong>Temporal Locality</strong>
+                    Recently accessed → likely reaccessed
+                </div>
+                <div class="cheat-item">
+                    <strong>Spatial Locality</strong>
+                    Nearby data → likely accessed together
+                </div>
+                <div class="cheat-item">
+                    <strong>LRU</strong>
+                    Least Recently Used cache eviction
+                </div>
+                <div class="cheat-item">
+                    <strong>Virtual Memory</strong>
+                    OS abstraction over physical RAM
+                </div>
+                <div class="cheat-item">
+                    <strong>Memory Alignment</strong>
+                    Data starts at address divisible by size
+                </div>
+                <div class="cheat-item">
+                    <strong>Endianness</strong>
+                    Byte order: little vs big-endian
+                </div>
+                <div class="cheat-item">
+                    <strong>Sequential Access</strong>
+                    95%+ cache hit rate
+                </div>
+                <div class="cheat-item">
+                    <strong>Random Access</strong>
+                    ~20% cache hit rate
+                </div>
+                <div class="cheat-item">
+                    <strong>Memory Bandwidth Wall</strong>
+                    CPU speed >> Memory speed improvement
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 DS-Rover. Master Data Structures & Algorithms from the ground up.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript for Interactive Features -->
+    <script>
+        // Reading Progress Bar
+        window.addEventListener('scroll', () => {
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight - windowHeight;
+            const scrolled = window.scrollY;
+            const progress = (scrolled / documentHeight) * 100;
+            document.getElementById('reading-progress').style.width = progress + '%';
+        });
+
+        // Intersection Observer for Fade-in Sections
+        const sections = document.querySelectorAll('.section');
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const sectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => {
+            sectionObserver.observe(section);
+        });
+
+        // Active Navigation Link
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.scrollY >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Toggle Case Study
+        function toggleCaseStudy(header) {
+            const caseStudy = header.parentElement;
+            caseStudy.classList.toggle('open');
+        }
+
+        // Toggle Collapsible Section
+        function toggleCollapsible(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.classList.toggle('open');
+            }
+        }
+
+        // Copy Code to Clipboard
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const code = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = 'var(--meta-blue)';
+                button.style.borderColor = 'var(--meta-blue)';
+                button.style.color = 'white';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = 'rgba(255, 128, 0, 0.2)';
+                    button.style.borderColor = 'var(--mclaren-orange)';
+                    button.style.color = 'var(--mclaren-orange)';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        }
+
+        // Auto-open first case study in each section
+        document.addEventListener('DOMContentLoaded', () => {
+            sections.forEach(section => {
+                section.classList.add('visible');
+            });
+        });
+
+        // ==================== HAMBURGER MENU ====================
+        function initHamburgerMenu() {
+            const hamburger = document.getElementById('hamburger');
+            const navLinks = document.getElementById('navLinks');
+            const mobileOverlay = document.getElementById('mobileOverlay');
+            const navLinkItems = document.querySelectorAll('.nav-link');
+
+            if (!hamburger || !navLinks || !mobileOverlay) {
+                console.warn('Navigation elements not found');
+                return;
+            }
+
+            // Toggle mobile menu
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                navLinks.classList.toggle('active');
+                mobileOverlay.classList.toggle('active');
+                document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
+            });
+
+            // Close menu when clicking overlay
+            mobileOverlay.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+                mobileOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+
+            // Close menu when clicking a nav link
+            navLinkItems.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        hamburger.classList.remove('active');
+                        navLinks.classList.remove('active');
+                        mobileOverlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                });
+            });
+        }
+
+        // Initialize hamburger menu after DOM loads
+        document.addEventListener('DOMContentLoaded', initHamburgerMenu);
+
+        // ==================== INTERACTIVE DEMOS ====================
+
+        // Byte Demo - Interactive Bit Flipper
+        const byteDemo = {
+            bits: [0, 0, 0, 0, 0, 0, 0, 0],
+            animationFrame: null,
+            
+            init() {
+                this.render();
+            },
+            
+            render() {
+                const canvas = document.getElementById('byte-canvas');
+                if (!canvas) return;
+                
+                canvas.innerHTML = `
+                    <div style="display: flex; justify-content: center; align-items: center; height: 200px;">
+                        <div class="memory-byte">
+                            <div class="byte-address">0x1000</div>
+                            <div class="byte-container">
+                                ${this.bits.map((bit, i) => `
+                                    <div class="bit ${bit ? 'on' : 'off'}" onclick="byteDemo.flipBit(${i})" title="Bit ${i} (2^${i} = ${Math.pow(2, i)})">
+                                        ${bit}
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="byte-value">Binary: ${this.bits.join('')}</div>
+                        </div>
+                    </div>
+                `;
+                this.updateStats();
+            },
+            
+            flipBit(index) {
+                this.bits[index] = this.bits[index] ? 0 : 1;
+                this.render();
+            },
+            
+            updateStats() {
+                const decimal = this.bits.reduce((sum, bit, i) => sum + (bit * Math.pow(2, i)), 0);
+                const hex = '0x' + decimal.toString(16).toUpperCase().padStart(2, '0');
+                const ascii = decimal >= 32 && decimal <= 126 ? String.fromCharCode(decimal) : 'N/A';
+                const bitsSet = this.bits.filter(b => b).length;
+                
+                document.getElementById('byte-decimal').textContent = decimal;
+                document.getElementById('byte-hex').textContent = hex;
+                document.getElementById('byte-ascii').textContent = ascii;
+                document.getElementById('bits-set').textContent = `${bitsSet}/8`;
+            },
+            
+            reset() {
+                this.bits = [0, 0, 0, 0, 0, 0, 0, 0];
+                this.render();
+            },
+            
+            setMax() {
+                this.bits = [1, 1, 1, 1, 1, 1, 1, 1];
+                this.render();
+            },
+            
+            randomize() {
+                this.bits = Array.from({length: 8}, () => Math.random() > 0.5 ? 1 : 0);
+                this.render();
+            },
+            
+            animate() {
+                if (this.animationFrame) {
+                    cancelAnimationFrame(this.animationFrame);
+                    this.animationFrame = null;
+                    return;
+                }
+                
+                let count = 0;
+                const animateCount = () => {
+                    if (count > 255) {
+                        this.animationFrame = null;
+                        return;
+                    }
+                    
+                    this.bits = count.toString(2).padStart(8, '0').split('').reverse().map(Number);
+                    this.render();
+                    count++;
+                    
+                    setTimeout(() => {
+                        this.animationFrame = requestAnimationFrame(animateCount);
+                    }, 50);
+                };
+                animateCount();
+            }
+        };
+
+        // Memory Hierarchy Demo
+        const hierarchyDemo = {
+            levels: [
+                { name: 'Registers', size: '~1 KB', time: '<1 ns', cost: '$10,000/GB', details: 'Fastest memory, built into CPU. Holds immediate operands and results.' },
+                { name: 'L1 Cache', size: '~64 KB', time: '1-2 ns', cost: '$5,000/GB', details: 'Split into instruction cache (L1i) and data cache (L1d). Per-core.' },
+                { name: 'L2 Cache', size: '~256 KB', time: '5-10 ns', cost: '$2,000/GB', details: 'Unified cache per core. Larger but slightly slower than L1.' },
+                { name: 'L3 Cache', size: '~8 MB', time: '20-40 ns', cost: '$1,000/GB', details: 'Shared across all CPU cores. Last level cache before RAM.' },
+                { name: 'Main RAM', size: '8-64 GB', time: '100 ns', cost: '$5/GB', details: 'DRAM. Main working memory. Volatile (loses data when powered off).' },
+                { name: 'SSD', size: '256GB-2TB', time: '50-100 μs', cost: '$0.10/GB', details: 'Flash storage. Fast persistent storage. Limited write endurance.' },
+                { name: 'Hard Disk', size: '1-10 TB', time: '5-10 ms', cost: '$0.02/GB', details: 'Magnetic platters. Slowest but cheapest per GB. Unlimited rewrites.' }
+            ],
+            selectedLevel: null,
+            
+            selectLevel(level) {
+                this.selectedLevel = level;
+                const info = this.levels[level];
+                
+                document.getElementById('hierarchy-level').textContent = info.name;
+                document.getElementById('hierarchy-time').textContent = info.time;
+                document.getElementById('hierarchy-size').textContent = info.size;
+                document.getElementById('hierarchy-cost').textContent = info.cost;
+                
+                const infoBox = document.getElementById('hierarchy-info');
+                infoBox.style.display = 'block';
+                infoBox.innerHTML = `<h4>${info.name}</h4><p>${info.details}</p>`;
+                
+                // Highlight selected level
+                document.querySelectorAll('.pyramid-level').forEach((el, i) => {
+                    if (i === level) {
+                        el.style.transform = 'scale(1.05)';
+                        el.style.boxShadow = '0 10px 40px var(--meta-glow)';
+                    } else {
+                        el.style.transform = '';
+                        el.style.boxShadow = '';
+                    }
+                });
+            },
+            
+            simulateAccess() {
+                const levels = document.querySelectorAll('.pyramid-level');
+                let delay = 0;
+                
+                levels.forEach((level, i) => {
+                    setTimeout(() => {
+                        level.style.background = 'linear-gradient(135deg, var(--mclaren-orange), var(--mclaren-dark))';
+                        setTimeout(() => {
+                            level.style.background = 'linear-gradient(135deg, var(--meta-blue), var(--meta-dark))';
+                        }, 300);
+                    }, delay);
+                    delay += 400;
+                });
+            },
+            
+            benchmarkSpeed() {
+                alert('Speed Comparison:\n\nRegister: 1 second\nL1 Cache: 2 seconds\nL2 Cache: 10 seconds\nL3 Cache: 40 seconds\nRAM: 1.5 minutes\nSSD: ~1 day\nHDD: ~4 months\n\n(If register access = 1 second in human scale)');
+            },
+            
+            showCostComparison() {
+                alert('Cost per GB:\n\nRegisters: $10,000\nL1-L3 Cache: $1,000-$5,000\nRAM: $5\nSSD: $0.10\nHDD: $0.02\n\nThis is why we can\'t just make everything out of registers!');
+            },
+            
+            reset() {
+                this.selectedLevel = null;
+                document.getElementById('hierarchy-level').textContent = 'None';
+                document.getElementById('hierarchy-time').textContent = '-';
+                document.getElementById('hierarchy-size').textContent = '-';
+                document.getElementById('hierarchy-cost').textContent = '-';
+                document.getElementById('hierarchy-info').style.display = 'none';
+                
+                document.querySelectorAll('.pyramid-level').forEach(el => {
+                    el.style.transform = '';
+                    el.style.boxShadow = '';
+                });
+            }
+        };
+
+        // Cache Demo - Sequential vs Random Access
+        const cacheDemo = {
+            cache: Array(4).fill(null), // 4 cache lines
+            memory: Array.from({length: 64}, (_, i) => i), // 64 elements
+            hits: 0,
+            misses: 0,
+            accessLog: [],
+            speed: 100,
+            isRunning: false,
+            
+            init() {
+                this.renderCache();
+                this.renderMemory();
+            },
+            
+            renderCache() {
+                const container = document.getElementById('cache-lines');
+                if (!container) return;
+                
+                container.innerHTML = this.cache.map((line, i) => `
+                    <div class="cache-line" style="margin: 10px 0;">
+                        <span style="color: var(--text-dim); margin-right: 10px;">Line ${i}:</span>
+                        ${line === null ? 
+                            '<span style="color: var(--text-dim);">Empty</span>' : 
+                            `<span style="color: var(--mclaren-orange);">Block ${Math.floor(line/16)}</span>`
+                        }
+                    </div>
+                `).join('');
+            },
+            
+            renderMemory() {
+                const container = document.getElementById('memory-array');
+                if (!container) return;
+                
+                container.innerHTML = this.memory.map((val, i) => `
+                    <div class="cache-block" id="mem-block-${i}" title="Element ${i}">
+                        ${val}
+                    </div>
+                `).join('');
+            },
+            
+            async access(index) {
+                const block = Math.floor(index / 16); // 16 elements per cache line
+                const isHit = this.cache.includes(block);
+                
+                const element = document.getElementById(`mem-block-${index}`);
+                if (element) {
+                    element.classList.add('accessing');
+                    setTimeout(() => element.classList.remove('accessing'), 500);
+                }
+                
+                if (isHit) {
+                    this.hits++;
+                    if (element) element.classList.add('hit');
+                    this.log(`Access [${index}]: HIT (in cache)`, 'hit');
+                } else {
+                    this.misses++;
+                    if (element) element.classList.add('miss');
+                    this.log(`Access [${index}]: MISS (load from RAM)`, 'miss');
+                    
+                    // LRU: evict oldest cache line
+                    this.cache.shift();
+                    this.cache.push(block);
+                    this.renderCache();
+                }
+                
+                this.updateStats();
+                
+                await new Promise(resolve => setTimeout(resolve, this.speed));
+                
+                if (element) {
+                    element.classList.remove('hit', 'miss');
+                }
+            },
+            
+            async runSequential() {
+                if (this.isRunning) return;
+                this.reset();
+                this.isRunning = true;
+                
+                for (let i = 0; i < 32; i++) {
+                    if (!this.isRunning) break;
+                    await this.access(i);
+                }
+                
+                this.isRunning = false;
+                this.log(`Sequential complete: ${((this.hits/(this.hits+this.misses))*100).toFixed(1)}% hit rate`, 'summary');
+            },
+            
+            async runRandom() {
+                if (this.isRunning) return;
+                this.reset();
+                this.isRunning = true;
+                
+                for (let i = 0; i < 32; i++) {
+                    if (!this.isRunning) break;
+                    const randomIndex = Math.floor(Math.random() * 64);
+                    await this.access(randomIndex);
+                }
+                
+                this.isRunning = false;
+                this.log(`Random complete: ${((this.hits/(this.hits+this.misses))*100).toFixed(1)}% hit rate`, 'summary');
+            },
+            
+            async runCustom() {
+                const pattern = prompt('Enter access pattern (comma-separated indices, e.g., 0,1,2,3,0,1,2,3):', '0,1,2,3,0,1,2,3,10,11,12,13');
+                if (!pattern) return;
+                
+                this.reset();
+                this.isRunning = true;
+                
+                const indices = pattern.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n) && n >= 0 && n < 64);
+                
+                for (let idx of indices) {
+                    if (!this.isRunning) break;
+                    await this.access(idx);
+                }
+                
+                this.isRunning = false;
+            },
+            
+            reset() {
+                this.isRunning = false;
+                this.cache = Array(4).fill(null);
+                this.hits = 0;
+                this.misses = 0;
+                this.accessLog = [];
+                this.renderCache();
+                this.renderMemory();
+                this.updateStats();
+                document.getElementById('access-log').innerHTML = '<div style="color: var(--text-dim);">Access log will appear here...</div>';
+            },
+            
+            updateStats() {
+                document.getElementById('cache-hits').textContent = this.hits;
+                document.getElementById('cache-misses').textContent = this.misses;
+                const total = this.hits + this.misses;
+                const rate = total > 0 ? ((this.hits / total) * 100).toFixed(1) : 0;
+                document.getElementById('cache-hit-rate').textContent = rate + '%';
+                document.getElementById('total-accesses').textContent = total;
+            },
+            
+            log(message, type) {
+                const logEl = document.getElementById('access-log');
+                if (!logEl) return;
+                
+                let color = 'var(--text-muted)';
+                if (type === 'hit') color = '#3fb950';
+                if (type === 'miss') color = 'var(--redbull-red)';
+                if (type === 'summary') color = 'var(--mclaren-orange)';
+                
+                const entry = document.createElement('div');
+                entry.style.color = color;
+                entry.textContent = message;
+                logEl.appendChild(entry);
+                logEl.scrollTop = logEl.scrollHeight;
+            },
+            
+            setSpeed(value) {
+                this.speed = 210 - parseInt(value); // Invert: higher slider = faster
+                document.getElementById('cache-speed-display').textContent = this.speed + 'ms';
+            }
+        };
+
+        // Memory Playground (basic implementation)
+        const memoryPlayground = {
+            memory: Array(256).fill(0),
+            allocated: 0,
+            animationId: null,
+            isAnimating: true,
+            speed: 50,
+            
+            init() {
+                this.render();
+                this.startAnimation();
+            },
+            
+            render() {
+                const canvas = document.getElementById('playground-canvas');
+                if (!canvas) return;
+                
+                canvas.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(16, 1fr); gap: 2px;">
+                        ${this.memory.map((byte, i) => `
+                            <div class="cache-block" style="height: 20px; font-size: 10px;" 
+                                 title="Address: 0x${i.toString(16).toUpperCase().padStart(2, '0')}, Value: ${byte}">
+                                ${byte ? byte.toString(16).toUpperCase() : '-'}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                this.updateStats();
+            },
+            
+            reset() {
+                this.memory = Array(256).fill(0);
+                this.allocated = 0;
+                this.render();
+            },
+            
+            randomize() {
+                this.memory = Array.from({length: 256}, () => Math.floor(Math.random() * 256));
+                this.allocated = this.memory.filter(b => b !== 0).length;
+                this.render();
+            },
+            
+            toggleAnimation() {
+                this.isAnimating = !this.isAnimating;
+                document.getElementById('anim-toggle-text').textContent = this.isAnimating ? 'Pause Animation' : 'Resume Animation';
+                if (this.isAnimating) this.startAnimation();
+            },
+            
+            startAnimation() {
+                const animate = () => {
+                    if (!this.isAnimating) return;
+                    
+                    // Randomly update a few bytes
+                    for (let i = 0; i < 3; i++) {
+                        const idx = Math.floor(Math.random() * 256);
+                        this.memory[idx] = Math.floor(Math.random() * 256);
+                    }
+                    
+                    this.allocated = this.memory.filter(b => b !== 0).length;
+                    this.render();
+                    
+                    setTimeout(() => {
+                        this.animationId = requestAnimationFrame(animate);
+                    }, 1000 - (this.speed * 10));
+                };
+                
+                if (this.isAnimating) {
+                    animate();
+                }
+            },
+            
+            setSpeed(value) {
+                this.speed = parseInt(value);
+                document.getElementById('speed-display').textContent = value + '%';
+            },
+            
+            updateStats() {
+                const free = 256 - this.allocated;
+                const fragmentation = this.calculateFragmentation();
+                
+                document.getElementById('stat-allocated').textContent = this.allocated + ' bytes';
+                document.getElementById('stat-free').textContent = free + ' bytes';
+                document.getElementById('stat-frag').textContent = fragmentation + '%';
+            },
+            
+            calculateFragmentation() {
+                let fragments = 0;
+                let inFreeBlock = false;
+                
+                for (let i = 0; i < this.memory.length; i++) {
+                    if (this.memory[i] === 0) {
+                        if (!inFreeBlock) {
+                            fragments++;
+                            inFreeBlock = true;
+                        }
+                    } else {
+                        inFreeBlock = false;
+                    }
+                }
+                
+                return Math.min(100, fragments * 10);
+            }
+        };
+
+        // Pointer Demo - Interactive Pointer Visualizer
+        const pointerDemo = {
+            variables: [],
+            pointers: [],
+            nextAddress: 0x1000,
+            varCounter: 0,
+            ptrCounter: 0,
+            
+            init() {
+                this.render();
+            },
+            
+            createVariable() {
+                const name = prompt('Enter variable name:', `var${this.varCounter}`);
+                if (!name) return;
+                
+                const value = prompt('Enter value (integer):', Math.floor(Math.random() * 100));
+                if (value === null) return;
+                
+                const variable = {
+                    name: name,
+                    type: 'int',
+                    address: this.nextAddress,
+                    value: parseInt(value) || 0,
+                    size: 4,
+                    isPointer: false
+                };
+                
+                this.variables.push(variable);
+                this.nextAddress += 8; // 8-byte alignment
+                this.varCounter++;
+                this.render();
+            },
+            
+            createPointer() {
+                if (this.variables.length === 0) {
+                    alert('Create a variable first!');
+                    return;
+                }
+                
+                const targetName = prompt('Point to which variable? Enter variable name:', this.variables[this.variables.length - 1].name);
+                const target = this.variables.find(v => v.name === targetName);
+                
+                if (!target) {
+                    alert('Variable not found!');
+                    return;
+                }
+                
+                const ptrName = prompt('Enter pointer name:', `ptr${this.ptrCounter}`);
+                if (!ptrName) return;
+                
+                const pointer = {
+                    name: ptrName,
+                    type: 'int*',
+                    address: this.nextAddress,
+                    value: target.address, // Points to target's address
+                    size: 8, // 64-bit pointer
+                    isPointer: true,
+                    pointsTo: target.name
+                };
+                
+                this.pointers.push(pointer);
+                this.variables.push(pointer);
+                this.nextAddress += 8;
+                this.ptrCounter++;
+                this.render();
+            },
+            
+            dereference() {
+                if (this.pointers.length === 0) {
+                    alert('No pointers to dereference!');
+                    return;
+                }
+                
+                const ptrName = prompt('Which pointer to dereference?', this.pointers[this.pointers.length - 1].name);
+                const ptr = this.pointers.find(p => p.name === ptrName);
+                
+                if (!ptr) {
+                    alert('Pointer not found!');
+                    return;
+                }
+                
+                const target = this.variables.find(v => v.address === ptr.value && !v.isPointer);
+                if (target) {
+                    alert(`*${ptr.name} = ${target.value}\n(dereferencing ${ptr.name} gives us ${target.name}'s value: ${target.value})`);
+                } else {
+                    alert('Pointer doesn\'t point to a valid variable!');
+                }
+            },
+            
+            reset() {
+                this.variables = [];
+                this.pointers = [];
+                this.nextAddress = 0x1000;
+                this.varCounter = 0;
+                this.ptrCounter = 0;
+                this.render();
+            },
+            
+            render() {
+                this.renderMemoryMap();
+                this.renderVariableTable();
+                this.updateStats();
+            },
+            
+            renderMemoryMap() {
+                const container = document.getElementById('memory-map');
+                if (!container) return;
+                
+                if (this.variables.length === 0) {
+                    container.innerHTML = '<div style="color: var(--text-dim);">No variables in memory yet</div>';
+                    return;
+                }
+                
+                container.innerHTML = this.variables.map(v => {
+                    const isPtr = v.isPointer;
+                    const color = isPtr ? 'var(--meta-blue)' : 'var(--mclaren-orange)';
+                    const displayValue = isPtr ? `→ 0x${v.value.toString(16).toUpperCase()} (${v.pointsTo})` : v.value;
+                    
+                    return `
+                        <div style="display: flex; align-items: center; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 6px; border-left: 3px solid ${color};">
+                            <div style="flex: 0 0 120px; font-family: 'Courier New', monospace; color: var(--text-dim);">
+                                0x${v.address.toString(16).toUpperCase().padStart(4, '0')}
+                            </div>
+                            <div style="flex: 0 0 100px; font-weight: 600; color: ${color};">
+                                ${v.name}
+                            </div>
+                            <div style="flex: 0 0 80px; color: var(--text-muted); font-size: 0.9em;">
+                                ${v.type} (${v.size}B)
+                            </div>
+                            <div style="flex: 1; font-family: 'Courier New', monospace; color: white;">
+                                ${displayValue}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            },
+            
+            renderVariableTable() {
+                const tbody = document.getElementById('variable-table');
+                if (!tbody) return;
+                
+                if (this.variables.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: var(--text-dim);">No variables created yet</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = this.variables.map(v => {
+                    const displayValue = v.isPointer ? `0x${v.value.toString(16).toUpperCase()} → ${v.pointsTo}` : v.value;
+                    const rowColor = v.isPointer ? 'rgba(0, 129, 251, 0.1)' : 'rgba(255, 128, 0, 0.05)';
+                    
+                    return `
+                        <tr style="background: ${rowColor}; border-bottom: 1px solid var(--glass-border);">
+                            <td style="padding: 10px; font-weight: 600;">${v.name}</td>
+                            <td style="padding: 10px; color: var(--text-muted);">${v.type}</td>
+                            <td style="padding: 10px; font-family: 'Courier New', monospace; color: var(--meta-blue);">
+                                0x${v.address.toString(16).toUpperCase()}
+                            </td>
+                            <td style="padding: 10px; font-family: 'Courier New', monospace;">
+                                ${displayValue}
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            },
+            
+            updateStats() {
+                const varCount = this.variables.filter(v => !v.isPointer).length;
+                const ptrCount = this.pointers.length;
+                const memUsed = this.variables.reduce((sum, v) => sum + v.size, 0);
+                
+                // Calculate pointer chains (pointers pointing to pointers)
+                let chains = 0;
+                this.pointers.forEach(ptr => {
+                    const target = this.variables.find(v => v.address === ptr.value);
+                    if (target && target.isPointer) chains++;
+                });
+                
+                document.getElementById('var-count').textContent = varCount;
+                document.getElementById('ptr-count').textContent = ptrCount;
+                document.getElementById('mem-used').textContent = memUsed + ' bytes';
+                document.getElementById('ptr-chains').textContent = chains;
+            }
+        };
+
+        // Initialize all demos when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                byteDemo.init();
+                cacheDemo.init();
+                memoryPlayground.init();
+                pointerDemo.init();
+            }, 500);
+        });
+    </script>
+</body>
+</html>
