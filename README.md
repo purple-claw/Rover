@@ -1,4 +1,4 @@
-# Rover - Digital DSA Instructor
+# Rover - Your Last Chance to Master DSA from Scratch.
 
 A modern, interactive web-based platform for learning Data Structures and Algorithms (DSA) with comprehensive tutorials, pattern recognition training, and complexity analysis.
 
