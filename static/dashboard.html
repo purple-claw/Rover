@@ -3,1191 +3,249 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rover | Dashboard</title>
+    <title>Rover | Learning Dashboard</title>
+    
+    <!-- Quicksand Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
+        /* ==================== GLASSMORPHISM THEME ==================== */
+        :root {
+            /* Pure Black Base */
+            --bg-primary: #000000;
+            --bg-secondary: #0a0a0a;
+            
+            /* Glass Effect Colors */
+            --glass-white: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-highlight: rgba(255, 255, 255, 0.15);
+            
+            /* McLaren Orange */
+            --mclaren-orange: #FF8000;
+            --mclaren-glow: rgba(255, 128, 0, 0.3);
+            --mclaren-light: #FFA040;
+            --mclaren-dark: #CC6600;
+            
+            /* Text Colors */
+            --text-primary: #FFFFFF;
+            --text-secondary: #FFFFFF;
+            --text-muted: rgba(255, 255, 255, 0.9);
+            --text-dim: rgba(255, 255, 255, 0.7);
+            
+            /* Layout */
+            --container-width: 1200px;
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 2.5rem;
+            --spacing-2xl: 3rem;
+            
+            /* Border Radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            
+            /* Animations */
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        :root {
-            --primary: #FF8000;
-            --black: #000000;
-            --white: #FFFFFF;
-            --glass: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --orange-glow: rgba(255, 128, 0, 0.3);
-            --sidebar-width: 260px;
-            --header-height: 70px;
-        }
-
         body {
-            font-family: 'Quicksand', sans-serif;
-            background: var(--black);
-            color: var(--white);
-            line-height: 1.6;
+            font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
             overflow-x: hidden;
+            position: relative;
+            font-size: 16px;
+            font-weight: 400;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        /* Modern Sidebar with Glass Effect */
-        .sidebar {
+        /* Animated Background Particles */
+        .background-particles {
             position: fixed;
+            top: 0;
             left: 0;
-            top: 0;
-            width: var(--sidebar-width);
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-right: 1px solid var(--glass-border);
-            display: flex;
-            flex-direction: column;
-            z-index: 1000;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .sidebar-header {
-            height: var(--header-height);
-            padding: 0 1.5rem;
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .logo {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--primary);
-            text-decoration: none;
-            letter-spacing: 0.1em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-shadow: 0 0 20px rgba(255, 128, 0, 0.5);
-            animation: logoGlow 3s ease-in-out infinite;
-        }
-
-        @keyframes logoGlow {
-            0%, 100% {
-                text-shadow: 
-                    0 0 20px rgba(255, 128, 0, 0.5),
-                    0 0 40px rgba(255, 128, 0, 0.3);
-            }
-            50% {
-                text-shadow: 
-                    0 0 25px rgba(255, 128, 0, 0.6),
-                    0 0 50px rgba(255, 128, 0, 0.4),
-                    0 0 70px rgba(255, 128, 0, 0.2);
-            }
-        }
-
-        .logo:hover {
-            transform: translateX(4px);
-            animation: none;
-            text-shadow: 
-                0 0 30px rgba(255, 128, 0, 0.7),
-                0 0 60px rgba(255, 128, 0, 0.5),
-                0 0 90px rgba(255, 128, 0, 0.3);
-        }
-
-        .nav-section {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1.5rem 0;
-        }
-
-        .nav-section::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .nav-section::-webkit-scrollbar-thumb {
-            background: rgba(255, 128, 0, 0.3);
-            border-radius: 2px;
-        }
-
-        .nav-title {
-            padding: 0 1.5rem;
-            margin-bottom: 0.5rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        .nav-item {
-            position: relative;
-            margin: 0.25rem 0.75rem;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem;
-            background: transparent;
-            border: 1px solid transparent;
-            border-radius: 12px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9375rem;
-            font-weight: 500;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            width: 100%;
-            text-align: left;
-            position: relative;
-            overflow: hidden;
-            animation: navItemAppear 0.6s ease both;
-        }
-
-        @keyframes navItemAppear {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .nav-item:nth-child(1) .nav-link { animation-delay: 0.1s; }
-        .nav-item:nth-child(2) .nav-link { animation-delay: 0.2s; }
-        .nav-item:nth-child(3) .nav-link { animation-delay: 0.3s; }
-        .nav-item:nth-child(4) .nav-link { animation-delay: 0.4s; }
-        .nav-item:nth-child(5) .nav-link { animation-delay: 0.5s; }
-        .nav-item:nth-child(6) .nav-link { animation-delay: 0.6s; }
-
-        .nav-link::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(255, 128, 0, 0.15), transparent);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 3px;
-            background: var(--primary);
-            transform: scaleY(0);
-            transform-origin: center;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .nav-link:hover {
-            color: var(--white);
-            background: rgba(255, 128, 0, 0.05);
-            border-color: rgba(255, 128, 0, 0.3);
-            transform: translateX(8px);
-            box-shadow: 0 4px 20px rgba(255, 128, 0, 0.15);
-        }
-
-        .nav-link:hover::before {
-            opacity: 1;
-        }
-
-        .nav-link:hover::after {
-            transform: scaleY(1);
-        }
-
-        .nav-link.active {
-            color: var(--primary);
-            background: rgba(255, 128, 0, 0.1);
-            border-color: rgba(255, 128, 0, 0.3);
-            box-shadow: 0 0 20px rgba(255, 128, 0, 0.2);
-        }
-
-        .nav-link.active::after {
-            transform: scaleY(1);
-        }
-
-        .nav-icon {
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .nav-badge {
-            margin-left: auto;
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.125rem 0.5rem;
-            background: rgba(255, 128, 0, 0.2);
-            color: var(--primary);
-            border-radius: 10px;
-        }
-
-        .nav-expand {
-            margin-left: auto;
-            width: 16px;
-            height: 16px;
-            transition: transform 0.3s ease;
-        }
-
-        .nav-link.expanded .nav-expand {
-            transform: rotate(90deg);
-        }
-
-        .sub-nav {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-            margin-left: 2rem;
-        }
-
-        .sub-nav.expanded {
-            max-height: 500px;
-        }
-
-        .sub-nav-item {
-            padding: 0.5rem 1rem;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.875rem;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: block;
-            text-decoration: none;
-            margin: 0.25rem 0;
-            position: relative;
-            overflow: hidden;
-            animation: subItemFade 0.4s ease both;
-        }
-
-        @keyframes subItemFade {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .sub-nav-item:nth-child(1) { animation-delay: 0.05s; }
-        .sub-nav-item:nth-child(2) { animation-delay: 0.1s; }
-        .sub-nav-item:nth-child(3) { animation-delay: 0.15s; }
-        .sub-nav-item:nth-child(4) { animation-delay: 0.2s; }
-
-        .sub-nav-item::before {
-            content: '';
-            position: absolute;
-            left: -100%;
-            top: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 128, 0, 0.1), transparent);
-            transition: left 0.4s ease;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
         }
 
-        .sub-nav-item:hover {
-            color: var(--primary);
-            background: rgba(255, 128, 0, 0.05);
-            transform: translateX(8px);
-            text-shadow: 0 0 10px rgba(255, 128, 0, 0.3);
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--mclaren-orange);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float linear infinite;
         }
 
-        .sub-nav-item:hover::before {
-            left: 100%;
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.3;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px);
+                opacity: 0;
+            }
         }
 
-        .sidebar-footer {
-            padding: 1.5rem;
-            border-top: 1px solid var(--glass-border);
-            display: flex;
-            gap: 1rem;
+        /* Progress Bar */
+        #reading-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--mclaren-orange), var(--mclaren-light));
+            box-shadow: 0 0 10px var(--mclaren-glow);
+            z-index: 9999;
+            transition: width 0.1s ease;
         }
 
-        .stat-item {
-            flex: 1;
-            text-align: center;
+        /* Container */
+        .container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+            position: relative;
+            z-index: 1;
         }
 
-        .stat-value {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--primary);
-            display: block;
-        }
-
-        .stat-label {
-            font-size: 0.625rem;
-            color: rgba(255, 255, 255, 0.5);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        /* Main Content Area */
-        .main-container {
-            margin-left: var(--sidebar-width);
-            min-height: 100vh;
-            transition: margin-left 0.3s ease;
-        }
-
-        .header {
-            height: var(--header-height);
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 2rem;
+        /* Navigation */
+        nav {
             position: sticky;
             top: 0;
-            z-index: 100;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-        }
-
-        .search-box {
-            position: relative;
-            width: 400px;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 0.75rem 1rem 0.75rem 2.5rem;
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            color: var(--white);
-            font-size: 0.875rem;
-            font-family: 'Quicksand', sans-serif;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: rgba(255, 128, 0, 0.4);
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 0.75rem 0;
             box-shadow: 
-                0 0 0 3px rgba(255, 128, 0, 0.1),
-                0 0 20px rgba(255, 128, 0, 0.1);
-            background: rgba(255, 128, 0, 0.03);
+                0 1px 3px rgba(0, 0, 0, 0.5),
+                0 1px 20px rgba(255, 128, 0, 0.1),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.05);
         }
 
-        .search-input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 18px;
-            height: 18px;
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .header-btn {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            color: rgba(255, 255, 255, 0.8);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .header-btn:hover {
-            border-color: rgba(255, 128, 0, 0.3);
-            color: var(--primary);
-            transform: translateY(-2px);
-        }
-
-        .notification-dot {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 8px;
-            height: 8px;
-            background: var(--primary);
-            border-radius: 50%;
-            border: 2px solid var(--black);
-        }
-
-        .mobile-menu {
-            display: none;
-            width: 40px;
-            height: 40px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0;
-        }
-
-        .mobile-menu span {
-            display: block;
-            width: 24px;
-            height: 2px;
-            background: var(--white);
-            margin: 5px auto;
-            transition: all 0.3s ease;
-        }
-
-        /* Dashboard Content */
-        .content {
-            padding: 2rem;
-            animation: fadeIn 0.6s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .page-title {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, var(--white) 0%, rgba(255, 255, 255, 0.8) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .page-subtitle {
-            color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 2rem;
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.05));
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 1.5rem;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-            animation: statPulse 4s ease-in-out infinite;
-        }
-
-        @keyframes statPulse {
-            0%, 100% {
-                box-shadow: 0 0 0 0 rgba(255, 128, 0, 0);
-            }
-            50% {
-                box-shadow: 0 0 30px rgba(255, 128, 0, 0.1);
-            }
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 128, 0, 0.1) 0%, transparent 70%);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            pointer-events: none;
-        }
-
-        .stat-card::after {
-            content: '';
-            position: absolute;
-            inset: -1px;
-            background: linear-gradient(45deg, transparent 30%, rgba(255, 128, 0, 0.3), transparent 70%);
-            opacity: 0;
-            z-index: -1;
-            transition: opacity 0.4s ease;
-            animation: shimmer 3s ease-in-out infinite;
-            background-size: 200% 200%;
-        }
-
-        @keyframes shimmer {
-            0% { background-position: 200% 200%; }
-            100% { background-position: -200% -200%; }
-        }
-
-        .stat-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            border-color: rgba(255, 128, 0, 0.4);
-            box-shadow: 
-                0 20px 40px rgba(255, 128, 0, 0.2),
-                inset 0 0 20px rgba(255, 128, 0, 0.05);
-            animation: none;
-        }
-
-        .stat-card:hover::before {
-            opacity: 1;
-        }
-
-        .stat-card:hover::after {
-            opacity: 1;
-        }
-
-        .stat-header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-        }
-
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 128, 0, 0.1);
-            border-radius: 12px;
-            color: var(--primary);
-            transition: all 0.4s ease;
-            box-shadow: 0 0 20px rgba(255, 128, 0, 0.2);
-        }
-
-        .stat-card:hover .stat-icon {
-            transform: scale(1.1) rotate(5deg);
-            box-shadow: 0 0 30px rgba(255, 128, 0, 0.4);
-            background: rgba(255, 128, 0, 0.2);
-        }
-
-        .stat-trend {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #10b981;
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        .stat-trend.down {
-            color: #ef4444;
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--white);
-            margin-bottom: 0.25rem;
-        }
-
-        .stat-label {
-            font-size: 0.875rem;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        /* Resource Grid Section */
-        .resources-section {
-            margin-bottom: 3rem;
-        }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 2rem;
-        }
-
-        .section-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--white);
-        }
-
-        .view-toggle {
-            display: flex;
-            gap: 0.5rem;
-            background: var(--glass);
-            padding: 0.25rem;
-            border-radius: 10px;
-            border: 1px solid var(--glass-border);
-        }
-
-        .view-btn {
-            padding: 0.5rem 1rem;
-            background: transparent;
-            border: none;
-            border-radius: 8px;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Quicksand', sans-serif;
-        }
-
-        .view-btn.active {
-            background: rgba(255, 128, 0, 0.2);
-            color: var(--primary);
-        }
-
-        .resources-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .resource-card {
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 1.5rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            animation: resourceFadeIn 0.8s ease both;
-            --glow: rgba(255, 128, 0, 0);
-        }
-
-        @keyframes resourceFadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .resource-card:nth-child(1) { animation-delay: 0.1s; }
-        .resource-card:nth-child(2) { animation-delay: 0.2s; }
-        .resource-card:nth-child(3) { animation-delay: 0.3s; }
-        .resource-card:nth-child(4) { animation-delay: 0.4s; }
-        .resource-card:nth-child(5) { animation-delay: 0.5s; }
-        .resource-card:nth-child(6) { animation-delay: 0.6s; }
-
-        .resource-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(ellipse at top left, rgba(255, 128, 0, 0.15), transparent 50%);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            pointer-events: none;
-        }
-
-        .resource-card::after {
+        nav::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--primary), transparent);
-            transform: translateX(-100%);
-            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent,
+                rgba(255, 128, 0, 0.3) 20%,
+                rgba(255, 128, 0, 0.5) 50%,
+                rgba(255, 128, 0, 0.3) 80%,
+                transparent
+            );
+            opacity: 0.8;
         }
 
-        .resource-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            border-color: rgba(255, 128, 0, 0.4);
-            box-shadow: 
-                0 20px 40px rgba(255, 128, 0, 0.15),
-                0 0 60px var(--glow);
-            --glow: rgba(255, 128, 0, 0.1);
-        }
-
-        .resource-card:hover::before {
-            opacity: 1;
-        }
-
-        .resource-card:hover::after {
-            transform: translateX(100%);
-        }
-
-        .resource-card.highlight {
-            animation: highlight 0.8s ease;
-            border-color: var(--primary);
-        }
-
-        @keyframes highlight {
-            0%, 100% { 
-                box-shadow: 0 0 0 0 rgba(255, 128, 0, 0);
-                filter: brightness(1);
-            }
-            50% { 
-                box-shadow: 0 0 30px 10px rgba(255, 128, 0, 0.2);
-                filter: brightness(1.1);
-            }
-        }
-
-        .resource-header {
+        .nav-container {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            margin-bottom: 1rem;
-        }
-
-        .resource-header h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--white);
-            margin: 0;
-        }
-
-        .resource-count {
-            font-size: 0.875rem;
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .resource-progress {
-            margin-bottom: 1.5rem;
-        }
-
-        .progress-bar {
-            height: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-            overflow: hidden;
-            margin-bottom: 0.5rem;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), #ff6b6b);
-            border-radius: 3px;
-            transition: width 0.3s ease;
-        }
-
-        .progress-text {
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .resource-items {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .resource-item {
-            display: flex;
             align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
+            gap: 2rem;
+            padding: 0 var(--spacing-lg);
+            max-width: var(--container-width);
+            margin: 0 auto;
+        }
+
+        .nav-logo {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--mclaren-orange);
             text-decoration: none;
-            color: var(--white);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            text-shadow: 0 0 20px var(--mclaren-glow);
+            animation: logoGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes logoGlow {
+            0%, 100% {
+                text-shadow: 0 0 20px var(--mclaren-glow);
+            }
+            50% {
+                text-shadow: 0 0 30px var(--mclaren-glow), 0 0 40px var(--mclaren-glow);
+            }
+        }
+
+        .nav-logo:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all var(--transition-fast);
             position: relative;
-            overflow: hidden;
-            animation: itemSlideIn 0.6s ease both;
+            padding: 0.5rem 0;
         }
 
-        @keyframes itemSlideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+        .nav-link:hover {
+            color: var(--mclaren-orange);
+            text-shadow: 0 0 20px var(--mclaren-glow);
         }
 
-        .resource-item:nth-child(1) { animation-delay: 0.1s; }
-        .resource-item:nth-child(2) { animation-delay: 0.2s; }
-        .resource-item:nth-child(3) { animation-delay: 0.3s; }
-
-        .resource-item::before {
+        .nav-link.active::after {
             content: '';
             position: absolute;
+            bottom: -3px;
             left: 0;
-            top: 0;
-            height: 100%;
-            width: 2px;
-            background: var(--primary);
-            transform: scaleY(0);
-            transition: transform 0.3s ease;
+            right: 0;
+            height: 2px;
+            background: var(--mclaren-orange);
+            box-shadow: 0 0 10px var(--mclaren-glow);
         }
 
-        .resource-item:hover {
-            background: rgba(255, 128, 0, 0.1);
-            border-color: rgba(255, 128, 0, 0.3);
-            transform: translateX(8px);
-            box-shadow: 0 4px 20px rgba(255, 128, 0, 0.1);
-            color: var(--primary);
-        }
-
-        .resource-item:hover::before {
-            transform: scaleY(1);
-        }
-
-        .resource-item:hover .item-icon {
-            transform: scale(1.2) rotate(5deg);
-        }
-
-        .item-icon {
-            font-size: 1.25rem;
-            transition: all 0.3s ease;
-        }
-
-        .item-name {
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
-        .resource-more {
-            font-size: 0.75rem;
-            color: var(--primary);
+        /* Hero Section */
+        .hero {
+            padding: var(--spacing-2xl) 0;
             text-align: center;
-            padding: 0.5rem;
-            cursor: pointer;
-            transition: opacity 0.3s ease;
+            position: relative;
+            margin-bottom: var(--spacing-xl);
+            z-index: 1;
+            animation: fadeInUp 0.8s ease;
         }
 
-        .resource-more:hover {
-            opacity: 0.8;
-        }        .resource-header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-        }
-
-        .resource-icon {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 128, 0, 0.1);
-            border-radius: 10px;
-            color: var(--primary);
-        }
-
-        .resource-badge {
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.25rem 0.75rem;
-            background: rgba(59, 130, 246, 0.1);
-            color: #60a5fa;
-            border-radius: 20px;
-        }
-
-        .resource-badge.new {
-            background: rgba(16, 185, 129, 0.1);
-            color: #34d399;
-        }
-
-        .resource-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--white);
-            margin-bottom: 0.5rem;
-            transition: color 0.3s ease;
-        }
-
-        .resource-card:hover .resource-title {
-            color: var(--primary);
-        }
-
-        .resource-description {
-            font-size: 0.875rem;
-            color: rgba(255, 255, 255, 0.6);
-            line-height: 1.6;
-            margin-bottom: 1rem;
-        }
-
-        .resource-meta {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        .meta-item svg {
-            width: 14px;
-            height: 14px;
-        }
-
-        /* Section Headers */
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 2rem;
-        }
-
-        .section-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--white);
-            margin: 0;
-        }
-
-        .view-toggle {
-            display: flex;
-            gap: 0.5rem;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 0.25rem;
-            border-radius: 10px;
-        }
-
-        .view-btn {
-            padding: 0.5rem 1rem;
-            background: transparent;
-            border: none;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.875rem;
-            font-weight: 500;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .view-btn.active {
-            background: rgba(255, 128, 0, 0.2);
-            color: var(--primary);
-            box-shadow: inset 0 0 10px rgba(255, 128, 0, 0.3);
-        }
-
-        .view-btn:hover:not(.active) {
-            color: var(--white);
-            background: rgba(255, 128, 0, 0.1);
-        }
-
-        /* Progress Indicator */
-        .progress-section {
-            background: linear-gradient(135deg, rgba(255, 128, 0, 0.05), rgba(255, 128, 0, 0.02));
-            border: 1px solid rgba(255, 128, 0, 0.2);
-            border-radius: 20px;
-            padding: 2rem;
-            margin-bottom: 3rem;
-        }
-
-        .progress-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1.5rem;
-        }
-
-        .progress-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--white);
-        }
-
-        .progress-percentage {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .progress-bar {
-            height: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 1.5rem;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), #FFA500);
-            border-radius: 10px;
-            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .progress-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-        }
-
-        .progress-stat {
-            text-align: center;
-        }
-
-        .progress-stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--white);
-        }
-
-        .progress-stat-label {
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.5);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        /* Mobile Responsive */
-        @media (max-width: 1024px) {
-            .sidebar {
-                position: fixed;
-                transform: translateX(-100%);
-                box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
-            }
-
-            .sidebar.active {
-                transform: translateX(0);
-            }
-
-            .main-container {
-                margin-left: 0;
-            }
-
-            .mobile-menu {
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-            }
-
-            .search-box {
-                width: 300px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .content {
-                padding: 1rem;
-            }
-
-            .header {
-                padding: 0 1rem;
-            }
-
-            .header-left {
-                flex: 1;
-            }
-
-            .search-box {
-                width: 100%;
-                max-width: 200px;
-            }
-
-            .header-btn span {
-                display: none;
-            }
-
-            .page-title {
-                font-size: 1.5rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-
-            .resources-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-
-            .progress-stats {
-                gap: 0.5rem;
-            }
-
-            .progress-stat-value {
-                font-size: 1.25rem;
-            }
-
-            .sidebar {
-                width: 85%;
-                max-width: 320px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .stat-value {
-                font-size: 1.5rem;
-            }
-
-            .resource-card {
-                padding: 1rem;
-            }
-
-            .progress-section {
-                padding: 1.5rem;
-            }
-
-            .view-toggle {
-                display: none;
-            }
-        }
-
-        /* Overlay for mobile sidebar */
-        .overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            z-index: 999;
-        }
-
-        .overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* Animations */
-        .fade-in {
-            animation: fadeIn 0.6s ease;
-        }
-
-        .slide-up {
-            animation: slideUp 0.6s ease;
-        }
-
-        @keyframes slideUp {
+        @keyframes fadeInUp {
             from {
                 opacity: 0;
                 transform: translateY(30px);
@@ -1198,241 +256,1038 @@
             }
         }
 
-        .stagger {
-            animation: fadeIn 0.6s ease both;
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, 
+                var(--mclaren-orange) 0%, 
+                var(--mclaren-light) 50%, 
+                var(--mclaren-orange) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 3s ease-in-out infinite;
         }
 
-        .stagger:nth-child(1) { animation-delay: 0.1s; }
-        .stagger:nth-child(2) { animation-delay: 0.2s; }
-        .stagger:nth-child(3) { animation-delay: 0.3s; }
-        .stagger:nth-child(4) { animation-delay: 0.4s; }
+        @keyframes glow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .stat-card {
+            background: var(--glass-white);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-normal);
+            animation: slideInUp 0.6s ease backwards;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--mclaren-orange), var(--mclaren-light));
+            opacity: 0;
+            transition: opacity var(--transition-normal);
+        }
+
+        .stat-card:hover {
+            border-color: rgba(255, 128, 0, 0.3);
+            box-shadow: 0 8px 32px rgba(255, 128, 0, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 128, 0, 0.1);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--mclaren-orange);
+            margin-bottom: var(--spacing-sm);
+            transition: all var(--transition-normal);
+        }
+
+        .stat-card:hover .stat-icon {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 0 20px rgba(255, 128, 0, 0.3);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-dim);
+        }
+
+        /* Animated List Container */
+        .content-section {
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .section-title .icon {
+            color: var(--mclaren-orange);
+        }
+
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: var(--spacing-sm);
+            background: var(--glass-white);
+            padding: 0.35rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--glass-border);
+        }
+
+        .filter-tab {
+            padding: 0.5rem 1.25rem;
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-sm);
+            color: var(--text-dim);
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        .filter-tab:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .filter-tab.active {
+            background: rgba(255, 128, 0, 0.2);
+            color: var(--mclaren-orange);
+            box-shadow: 0 0 20px rgba(255, 128, 0, 0.2);
+        }
+
+        /* Animated List */
+        .animated-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .list-item {
+            background: var(--glass-white);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-normal);
+            cursor: pointer;
+            animation: listItemSlide 0.6s ease backwards;
+        }
+
+        @keyframes listItemSlide {
+            from {
+                opacity: 0;
+                transform: translateX(-40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .list-item:nth-child(1) { animation-delay: 0.1s; }
+        .list-item:nth-child(2) { animation-delay: 0.15s; }
+        .list-item:nth-child(3) { animation-delay: 0.2s; }
+        .list-item:nth-child(4) { animation-delay: 0.25s; }
+        .list-item:nth-child(5) { animation-delay: 0.3s; }
+        .list-item:nth-child(6) { animation-delay: 0.35s; }
+        .list-item:nth-child(7) { animation-delay: 0.4s; }
+        .list-item:nth-child(8) { animation-delay: 0.45s; }
+
+        .list-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--mclaren-orange);
+            transform: scaleY(0);
+            transform-origin: top;
+            transition: transform var(--transition-normal);
+        }
+
+        .list-item:hover {
+            border-color: rgba(255, 128, 0, 0.4);
+            box-shadow: 0 8px 32px rgba(255, 128, 0, 0.15);
+            transform: translateX(8px);
+        }
+
+        .list-item:hover::before {
+            transform: scaleY(1);
+        }
+
+        .list-item-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .list-item-icon {
+            width: 56px;
+            height: 56px;
+            background: rgba(255, 128, 0, 0.1);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            color: var(--mclaren-orange);
+            flex-shrink: 0;
+            transition: all var(--transition-normal);
+        }
+
+        .list-item:hover .list-item-icon {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 0 20px rgba(255, 128, 0, 0.3);
+        }
+
+        .list-item-content {
+            flex: 1;
+        }
+
+        .list-item-title {
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+            transition: color var(--transition-fast);
+        }
+
+        .list-item:hover .list-item-title {
+            color: var(--mclaren-orange);
+        }
+
+        .list-item-count {
+            font-size: 0.875rem;
+            color: var(--text-dim);
+        }
+
+        .list-item-badge {
+            background: rgba(255, 128, 0, 0.15);
+            color: var(--mclaren-orange);
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .list-item-sublist {
+            margin-top: var(--spacing-md);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+            padding-left: calc(56px + var(--spacing-md));
+        }
+
+        .sublist-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.9375rem;
+            transition: all var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sublist-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--mclaren-orange);
+            transform: scaleY(0);
+            transition: transform var(--transition-fast);
+        }
+
+        .sublist-item:hover {
+            background: rgba(255, 128, 0, 0.1);
+            color: var(--mclaren-orange);
+            transform: translateX(8px);
+        }
+
+        .sublist-item:hover::before {
+            transform: scaleY(1);
+        }
+
+        .sublist-icon {
+            font-size: 0.875rem;
+            color: var(--mclaren-orange);
+            opacity: 0.6;
+            transition: all var(--transition-fast);
+        }
+
+        .sublist-item:hover .sublist-icon {
+            opacity: 1;
+            transform: translateX(3px);
+        }
+
+        /* Loading Skeleton */
+        .skeleton {
+            background: linear-gradient(
+                90deg,
+                var(--glass-white) 25%,
+                rgba(255, 255, 255, 0.08) 50%,
+                var(--glass-white) 75%
+            );
+            background-size: 200% 100%;
+            animation: loading 1.5s ease-in-out infinite;
+            border-radius: var(--radius-md);
+        }
+
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .skeleton-item {
+            height: 120px;
+            margin-bottom: var(--spacing-md);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-2xl);
+            background: var(--glass-white);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            margin: var(--spacing-xl) 0;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: var(--spacing-md);
+            opacity: 0.5;
+        }
+
+        .empty-state-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-primary);
+        }
+
+        .empty-state-text {
+            color: var(--text-dim);
+        }
+
+        /* Search Box */
+        .search-container {
+            margin-bottom: var(--spacing-xl);
+            position: relative;
+        }
+
+        .search-box {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.5rem 1rem 3.5rem;
+            background: var(--glass-white);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 500;
+            transition: all var(--transition-normal);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: rgba(255, 128, 0, 0.4);
+            box-shadow: 
+                0 0 0 3px rgba(255, 128, 0, 0.1),
+                0 8px 24px rgba(255, 128, 0, 0.15);
+            background: rgba(255, 128, 0, 0.03);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-dim);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-dim);
+            transition: color var(--transition-fast);
+        }
+
+        .search-input:focus + .search-icon {
+            color: var(--mclaren-orange);
+        }
+
+        /* Scroll to Top Button */
+        .scroll-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: var(--mclaren-orange);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: all var(--transition-normal);
+            z-index: 998;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(255, 128, 0, 0.4);
+        }
+
+        .scroll-to-top.visible {
+            opacity: 1;
+            pointer-events: all;
+            animation: bounceIn 0.5s ease;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0) rotate(0deg);
+            }
+            50% {
+                transform: scale(1.2) rotate(180deg);
+            }
+            100% {
+                transform: scale(1) rotate(360deg);
+            }
+        }
+
+        .scroll-to-top:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 6px 25px rgba(255, 128, 0, 0.6);
+        }
+
+        /* Footer */
+        footer {
+            margin-top: var(--spacing-2xl);
+            padding: var(--spacing-xl) 0;
+            border-top: 1px solid var(--glass-border);
+            text-align: center;
+            color: var(--text-dim);
+        }
+
+        footer a {
+            color: var(--mclaren-orange);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+
+        footer a:hover {
+            color: var(--mclaren-light);
+            text-shadow: 0 0 10px var(--mclaren-glow);
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            z-index: 1001;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 25px;
+            height: 2px;
+            background: var(--mclaren-orange);
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(7px, 7px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        /* Mobile Sidebar */
+        .mobile-sidebar {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 85%;
+            max-width: 350px;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-left: 1px solid var(--glass-border);
+            z-index: 1002;
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            box-shadow: -4px 0 24px rgba(0, 0, 0, 0.5);
+        }
+
+        .mobile-sidebar.active {
+            right: 0;
+        }
+
+        .mobile-sidebar-header {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mobile-sidebar-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--mclaren-orange);
+        }
+
+        .close-sidebar {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: all var(--transition-fast);
+        }
+
+        .close-sidebar:hover {
+            color: var(--mclaren-orange);
+            transform: rotate(90deg);
+        }
+
+        .mobile-sidebar-content {
+            padding: var(--spacing-lg);
+        }
+
+        .mobile-nav-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .mobile-nav-group-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--glass-white);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-xs);
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all var(--transition-fast);
+            cursor: pointer;
+        }
+
+        .mobile-nav-item:hover {
+            background: rgba(255, 128, 0, 0.1);
+            border-color: rgba(255, 128, 0, 0.3);
+            transform: translateX(-4px);
+        }
+
+        .mobile-nav-icon {
+            font-size: 1.25rem;
+        }
+
+        .mobile-nav-text {
+            flex: 1;
+            font-size: 0.9375rem;
+            font-weight: 500;
+        }
+
+        .mobile-nav-count {
+            font-size: 0.75rem;
+            color: var(--mclaren-orange);
+            background: rgba(255, 128, 0, 0.15);
+            padding: 0.125rem 0.5rem;
+            border-radius: var(--radius-sm);
+        }
+
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1001;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .mobile-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            /* Slim Stats for Mobile */
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 0;
+                background: var(--glass-white);
+                border: 1px solid var(--glass-border);
+                border-radius: var(--radius-lg);
+                padding: var(--spacing-sm);
+                margin-bottom: var(--spacing-lg);
+            }
+
+            .stat-card {
+                background: transparent;
+                border: none;
+                border-radius: 0;
+                padding: var(--spacing-sm);
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-sm);
+                animation: none;
+            }
+
+            .stat-card:not(:last-child) {
+                border-bottom: 1px solid var(--glass-border);
+            }
+
+            .stat-card::before {
+                display: none;
+            }
+
+            .stat-card:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            .stat-icon {
+                width: 36px;
+                height: 36px;
+                margin-bottom: 0;
+                flex-shrink: 0;
+            }
+
+            .stat-card:hover .stat-icon {
+                transform: none;
+                box-shadow: 0 0 10px rgba(255, 128, 0, 0.2);
+            }
+
+            .stat-value {
+                font-size: 1.25rem;
+                margin-bottom: 0;
+                font-weight: 600;
+            }
+
+            .stat-label {
+                font-size: 0.8125rem;
+                margin-left: auto;
+                text-align: right;
+                color: var(--text-dim);
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--spacing-md);
+            }
+
+            .filter-tabs {
+                width: 100%;
+                overflow-x: auto;
+            }
+
+            .list-item {
+                padding: var(--spacing-md);
+            }
+
+            .list-item-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 1.5rem;
+            }
+
+            .list-item-title {
+                font-size: 1.15rem;
+            }
+
+            .list-item-sublist {
+                padding-left: 0;
+                margin-top: var(--spacing-sm);
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 var(--spacing-md);
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .list-item {
+                padding: var(--spacing-sm);
+            }
+
+            .stat-value {
+                font-size: 1.125rem;
+            }
+
+            .stat-label {
+                font-size: 0.75rem;
+            }
+
+            .mobile-sidebar {
+                width: 90%;
+            }
+        }
+
+        /* Pulse Animation for New Items */
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(255, 128, 0, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(255, 128, 0, 0);
+            }
+        }
+
+        .new-item {
+            animation: pulse 2s ease infinite;
+        }
     </style>
 </head>
 <body>
-    <!-- Overlay for mobile menu -->
-    <div class="overlay" id="overlay"></div>
+    <!-- Reading Progress Bar -->
+    <div id="reading-progress"></div>
 
-    <!-- Modern Sidebar -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <a href="/" class="logo">ROVER</a>
+    <!-- Background Particles -->
+    <div class="background-particles" id="particles"></div>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <!-- Mobile Sidebar -->
+    <div class="mobile-sidebar" id="mobileSidebar">
+        <div class="mobile-sidebar-header">
+            <h3 class="mobile-sidebar-title">Quick Access</h3>
+            <button class="close-sidebar" id="closeSidebar">×</button>
         </div>
-
-        <nav class="nav-section" id="sidebar-navigation">
-            <div class="nav-title">Learning Paths</div>
-            <div id="nav-categories">
-                <!-- Will be populated by JavaScript -->
-            </div>
-        </nav>
-
-        <div class="sidebar-footer">
-            <div class="stat-item">
-                <span class="stat-value" id="footer-categories">-</span>
-                <span class="stat-label">Topics</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-value" id="footer-resources">-</span>
-                <span class="stat-label">Resources</span>
-            </div>
+        <div class="mobile-sidebar-content" id="mobileSidebarContent">
+            <!-- Will be populated by JavaScript -->
         </div>
-    </aside>
-
-    <!-- Main Container -->
-    <div class="main-container">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-left">
-                <button class="mobile-menu" id="mobile-menu">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-                <div class="search-box">
-                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="11" cy="11" r="8"/>
-                        <path d="m21 21-4.35-4.35"/>
-                    </svg>
-                    <input type="text" class="search-input" placeholder="Search resources..." id="search-input">
-                </div>
-            </div>
-            <div class="header-right">
-                <button class="header-btn" title="Notifications">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                    </svg>
-                    <span class="notification-dot"></span>
-                </button>
-                <button class="header-btn" title="GitHub" onclick="window.open('https://github.com/purple-claw/Rover', '_blank')">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.135 20.165 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
-                    </svg>
-                </button>
-            </div>
-        </header>
-
-        <!-- Content -->
-        <main class="content">
-            <h1 class="page-title">Dashboard Overview</h1>
-            <p class="page-subtitle">Master Data Structures and Algorithms from first principles</p>
-
-            <!-- Stats Grid -->
-            <div class="stats-grid">
-                <div class="stat-card stagger">
-                    <div class="stat-header">
-                        <div class="stat-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-                            </svg>
-                        </div>
-                        <div class="stat-trend">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                            </svg>
-                            +12%
-                        </div>
-                    </div>
-                    <div class="stat-value" id="stat-categories">-</div>
-                    <div class="stat-label">Learning Topics</div>
-                </div>
-
-                <div class="stat-card stagger">
-                    <div class="stat-header">
-                        <div class="stat-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                <polyline points="14 2 14 8 20 8"/>
-                            </svg>
-                        </div>
-                        <div class="stat-trend">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                            </svg>
-                            +8%
-                        </div>
-                    </div>
-                    <div class="stat-value" id="stat-resources">-</div>
-                    <div class="stat-label">Total Resources</div>
-                </div>
-
-                <div class="stat-card stagger">
-                    <div class="stat-header">
-                        <div class="stat-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <polyline points="12 6 12 12 16 14"/>
-                            </svg>
-                        </div>
-                        <div class="stat-trend">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 5v14M5 12h14"/>
-                            </svg>
-                            100%
-                        </div>
-                    </div>
-                    <div class="stat-value">24/7</div>
-                    <div class="stat-label">Available Always</div>
-                </div>
-
-                <div class="stat-card stagger">
-                    <div class="stat-header">
-                        <div class="stat-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-                            </svg>
-                        </div>
-                        <div class="stat-trend">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M20 6L9 17l-5-5"/>
-                            </svg>
-                            Free
-                        </div>
-                    </div>
-                    <div class="stat-value">100%</div>
-                    <div class="stat-label">Free Forever</div>
-                </div>
-            </div>
-
-            <!-- Resources Section -->
-            <div class="resources-section">
-                <div class="section-header">
-                    <h2 class="section-title">Learning Resources</h2>
-                    <div class="view-toggle">
-                        <button class="view-btn active">Grid</button>
-                        <button class="view-btn">List</button>
-                    </div>
-                </div>
-                <div class="resources-grid" id="resources-grid">
-                    <!-- Resources will be populated by JavaScript -->
-                </div>
-            </div>
-        </main>
     </div>
 
-    <script src="/static/index.js?v=20251016"></script>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="/" class="nav-logo">ROVER</a>
+            <ul class="nav-links">
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/dashboard" class="nav-link active">Dashboard</a></li>
+                <li><a href="https://github.com/purple-claw/Rover" target="_blank" class="nav-link">GitHub</a></li>
+            </ul>
+            <button class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>Learning Dashboard</h1>
+            <p>Master Data Structures & Algorithms from first principles. Your journey to algorithmic mastery starts here.
+                All the Best and Good Luck for your DSA Journey!
+            </p>
+        </section>
+
+        <!-- Search -->
+        <div class="search-container">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    id="search-input" 
+                    placeholder="Search topics, algorithms, concepts..."
+                    autocomplete="off"
+                >
+                <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="m21 21-4.35-4.35"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid" id="stats-grid">
+            <!-- Stats will be populated by JavaScript -->
+            <div class="stat-card skeleton skeleton-item"></div>
+            <div class="stat-card skeleton skeleton-item"></div>
+            <div class="stat-card skeleton skeleton-item"></div>
+            <div class="stat-card skeleton skeleton-item"></div>
+        </div>
+
+        <!-- Content Section -->
+        <div class="content-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    Learning Paths
+                </h2>
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="all">All Topics</button>
+                    <button class="filter-tab" data-filter="fundamentals">Fundamentals</button>
+                    <button class="filter-tab" data-filter="advanced">Advanced</button>
+                </div>
+            </div>
+
+            <!-- Animated List -->
+            <ul class="animated-list" id="content-list">
+                <!-- Content will be populated by JavaScript -->
+                <li class="list-item skeleton skeleton-item"></li>
+                <li class="list-item skeleton skeleton-item"></li>
+                <li class="list-item skeleton skeleton-item"></li>
+                <li class="list-item skeleton skeleton-item"></li>
+            </ul>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>Built with ❤️ by <a href="https://github.com/purple-claw/" target="_blank">Nitin Sri(Purple-Claw)</a></p>
+            <p style="margin-top: 0.5rem; font-size: 0.875rem;">Open source learning platform for DSA mastery</p>
+        </footer>
+    </div>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-to-top" id="scrollToTop" aria-label="Scroll to top">
+        ↑
+    </button>
+
     <script>
-        // ==========================================
-        // GLOBAL STATE
-        // ==========================================
-        let navigationData = null;
-        let activeCategory = null;
+        // MOBILE MENU & HAMBURGER
+        const hamburger = document.getElementById('hamburger');
+        const mobileSidebar = document.getElementById('mobileSidebar');
+        const mobileOverlay = document.getElementById('mobileOverlay');
+        const closeSidebar = document.getElementById('closeSidebar');
 
-        // Mobile Menu Toggle
-        const mobileMenu = document.getElementById('mobile-menu');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
-
-        mobileMenu.addEventListener('click', () => {
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
-        });
-
-        overlay.addEventListener('click', () => {
-            sidebar.classList.remove('active');
-            overlay.classList.remove('active');
-        });
-
-        // ==========================================
-        // SEARCH FUNCTIONALITY
-        // ==========================================
-        const searchInput = document.getElementById('search-input');
-        let searchTimeout;
-
-        searchInput.addEventListener('input', (e) => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                const query = e.target.value.toLowerCase();
-                if (query) {
-                    filterContent(query);
-                } else {
-                    renderResourcesGrid(navigationData);
-                }
-            }, 300);
-        });
-
-        function filterContent(query) {
-            if (!navigationData) return;
-            
-            const filtered = navigationData.map(category => {
-                const matchingFiles = getAllFiles(category).filter(file => 
-                    file.name.toLowerCase().includes(query)
-                );
-                
-                if (matchingFiles.length > 0) {
-                    return {
-                        ...category,
-                        children: matchingFiles.map(file => ({ ...file, type: 'file' }))
-                    };
-                }
-                return null;
-            }).filter(Boolean);
-            
-            renderResourcesGrid(filtered);
+        function openMobileSidebar() {
+            hamburger.classList.add('active');
+            mobileSidebar.classList.add('active');
+            mobileOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
         }
 
-        // ==========================================
-        // LOAD NAVIGATION DATA
-        // ==========================================
+        function closeMobileSidebar() {
+            hamburger.classList.remove('active');
+            mobileSidebar.classList.remove('active');
+            mobileOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        hamburger.addEventListener('click', openMobileSidebar);
+        closeSidebar.addEventListener('click', closeMobileSidebar);
+        mobileOverlay.addEventListener('click', closeMobileSidebar);
+
+        // BACKGROUND PARTICLES
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 30;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDuration = (Math.random() * 20 + 10) + 's';
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // PROGRESS BAR
+        window.addEventListener('scroll', () => {
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight - windowHeight;
+            const scrolled = window.scrollY;
+            const progress = (scrolled / documentHeight) * 100;
+            document.getElementById('reading-progress').style.width = progress + '%';
+        });
+
+        // SCROLL TO TOP
+        const scrollToTopBtn = document.getElementById('scrollToTop');
+
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollToTopBtn.classList.add('visible');
+            } else {
+                scrollToTopBtn.classList.remove('visible');
+            }
+        });
+
+        scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // DATA LOADING AND RENDERING
+        let navigationData = null;
+        let currentFilter = 'all';
+
+        // Map from topic to SVG icon HTML (professional line icons)
+        const iconMap = {
+            'Complexity': `<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20v-6" /><circle cx="12" cy="10" r="4" /><path d="M7.5 5A8.5 8.5 0 002 12.5M16.5 5A8.5 8.5 0 0122 12.5" /></svg>`,
+            'Problem Solving': `<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 8h8v8H8z"/></svg>`,
+            'Sliding Window': `<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="10" rx="2"/><rect x="3" y="10" width="6" height="4" fill="var(--mclaren-orange)" stroke="none"/></svg>`,
+            'Arrays': `<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 7v10M12 7v10M17 7v10"/></svg>`,
+            'Memory': `<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="7" width="16" height="10" rx="2"/><path d="M8 7V5h8v2"/></svg>`,
+            'Sorting': `<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 20l6-16 6 16"/><path d="M6 17h12"/></svg>`,
+            'Searching': `<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="18" y1="18" x2="15.5" y2="15.5"/></svg>`,
+            'Trees': `<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="3"/><path d="M12 10v4"/><circle cx="7" cy="17" r="3"/><circle cx="17" cy="17" r="3"/><path d="M12 14l-5 3"/><path d="M12 14l5 3"/></svg>`,
+            'Graphs': `<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="18" r="3"/><path d="M6 9v6"/><path d="M9 6h6"/><path d="M18 9v6"/><path d="M9 18h6"/></svg>`,
+            'Dynamic Programming': `<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="7" height="13" rx="2"/><rect x="14" y="3" width="7" height="18" rx="2"/><path d="M10 15H14"/></svg>`,
+            'Greedy': `<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="7" height="10" rx="2"/><rect x="14" y="3" width="7" height="18" rx="2"/><path d="M10 16H14"/></svg>`,
+            'Backtracking': `<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/><path d="M19 12H9"/></svg>`,
+            'Default': `<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>`
+        };
+
         async function loadNavigation() {
             try {
                 const response = await fetch(`/api/navigation?ts=${Date.now()}`, { cache: 'no-store' });
@@ -1440,28 +1295,9 @@
                 
                 if (data.navigation && Array.isArray(data.navigation)) {
                     navigationData = data.navigation;
-
-                    // Derive summary without NaN risks
-                    const { topLevelCategories, totalFiles } = computeNavigationSummary(navigationData);
-
-                    // Update stats only if elements exist
-                    const statCategoriesEl = document.getElementById('stat-categories');
-                    const statResourcesEl = document.getElementById('stat-resources');
-                    const footerCategoriesEl = document.getElementById('footer-categories');
-                    const footerResourcesEl = document.getElementById('footer-resources');
-
-                    if (statCategoriesEl) statCategoriesEl.textContent = topLevelCategories;
-                    if (statResourcesEl) statResourcesEl.textContent = totalFiles;
-                    if (footerCategoriesEl) footerCategoriesEl.textContent = topLevelCategories;
-                    if (footerResourcesEl) footerResourcesEl.textContent = totalFiles;
-                    
-                    // Render sidebar navigation
-                    renderSidebarNavigation(data.navigation);
-                    
-                    // Render resources grid
-                    renderResourcesGrid(data.navigation);
+                    renderStats(navigationData);
+                    renderContentList(navigationData);
                 } else {
-                    console.error('Invalid navigation data structure');
                     showError();
                 }
             } catch (error) {
@@ -1470,184 +1306,208 @@
             }
         }
 
-        // Render Sidebar Navigation
-        function renderSidebarNavigation(items) {
-            const navCategories = document.getElementById('nav-categories');
+        function renderStats(items) {
+            const statsGrid = document.getElementById('stats-grid');
             
-            const iconMap = {
-                'Complexity': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
-                'Problem Solving': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>',
-                'Sliding Window': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>',
-                'Arrays': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="6" height="8"/><rect x="11" y="8" width="6" height="8"/><rect x="19" y="8" width="2" height="8"/></svg>',
-                'Memory': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="10" rx="2"/><path d="M7 7V5a2 2 0 012-2h6a2 2 0 012 2v2M7 17v2a2 2 0 002 2h6a2 2 0 002-2v-2"/></svg>',
-                'Test': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'
-            };
+            const totalTopics = items.filter(item => item && item.type === 'folder').length;
+            const totalResources = items.reduce((acc, item) => acc + countFilesInNode(item), 0);
+            
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-value">${totalTopics}</div>
+                    <div class="stat-label">Learning Topics</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                    </div>
+                    <div class="stat-value">${totalResources}</div>
+                    <div class="stat-label">Total Resources</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                    </div>
+                    <div class="stat-value">24/7</div>
+                    <div class="stat-label">Always Available</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-value">100%</div>
+                    <div class="stat-label">Free Forever</div>
+                </div>
+            `;
+        }
+
+        function renderContentList(items) {
+            const contentList = document.getElementById('content-list');
             
             let html = '';
             
             items.forEach((item, index) => {
                 if (item && item.type === 'folder') {
                     const fileCount = countFilesInNode(item);
-                    const icon = iconMap[item.name] || '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>';
+                    const icon = iconMap[item.name] || iconMap['Default'];
+                    const isNew = index < 2; // Mark first two as new
                     
                     html += `
-                        <div class="nav-item">
-                            <button class="nav-link" data-category="${item.name}" data-index="${index}">
-                                <div class="nav-icon">${icon}</div>
-                                <span>${item.name}</span>
-                                <span class="nav-badge">${fileCount}</span>
-                                <svg class="nav-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="9 18 15 12 9 6"/>
-                                </svg>
-                            </button>
-                            <div class="sub-nav" data-category="${item.name}">
+                        <li class="list-item ${isNew ? 'new-item' : ''}" data-category="${item.name}">
+                            <div class="list-item-header">
+                                <div class="list-item-icon">${icon}</div>
+                                <div class="list-item-content">
+                                    <h3 class="list-item-title">${item.name}</h3>
+                                    <p class="list-item-count">${fileCount} ${fileCount === 1 ? 'resource' : 'resources'}</p>
+                                </div>
+                                ${isNew ? '<span class="list-item-badge">New</span>' : ''}
+                            </div>
+                            <div class="list-item-sublist">
                                 ${renderSubItems(item.children)}
                             </div>
+                        </li>
+                    `;
+                }
+            });
+            
+            contentList.innerHTML = html;
+            
+            // Also populate mobile sidebar
+            renderMobileSidebar(items);
+        }
+
+        function renderMobileSidebar(items) {
+            const mobileSidebarContent = document.getElementById('mobileSidebarContent');
+            
+            let html = '<div class="mobile-nav-group"><div class="mobile-nav-group-title">Quick Navigation</div>';
+            
+            items.forEach(item => {
+                if (item && item.type === 'folder') {
+                    const fileCount = countFilesInNode(item);
+                    const icon = iconMap[item.name] || iconMap['Default'];
+                    
+                    html += `
+                        <div class="mobile-nav-item" onclick="scrollToCategory('${item.name}'); closeMobileSidebar();">
+                            <span class="mobile-nav-icon">${icon}</span>
+                            <span class="mobile-nav-text">${item.name}</span>
+                            <span class="mobile-nav-count">${fileCount}</span>
                         </div>
                     `;
                 }
             });
             
-            navCategories.innerHTML = html;
+            html += '</div>';
             
-            // Add event listeners
-            document.querySelectorAll('.nav-link').forEach(button => {
-                button.addEventListener('click', function() {
-                    const categoryName = this.dataset.category;
-                    const subNav = this.nextElementSibling;
-                    
-                    // Toggle expansion
-                    this.classList.toggle('expanded');
-                    subNav.classList.toggle('expanded');
-                    
-                    // Set active category
-                    document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // Scroll to resources
-                    document.querySelector('.resources-section')?.scrollIntoView({ behavior: 'smooth' });
-                });
+            // Add direct file links
+            html += '<div class="mobile-nav-group"><div class="mobile-nav-group-title">All Resources</div>';
+            
+            items.forEach(item => {
+                if (item && item.type === 'folder' && item.children) {
+                    html += renderMobileFileLinks(item.children);
+                }
             });
+            
+            html += '</div>';
+            
+            mobileSidebarContent.innerHTML = html;
         }
 
-        function renderSubItems(children) {
+        function renderMobileFileLinks(children, depth = 0) {
             if (!children || !Array.isArray(children)) return '';
             
             let html = '';
+            
             children.forEach(child => {
                 if (!child) return;
                 
                 if (child.type === 'file') {
                     const fileName = child.name || 'Untitled';
                     const fileUrl = child.url || '#';
+                    
                     html += `
-                        <a class="sub-nav-item" href="${fileUrl}">
-                            ${fileName}
+                        <a href="${fileUrl}" class="mobile-nav-item" style="padding-left: ${1 + depth * 0.5}rem;">
+                            <span class="mobile-nav-icon">📄</span>
+                            <span class="mobile-nav-text">${fileName}</span>
                         </a>
                     `;
                 } else if (child.type === 'folder' && child.children) {
-                    html += renderSubItems(child.children);
+                    html += renderMobileFileLinks(child.children, depth + 1);
                 }
             });
+            
             return html;
         }
 
-        // Render Resources Grid
-        function renderResourcesGrid(items) {
-            const resourcesGrid = document.getElementById('resources-grid');
-            if (!resourcesGrid) return;
-            
-            let html = '';
-            
-            items.forEach(item => {
-                if (item && item.type === 'folder') {
-                    const fileCount = countFilesInNode(item);
-                    const completedCount = 0;
-                    const progress = 0;
-                    
-                    html += `
-                        <div class="resource-card" data-category="${item.name}">
-                            <div class="resource-header">
-                                <h3>${item.name}</h3>
-                                <span class="resource-count">${fileCount} lessons</span>
-                            </div>
-                            <div class="resource-progress">
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: ${progress}%"></div>
-                                </div>
-                                <span class="progress-text">${completedCount}/${fileCount} completed</span>
-                            </div>
-                            <div class="resource-items">
-                                ${renderResourceItems(item.children)}
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-            
-            resourcesGrid.innerHTML = html;
+        function scrollToCategory(categoryName) {
+            const listItem = document.querySelector(`[data-category="${categoryName}"]`);
+            if (listItem) {
+                listItem.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+                listItem.style.animation = 'pulse 1s ease';
+                setTimeout(() => {
+                    listItem.style.animation = '';
+                }, 1000);
+            }
         }
 
-        function renderResourceItems(children) {
+        function renderSubItems(children) {
             if (!children || !Array.isArray(children)) return '';
             
             let html = '';
             let count = 0;
+            const maxShow = 5;
             
-            children.forEach(child => {
-                if (!child || count >= 3) return;
-                
-                if (child.type === 'file') {
-                    const fileName = child.name || 'Untitled';
-                    const fileUrl = child.url || '#';
-                    count++;
+            function processChildren(items) {
+                items.forEach(child => {
+                    if (!child || count >= maxShow) return;
                     
-                    html += `
-                        <a href="${fileUrl}" class="resource-item">
-                            <span class="item-icon">📄</span>
-                            <span class="item-name">${fileName}</span>
-                        </a>
-                    `;
-                } else if (child.type === 'folder' && child.children) {
-                    const subItems = renderResourceItems(child.children);
-                    if (subItems) html += subItems;
-                }
-            });
+                    if (child.type === 'file') {
+                        const fileName = child.name || 'Untitled';
+                        const fileUrl = child.url || '#';
+                        count++;
+                        
+                        html += `
+                            <a href="${fileUrl}" class="sublist-item">
+                                <span class="sublist-icon">→</span>
+                                <span>${fileName}</span>
+                            </a>
+                        `;
+                    } else if (child.type === 'folder' && child.children) {
+                        processChildren(child.children);
+                    }
+                });
+            }
             
-            // Count total files in children, handling nested folders
-            const totalFileCount = Array.isArray(children)
-                ? children.reduce((acc, ch) => acc + countFilesInNode(ch), 0)
-                : 0;
-
-            if (totalFileCount > 3) {
-                const remaining = Math.max(0, totalFileCount - count);
-                if (remaining > 0) {
-                    html += `<div class="resource-more">+${remaining} more</div>`;
-                }
+            processChildren(children);
+            
+            const totalFiles = countFilesInNode({ children });
+            if (totalFiles > maxShow) {
+                html += `
+                    <div class="sublist-item" style="opacity: 0.6; cursor: default;">
+                        <span class="sublist-icon">•••</span>
+                        <span>+${totalFiles - maxShow} more resources</span>
+                    </div>
+                `;
             }
             
             return html;
         }
 
-        // ==========================================
-        // UTILITY FUNCTIONS
-        // ==========================================
-        function getAllFiles(item) {
-            if (!item) return [];
-            
-            let files = [];
-            if (item.type === 'file') {
-                return [item];
-            }
-            if (item.children && Array.isArray(item.children)) {
-                item.children.forEach(child => {
-                    files = files.concat(getAllFiles(child));
-                });
-            }
-            return files;
-        }
-        
-        // Deterministic counting helpers
         function countFilesInNode(node) {
             if (!node) return 0;
             if (node.type === 'file') return 1;
@@ -1657,88 +1517,83 @@
             return 0;
         }
 
-        function computeNavigationSummary(nav) {
-            const topLevelCategories = Array.isArray(nav)
-                ? nav.filter(n => n && n.type === 'folder').length
-                : 0;
-            const totalFiles = Array.isArray(nav)
-                ? nav.reduce((acc, n) => acc + countFilesInNode(n), 0)
-                : 0;
-            return { topLevelCategories, totalFiles };
-        }
-
-        function scrollToResources(categoryName) {
-            const resourceCard = document.querySelector(`[data-category="${categoryName}"]`);
-            if (resourceCard) {
-                resourceCard.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'center' 
-                });
-                resourceCard.classList.add('highlight');
-                setTimeout(() => resourceCard.classList.remove('highlight'), 2000);
-            }
-        }
-
-        function navigateTo(url) {
-            window.location.href = url;
-        }
-
         function showError() {
-            document.getElementById('resources-grid').innerHTML = `
-                <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
-                    <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
-                    <h3 style="font-size: 20px; margin-bottom: 8px; color: var(--white);">Failed to load resources</h3>
-                    <p style="color: rgba(255, 255, 255, 0.6);">Please refresh the page or try again later</p>
+            const contentList = document.getElementById('content-list');
+            contentList.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">⚠️</div>
+                    <h3 class="empty-state-title">Failed to load resources</h3>
+                    <p class="empty-state-text">Please refresh the page or try again later</p>
                 </div>
             `;
         }
 
-        // ==========================================
-        // SMOOTH SCROLL FOR ANCHORS
-        // ==========================================
-        document.addEventListener('click', (e) => {
-            if (e.target.tagName === 'A' && e.target.hash) {
-                e.preventDefault();
-                const target = document.querySelector(e.target.hash);
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
+        // SEARCH FUNCTIONALITY
+        const searchInput = document.getElementById('search-input');
+        let searchTimeout;
+
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const query = e.target.value.toLowerCase();
+                filterContent(query);
+            }, 300);
+        });
+
+        function filterContent(query) {
+            const listItems = document.querySelectorAll('.list-item');
+            
+            if (!query) {
+                listItems.forEach(item => {
+                    item.style.display = '';
+                    item.style.animation = 'listItemSlide 0.6s ease';
+                });
+                return;
             }
-        });
-
-        // ==========================================
-        // INITIALIZE
-        // ==========================================
-        window.addEventListener('load', () => {
-            console.log('Dashboard loading...');
-            loadNavigation().catch(err => {
-                console.error('Failed to load navigation:', err);
+            
+            listItems.forEach(item => {
+                const category = item.dataset.category.toLowerCase();
+                const subItems = item.querySelectorAll('.sublist-item');
+                let hasMatch = category.includes(query);
+                
+                if (!hasMatch) {
+                    subItems.forEach(subItem => {
+                        if (subItem.textContent.toLowerCase().includes(query)) {
+                            hasMatch = true;
+                        }
+                    });
+                }
+                
+                if (hasMatch) {
+                    item.style.display = '';
+                    item.style.animation = 'listItemSlide 0.6s ease';
+                } else {
+                    item.style.display = 'none';
+                }
             });
-        });
+        }
 
-        // View Toggle Functionality
-        const viewButtons = document.querySelectorAll('.view-btn');
-        viewButtons.forEach(btn => {
-            btn.addEventListener('click', function() {
-                viewButtons.forEach(b => b.classList.remove('active'));
+        // FILTER TABS
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
                 
-                const view = this.textContent.toLowerCase();
-                const resourcesGrid = document.getElementById('resources-grid');
-                
-                if (view === 'list') {
-                    resourcesGrid.style.gridTemplateColumns = '1fr';
-                } else {
-                    resourcesGrid.style.gridTemplateColumns = '';
-                }
+                currentFilter = this.dataset.filter;
+                // Add filter logic here based on categories
             });
         });
 
-        // Auto-refresh every 60 seconds
+        // INITIALIZE
+        window.addEventListener('load', () => {
+            console.log('Dashboard loading...');
+            createParticles();
+            loadNavigation();
+        });
+
+        // Auto-refresh navigation data every 60 seconds
         setInterval(() => {
-            loadNavigation().catch(err => {
-                console.error('Auto-refresh failed:', err);
-            });
+            loadNavigation();
         }, 60000);
     </script>
 </body>
