@@ -654,29 +654,166 @@
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
+            .container {
+                padding: 0 var(--spacing-md);
+            }
+
+            nav {
+                padding: 0.5rem 0;
             }
 
             .nav-container {
-                flex-direction: column;
-                gap: 0.5rem;
-                align-items: center;
+                gap: 0.75rem;
+                padding: 0 var(--spacing-md);
+                overflow-x: auto;
+                overflow-y: hidden;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+
+            .nav-container::-webkit-scrollbar {
+                display: none;
+            }
+
+            .nav-link {
+                font-size: 13px;
+                padding: 0.5rem 0.75rem;
+                white-space: nowrap;
+                border-radius: var(--radius-sm);
+            }
+
+            .nav-link.active {
+                background: rgba(255, 128, 0, 0.1);
+            }
+
+            .nav-link.active::after {
+                display: none;
+            }
+
+            .hero {
+                padding: var(--spacing-xl) 0;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+                line-height: 1.2;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .section-subtitle {
+                font-size: 0.9rem;
+            }
+
+            .interactive-container {
+                padding: var(--spacing-md);
+            }
+
+            .interactive-container h3 {
+                font-size: 1.125rem;
             }
 
             .array-visual {
                 padding: var(--spacing-sm);
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
             }
 
             .array-element {
                 min-width: 50px;
                 height: 50px;
-                font-size: 16px;
+                font-size: 14px;
+            }
+
+            .array-index {
+                top: -20px;
+                font-size: 10px;
+            }
+
+            .array-address {
+                bottom: -20px;
+                font-size: 9px;
             }
 
             .control-panel {
                 flex-direction: column;
                 align-items: stretch;
+                gap: var(--spacing-sm);
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+
+            .control-input {
+                width: 100%;
+            }
+
+            .speed-control {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .speed-slider {
+                width: 100%;
+            }
+
+            .code-block {
+                font-size: 12px;
+                padding: var(--spacing-sm);
+                overflow-x: auto;
+            }
+
+            .info-box, .warning-box {
+                padding: var(--spacing-sm);
+                padding-left: 35px;
+                font-size: 0.875rem;
+            }
+
+            .info-box::before, .warning-box::before {
+                left: 10px;
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .hero p {
+                font-size: 0.9375rem;
+            }
+
+            .section-title {
+                font-size: 1.25rem;
+            }
+
+            .interactive-container {
+                padding: var(--spacing-sm);
+            }
+
+            .array-element {
+                min-width: 45px;
+                height: 45px;
+                font-size: 13px;
+            }
+
+            .btn {
+                padding: 8px 12px;
+                font-size: 12px;
             }
         }
 

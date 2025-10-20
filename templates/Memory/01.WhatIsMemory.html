@@ -1427,13 +1427,29 @@
         }
 
         @media (max-width: 768px) {
-            /* Hide desktop nav, show hamburger */
-            .hamburger {
-                display: flex;
+            nav {
+                padding: 0.75rem 0;
             }
 
-            nav {
-                position: sticky;
+            .nav-container {
+                position: relative;
+                justify-content: center;
+                padding: 0 var(--spacing-md);
+            }
+
+            .nav-logo {
+                font-size: 1.25rem;
+                z-index: 1002;
+                position: relative;
+            }
+
+            .hamburger {
+                display: flex;
+                position: absolute;
+                right: var(--spacing-md);
+                top: 50%;
+                transform: translateY(-50%);
+                z-index: 1002;
             }
 
             .nav-links {
@@ -1444,74 +1460,144 @@
                 width: 85%;
                 max-width: 320px;
                 background: rgba(0, 0, 0, 0.98);
-                backdrop-filter: blur(20px);
+                backdrop-filter: blur(24px);
+                -webkit-backdrop-filter: blur(24px);
                 flex-direction: column;
                 padding: 5rem 2rem 2rem;
                 gap: 0;
-                transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                            opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                            visibility 0s linear 0.4s;
                 border-left: 1px solid var(--glass-border);
-                z-index: 1000;
+                z-index: 1001;
+                box-shadow: -4px 0 24px rgba(0, 0, 0, 0.5);
+                overflow-y: auto;
+                visibility: hidden;
+                opacity: 0;
+                pointer-events: none;
             }
 
             .nav-links.active {
                 right: 0;
+                visibility: visible;
+                opacity: 1;
+                pointer-events: all;
+                transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                            opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                            visibility 0s linear 0s;
             }
 
             .nav-link {
-                font-size: 16px;
-                padding: 1rem 0;
+                font-size: 15px;
+                padding: 1rem 1.25rem;
                 border-bottom: 1px solid rgba(255, 255, 255, 0.05);
                 width: 100%;
+                border-radius: 0;
+                transition: all var(--transition-fast);
+            }
+
+            .nav-link:hover {
+                background: rgba(255, 128, 0, 0.1);
+                padding-left: 1.5rem;
+            }
+
+            .nav-link.active {
+                background: rgba(255, 128, 0, 0.15);
+                border-left: 3px solid var(--mclaren-orange);
             }
 
             .nav-link.active::after {
                 display: none;
             }
 
+            .mobile-overlay {
+                display: none;
+            }
+
+            .mobile-overlay.active {
+                display: block;
+            }
+
             .hero {
-                padding: 2rem 0;
+                padding: var(--spacing-xl) 0;
             }
 
             .hero h1 {
                 font-size: 2rem;
+                line-height: 1.2;
             }
 
             .hero p {
                 font-size: 1rem;
+                padding: 0 var(--spacing-sm);
             }
 
             .container {
-                padding: 0 1rem;
+                padding: 0 var(--spacing-md);
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .section-subtitle {
+                font-size: 0.9rem;
+            }
+
+            .content-block {
+                padding: var(--spacing-md);
+            }
+
+            .content-block h3 {
+                font-size: 1.3rem;
+            }
+
+            .content-block h4 {
+                font-size: 1.1rem;
+            }
+
+            .content-block p {
+                font-size: 1rem;
             }
 
             .interactive-demo {
-                padding: 1rem;
-                margin: 1rem 0;
+                padding: var(--spacing-md);
+                margin: var(--spacing-md) 0;
+            }
+
+            .interactive-demo h3 {
+                font-size: 1.125rem;
             }
 
             .demo-controls {
                 flex-direction: column;
                 align-items: stretch;
                 gap: 0.5rem;
+                padding: 0.75rem;
             }
 
-            .demo-btn {
+            .btn {
                 width: 100%;
+                padding: 0.75rem 1rem;
                 text-align: center;
             }
 
             .playground-canvas {
-                padding: 1rem;
+                padding: var(--spacing-sm);
                 min-height: 250px;
             }
 
             .playground-stats {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 0.75rem;
+                gap: 0.5rem;
+            }
+
+            .stat-item {
+                padding: 0.75rem;
             }
 
             .feynman-dive {
-                padding: 1rem;
+                padding: var(--spacing-md);
             }
 
             .feynman-dive h3 {
@@ -1522,20 +1608,25 @@
                 font-size: 1.1rem;
             }
 
-            .section-title {
-                font-size: 1.5rem;
+            .feynman-intro {
+                font-size: 1rem;
+                padding: var(--spacing-sm);
             }
 
             .toc {
-                padding: 1rem;
+                padding: var(--spacing-md);
+            }
+
+            .toc h2 {
+                font-size: 1.25rem;
             }
 
             .toc ul {
-                padding-left: 1rem;
+                padding-left: var(--spacing-md);
             }
 
             .checkpoint-timeline {
-                padding: 1rem;
+                padding: var(--spacing-md);
             }
 
             .checkpoint-item {
@@ -1545,22 +1636,43 @@
 
             .code-block {
                 font-size: 12px;
-                padding: 1rem;
-            }
-
-            .array-visual {
+                padding: var(--spacing-sm);
                 overflow-x: auto;
-                padding: 0.75rem;
             }
 
-            .array-element {
-                min-width: 50px;
-                height: 50px;
-                font-size: 14px;
+            .copy-btn {
+                padding: 0.35rem 0.75rem;
+                font-size: 10px;
+            }
+
+            table {
+                font-size: 0.875rem;
+                overflow-x: auto;
+                display: block;
+            }
+
+            table th, table td {
+                padding: var(--spacing-xs);
+                font-size: 0.8125rem;
+            }
+
+            .info-box, .warning-box {
+                padding: var(--spacing-sm);
+                padding-left: 35px;
+                font-size: 0.875rem;
+            }
+
+            .info-box::before, .warning-box::before {
+                width: 4px;
+                left: 10px;
+            }
+
+            .practical-approach, .theoretical-dive {
+                padding: var(--spacing-sm);
             }
 
             .hierarchy-pyramid {
-                padding: 1rem;
+                padding: var(--spacing-md);
             }
 
             .pyramid-level {
@@ -1578,6 +1690,31 @@
             .pyramid-level-6 {
                 width: 90% !important;
             }
+
+            .level-name {
+                font-size: 1rem;
+            }
+
+            .level-details {
+                font-size: 0.8rem;
+            }
+
+            .cheat-sheet-grid {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            .collapsible-section {
+                margin: 0.75rem 0;
+            }
+
+            .collapsible-header {
+                padding: 0.75rem 1rem;
+            }
+
+            .collapsible-title {
+                font-size: 1rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1585,33 +1722,75 @@
                 font-size: 15px;
             }
 
+            .container {
+                padding: 0 var(--spacing-sm);
+            }
+
+            .nav-logo {
+                font-size: 1.125rem;
+            }
+
+            .nav-links {
+                gap: 0.5rem;
+            }
+
+            .nav-link {
+                font-size: 12px;
+                padding: 0.5rem 0.625rem;
+            }
+
+            .hero {
+                padding: var(--spacing-lg) 0;
+            }
+
             .hero h1 {
                 font-size: 1.75rem;
             }
 
             .hero p {
-                font-size: 0.95rem;
+                font-size: 0.9375rem;
+            }
+
+            .section-title {
+                font-size: 1.25rem;
+            }
+
+            .content-block, .interactive-demo, .feynman-dive {
+                padding: var(--spacing-sm);
+            }
+
+            .content-block h3, .interactive-demo h3, .feynman-dive h3 {
+                font-size: 1.125rem;
+            }
+
+            .content-block h4, .feynman-dive h4 {
+                font-size: 1rem;
             }
 
             .demo-controls {
-                padding: 0.75rem;
+                padding: 0.5rem;
+            }
+
+            .btn {
+                padding: 0.625rem 0.875rem;
+                font-size: 12px;
             }
 
             .playground-stats {
                 grid-template-columns: 1fr;
+                gap: 0.5rem;
             }
 
             .stat-item {
-                padding: 0.75rem;
+                padding: 0.625rem;
             }
 
-            .nav-links {
-                width: 100%;
-                max-width: none;
+            .stat-label {
+                font-size: 0.75rem;
             }
 
-            .interactive-demo h3 {
-                font-size: 1.1rem;
+            .stat-value {
+                font-size: 1.125rem;
             }
 
             .byte-container {
@@ -1628,7 +1807,35 @@
             .cache-block {
                 min-width: 35px;
                 height: 35px;
-                font-size: 12px;
+                font-size: 11px;
+            }
+
+            .speed-control {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 0.5rem;
+            }
+
+            .speed-slider {
+                width: 100%;
+            }
+
+            .toc {
+                padding: var(--spacing-sm);
+            }
+
+            .toc h2 {
+                font-size: 1.125rem;
+            }
+
+            .code-block {
+                font-size: 11px;
+                padding: 0.625rem;
+            }
+
+            .copy-btn {
+                padding: 0.3rem 0.625rem;
+                font-size: 9px;
             }
         }
     </style>
@@ -2925,13 +3132,11 @@ def search_bst(root, target):
             const mobileOverlay = document.getElementById('mobileOverlay');
             const navLinkItems = document.querySelectorAll('.nav-link');
 
-            if (!hamburger || !navLinks || !mobileOverlay) {
-                console.warn('Navigation elements not found');
-                return;
-            }
+            if (!hamburger || !navLinks || !mobileOverlay) return;
 
             // Toggle mobile menu
-            hamburger.addEventListener('click', () => {
+            hamburger.addEventListener('click', (e) => {
+                e.stopPropagation();
                 hamburger.classList.toggle('active');
                 navLinks.classList.toggle('active');
                 mobileOverlay.classList.toggle('active');
@@ -2957,9 +3162,19 @@ def search_bst(root, target):
                     }
                 });
             });
+
+            // Close on ESC key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && navLinks.classList.contains('active')) {
+                    hamburger.classList.remove('active');
+                    navLinks.classList.remove('active');
+                    mobileOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
         }
 
-        // Initialize hamburger menu after DOM loads
+        // Initialize hamburger menu
         document.addEventListener('DOMContentLoaded', initHamburgerMenu);
 
         // ==================== INTERACTIVE DEMOS ====================
