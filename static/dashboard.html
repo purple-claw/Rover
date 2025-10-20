@@ -283,19 +283,28 @@
             line-height: 1.6;
         }
 
-        /* Stats Cards */
+        /* Stats Cards - Sleek Design */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: var(--spacing-md);
-            margin-bottom: var(--spacing-2xl);
-        }
-
-        .stat-card {
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-xl);
             background: var(--glass-white);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius-lg);
-            padding: var(--spacing-lg);
+            padding: var(--spacing-sm);
+        }
+
+        .stat-card {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
             position: relative;
             overflow: hidden;
             transition: all var(--transition-normal);
@@ -305,7 +314,7 @@
         @keyframes slideInUp {
             from {
                 opacity: 0;
-                transform: translateY(40px);
+                transform: translateY(20px);
             }
             to {
                 opacity: 1;
@@ -314,9 +323,9 @@
         }
 
         .stat-card:nth-child(1) { animation-delay: 0.1s; }
-        .stat-card:nth-child(2) { animation-delay: 0.2s; }
-        .stat-card:nth-child(3) { animation-delay: 0.3s; }
-        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+        .stat-card:nth-child(2) { animation-delay: 0.15s; }
+        .stat-card:nth-child(3) { animation-delay: 0.2s; }
+        .stat-card:nth-child(4) { animation-delay: 0.25s; }
 
         .stat-card::before {
             content: '';
@@ -324,16 +333,16 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 3px;
+            height: 2px;
             background: linear-gradient(90deg, var(--mclaren-orange), var(--mclaren-light));
             opacity: 0;
             transition: opacity var(--transition-normal);
         }
 
         .stat-card:hover {
-            border-color: rgba(255, 128, 0, 0.3);
-            box-shadow: 0 8px 32px rgba(255, 128, 0, 0.15);
-            transform: translateY(-4px);
+            border-color: rgba(255, 128, 0, 0.4);
+            background: rgba(255, 128, 0, 0.05);
+            transform: translateY(-2px);
         }
 
         .stat-card:hover::before {
@@ -341,33 +350,40 @@
         }
 
         .stat-icon {
-            width: 48px;
-            height: 48px;
+            width: 36px;
+            height: 36px;
             background: rgba(255, 128, 0, 0.1);
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-sm);
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--mclaren-orange);
-            margin-bottom: var(--spacing-sm);
+            margin-bottom: var(--spacing-xs);
             transition: all var(--transition-normal);
         }
 
+        .stat-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
         .stat-card:hover .stat-icon {
-            transform: scale(1.1) rotate(5deg);
-            box-shadow: 0 0 20px rgba(255, 128, 0, 0.3);
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(255, 128, 0, 0.3);
         }
 
         .stat-value {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--text-primary);
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.125rem;
+            line-height: 1;
         }
 
         .stat-label {
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             color: var(--text-dim);
+            font-weight: 500;
         }
 
         /* Animated List Container */
@@ -938,6 +954,12 @@
         }
 
         /* Responsive Design */
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
         @media (max-width: 768px) {
             .hero h1 {
                 font-size: 2.5rem;
@@ -947,30 +969,29 @@
                 font-size: 1.1rem;
             }
 
-            /* Slim Stats for Mobile */
+            /* Slim Stats for Mobile - Horizontal List */
             .stats-grid {
                 grid-template-columns: 1fr;
                 gap: 0;
-                background: var(--glass-white);
-                border: 1px solid var(--glass-border);
-                border-radius: var(--radius-lg);
-                padding: var(--spacing-sm);
-                margin-bottom: var(--spacing-lg);
+                padding: var(--spacing-xs);
             }
 
             .stat-card {
                 background: transparent;
                 border: none;
                 border-radius: 0;
-                padding: var(--spacing-sm);
+                border-bottom: 1px solid var(--glass-border);
+                padding: var(--spacing-sm) var(--spacing-md);
                 display: flex;
+                flex-direction: row;
                 align-items: center;
                 gap: var(--spacing-sm);
                 animation: none;
+                text-align: left;
             }
 
-            .stat-card:not(:last-child) {
-                border-bottom: 1px solid var(--glass-border);
+            .stat-card:last-child {
+                border-bottom: none;
             }
 
             .stat-card::before {
@@ -979,32 +1000,38 @@
 
             .stat-card:hover {
                 transform: none;
-                box-shadow: none;
+                background: transparent;
             }
 
             .stat-icon {
-                width: 36px;
-                height: 36px;
+                width: 32px;
+                height: 32px;
                 margin-bottom: 0;
                 flex-shrink: 0;
             }
 
+            .stat-icon svg {
+                width: 16px;
+                height: 16px;
+            }
+
             .stat-card:hover .stat-icon {
-                transform: none;
+                transform: scale(1.05);
                 box-shadow: 0 0 10px rgba(255, 128, 0, 0.2);
             }
 
             .stat-value {
-                font-size: 1.25rem;
+                font-size: 1.125rem;
                 margin-bottom: 0;
                 font-weight: 600;
             }
 
             .stat-label {
-                font-size: 0.8125rem;
+                font-size: 0.75rem;
                 margin-left: auto;
                 text-align: right;
                 color: var(--text-dim);
+                flex-shrink: 0;
             }
 
             .section-header {
@@ -1089,6 +1116,510 @@
         .new-item {
             animation: pulse 2s ease infinite;
         }
+
+        /* ==================== CONTENT SIDEBAR (was roadmap position) ==================== */
+        .content-sidebar {
+            position: fixed;
+            left: 20px;
+            top: 100px;
+            width: 280px;
+            max-height: calc(100vh - 140px);
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            z-index: 900;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            transition: all var(--transition-normal);
+        }
+
+        /* ==================== LEARNING ROADMAP (now in main content) ==================== */
+        .roadmap-container {
+            width: 100%;
+            background: transparent;
+            border: none;
+            padding: 0;
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .content-sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .content-sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 128, 0, 0.3);
+            border-radius: 2px;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .sidebar-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--mclaren-orange);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-size: 1.25rem;
+            transition: all var(--transition-fast);
+            padding: 0.25rem;
+        }
+
+        .sidebar-toggle:hover {
+            color: var(--mclaren-orange);
+            transform: rotate(90deg);
+        }
+
+        .sidebar-list {
+            list-style: none;
+        }
+
+        .sidebar-category {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-sm);
+            background: var(--glass-white);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .category-header:hover {
+            background: rgba(255, 128, 0, 0.1);
+            border-color: rgba(255, 128, 0, 0.3);
+        }
+
+        .category-icon {
+            font-size: 1.125rem;
+        }
+
+        .category-name {
+            flex: 1;
+            margin-left: var(--spacing-sm);
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .category-count {
+            font-size: 0.75rem;
+            color: var(--mclaren-orange);
+            background: rgba(255, 128, 0, 0.15);
+            padding: 0.125rem 0.5rem;
+            border-radius: var(--radius-sm);
+            margin-right: var(--spacing-xs);
+        }
+
+        .category-arrow {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            transition: transform var(--transition-fast);
+        }
+
+        .sidebar-category.expanded .category-arrow {
+            transform: rotate(90deg);
+        }
+
+        .category-items {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height var(--transition-normal);
+        }
+
+        .sidebar-category.expanded .category-items {
+            max-height: 500px;
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            margin-left: var(--spacing-lg);
+            margin-bottom: 0.25rem;
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: var(--radius-sm);
+            transition: all var(--transition-fast);
+            position: relative;
+        }
+
+        .category-item::before {
+            content: '→';
+            color: var(--mclaren-orange);
+            opacity: 0;
+            position: absolute;
+            left: -12px;
+            transition: all var(--transition-fast);
+        }
+
+        .category-item:hover {
+            color: var(--mclaren-orange);
+            background: rgba(255, 128, 0, 0.05);
+            padding-left: calc(var(--spacing-sm) + 12px);
+        }
+
+        .category-item:hover::before {
+            opacity: 1;
+            left: var(--spacing-xs);
+        }
+
+        .roadmap-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 2px solid var(--glass-border);
+        }
+
+        .roadmap-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--mclaren-orange);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .roadmap-toggle {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-size: 1.25rem;
+            transition: all var(--transition-fast);
+            padding: 0.25rem;
+        }
+
+        .roadmap-toggle:hover {
+            color: var(--mclaren-orange);
+            transform: rotate(90deg);
+        }
+
+
+        .roadmap-list {
+            list-style: none;
+            position: relative;
+        }
+
+        .roadmap-list::before {
+            content: '';
+            position: absolute;
+            left: 13px;
+            top: 10px;
+            bottom: 10px;
+            width: 2px;
+            background: linear-gradient(180deg, 
+                var(--glass-border) 0%, 
+                rgba(255, 128, 0, 0.3) 50%, 
+                var(--glass-border) 100%);
+        }
+
+        .roadmap-item {
+            position: relative;
+            padding-left: 40px;
+            margin-bottom: var(--spacing-lg);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            animation: roadmapSlide 0.6s ease backwards;
+        }
+
+        @keyframes roadmapSlide {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .roadmap-item:nth-child(1) { animation-delay: 0.1s; }
+        .roadmap-item:nth-child(2) { animation-delay: 0.15s; }
+        .roadmap-item:nth-child(3) { animation-delay: 0.2s; }
+        .roadmap-item:nth-child(4) { animation-delay: 0.25s; }
+        .roadmap-item:nth-child(5) { animation-delay: 0.3s; }
+        .roadmap-item:nth-child(6) { animation-delay: 0.35s; }
+        .roadmap-item:nth-child(7) { animation-delay: 0.4s; }
+        .roadmap-item:nth-child(8) { animation-delay: 0.45s; }
+
+        .roadmap-item:hover {
+            transform: translateX(4px);
+        }
+
+        .roadmap-checkpoint {
+            position: absolute;
+            left: 0;
+            top: 4px;
+            width: 28px;
+            height: 28px;
+            background: var(--bg-primary);
+            border: 2px solid var(--glass-border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            transition: all var(--transition-normal);
+            z-index: 1;
+        }
+
+        .roadmap-item.completed .roadmap-checkpoint {
+            background: var(--mclaren-orange);
+            border-color: var(--mclaren-orange);
+            box-shadow: 0 0 15px var(--mclaren-glow);
+        }
+
+        .roadmap-item.current .roadmap-checkpoint {
+            border-color: var(--mclaren-orange);
+            animation: checkpointPulse 2s ease infinite;
+        }
+
+        @keyframes checkpointPulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 var(--mclaren-glow);
+            }
+            50% {
+                box-shadow: 0 0 0 8px rgba(255, 128, 0, 0);
+            }
+        }
+
+        .roadmap-item.locked .roadmap-checkpoint {
+            border-color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .roadmap-content {
+            background: var(--glass-white);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            transition: all var(--transition-fast);
+        }
+
+        .roadmap-item:hover .roadmap-content {
+            border-color: rgba(255, 128, 0, 0.3);
+            background: rgba(255, 128, 0, 0.05);
+        }
+
+        .roadmap-item.completed .roadmap-content {
+            border-left: 3px solid var(--mclaren-orange);
+        }
+
+        .roadmap-item.current .roadmap-content {
+            border-left: 3px solid var(--mclaren-orange);
+            background: rgba(255, 128, 0, 0.1);
+        }
+
+        .roadmap-item-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .roadmap-item.locked .roadmap-item-title {
+            color: var(--text-dim);
+        }
+
+        .roadmap-item-desc {
+            font-size: 0.9375rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 0.25rem;
+            font-weight: 400;
+        }
+
+        .roadmap-item-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-top: 0.75rem;
+            font-size: 0.8125rem;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+
+        .roadmap-badge {
+            background: rgba(255, 128, 0, 0.15);
+            color: var(--mclaren-orange);
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.8125rem;
+        }
+
+        .roadmap-item.completed .roadmap-badge {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+        }
+
+        /* Roadmap Link Buttons */
+        .roadmap-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .roadmap-link-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            transition: all var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .roadmap-link-btn::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--mclaren-orange);
+            transform: scaleY(0);
+            transition: transform var(--transition-fast);
+        }
+
+        .roadmap-link-btn:hover {
+            background: rgba(255, 128, 0, 0.1);
+            border-color: rgba(255, 128, 0, 0.3);
+            color: var(--mclaren-orange);
+            transform: translateX(4px);
+        }
+
+        .roadmap-link-btn:hover::before {
+            transform: scaleY(1);
+        }
+
+        .roadmap-link-btn .link-icon {
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .roadmap-item.locked .roadmap-link-btn {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* Mobile Roadmap */
+        .roadmap-mobile-toggle {
+            display: none;
+            width: 100%;
+            background: linear-gradient(135deg, var(--mclaren-orange), var(--mclaren-light));
+            color: var(--bg-primary);
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-lg);
+            font-size: 0.9375rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 128, 0, 0.3);
+            transition: all var(--transition-fast);
+            font-family: 'Quicksand', sans-serif;
+            margin-bottom: var(--spacing-md);
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .roadmap-mobile-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(255, 128, 0, 0.5);
+        }
+
+        .roadmap-mobile-toggle:active {
+            transform: translateY(0);
+        }
+
+        .roadmap-mobile-toggle .icon {
+            font-size: 1.25rem;
+        }
+
+        .roadmap-mobile-toggle .text {
+            flex: 1;
+            margin-left: var(--spacing-sm);
+        }
+
+        .roadmap-mobile-toggle .arrow {
+            font-size: 1rem;
+            transition: transform var(--transition-fast);
+        }
+
+        .roadmap-mobile-toggle:hover .arrow {
+            transform: translateX(4px);
+        }
+
+        /* Responsive Content Sidebar */
+        @media (max-width: 1280px) {
+            .content-sidebar {
+                display: none;
+            }
+
+            .content-sidebar.mobile-open {
+                display: block;
+                position: fixed;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                width: 90%;
+                max-width: 400px;
+                max-height: 80vh;
+                z-index: 1003;
+            }
+
+            /* Roadmap takes full width on mobile */
+            .roadmap-container {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content-sidebar.mobile-open {
+                width: 95%;
+                max-width: none;
+                max-height: 85vh;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1110,6 +1641,114 @@
         <div class="mobile-sidebar-content" id="mobileSidebarContent">
             <!-- Will be populated by JavaScript -->
         </div>
+    </div>
+
+    <!-- Content Sidebar (Topics Navigation) -->
+    <div class="content-sidebar" id="contentSidebar">
+        <div class="sidebar-header">
+            <h3 class="sidebar-title">
+                All Topics
+            </h3>
+            <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">−</button>
+        </div>
+        
+        <ul class="sidebar-list" id="sidebarList">
+            <!-- Will be populated by JavaScript -->
+        </ul>
+    </div>
+
+    <!-- TEMP STORAGE - Move this block to main roadmap below -->
+    <!-- 
+        ROADMAP ITEMS - Copy these to the roadmap section in main content
+        -->
+    <div style="display:none" id="tempRoadmapItems">
+        <ul>
+            <li class="roadmap-item completed">
+                <div class="roadmap-checkpoint">✓</div>
+                <div class="roadmap-content">
+                    <div class="roadmap-item-title">Module-1 : Time and Space Complexity</div>
+                    <div class="roadmap-item-desc">Understand how the Algorithm Runs in the Computer</div>
+                    <div class="roadmap-links">
+                        <a href="/view/Complexity/01.Time%26Space.html" class="roadmap-link-btn">
+                            <span>01. Time & Space</span>
+                        </a>
+                        <a href="/view/Complexity/02.MathematicalAnalysis.html" class="roadmap-link-btn">
+                            <span>02. Mathematical Analysis</span>
+                        </a>
+                    </div>
+                    <div class="roadmap-item-meta">
+                        <span class="roadmap-badge">Basics</span>
+                        <span>⏱️ 120 min</span>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Module 2 Memory Fundamentals -->
+            <li class="roadmap-item completed">
+                <div class="roadmap-checkpoint">✓</div>
+                <div class="roadmap-content">
+                    <div class="roadmap-item-title">Module-2 : Memory Fundamentals</div>
+                    <div class="roadmap-item-desc">Before we start with Actual Problems, we need to understand how the Memory Works?? Why it works like this?? What happens when we use memory wrong??</div>
+                    <div class="roadmap-links">
+                        <a href="/view/Memory/01.WhatIsMemory.html" class="roadmap-link-btn">
+                            <span>01. What is Memory?</span>
+                        </a>
+                        <a href="/view/Memory/02.MemoryPatterns.html" class="roadmap-link-btn">
+                            <span>02. Learn Different Memory Patterns</span>
+                        </a>
+                        <a href="/view/Memory/03.Stack%26Heap.html" class="roadmap-link-btn">
+                            <span>03. Stack vs Heap</span>
+                        </a>
+                    </div>
+                    <div class="roadmap-item-meta">
+                        <span class="roadmap-badge">Basics</span>
+                        <span>⏱️ 240 min</span>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Module 3  Problem Solving-->
+            <li class="roadmap-item completed">
+                <div class="roadmap-checkpoint">✓</div>
+                <div class="roadmap-content">
+                    <div class="roadmap-item-title">Module-3 : Problem Solving</div>
+                    <div class="roadmap-item-desc">Dont write the code first, understand the problem first, Think a bruteforce solution first, then optimize it, understand the true magic of Problem Solving and Logic building.</div>
+                    <div class="roadmap-links">
+                        <a href="/view/Problem%20Solving/01.PatternRecognition.html" class="roadmap-link-btn">
+                            <span>01. Recognizing Patterns</span>
+                        </a>
+                    </div>
+                    <div class="roadmap-item-meta">
+                        <span class="roadmap-badge">Basics</span>
+                        <span>⏱️ 90 min</span>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Module 4 Arrays -->
+            <li class="roadmap-item completed">
+                <div class="roadmap-checkpoint">✓</div>
+                <div class="roadmap-content">
+                    <div class="roadmap-item-title">Module-4 : Kingdom of Arrays</div>
+                    <div class="roadmap-item-desc">Welcome to the world of Arrays, where nothing is impossible and everything is possible. With Arrays, you can solve 80% of the problems in the interview. Imagine them as the basic building blocks of the problems.</div>
+                    <div class="roadmap-links">
+                        <a href="/view/Arrays/01.ArrayBasics.html" class="roadmap-link-btn">
+                            <span>01. Array Basics</span>
+                        </a>
+                        <a href="/view/Arrays/02.ArrayMechanics.html" class="roadmap-link-btn">
+                            <span>02. Array Mechanics - How Arrays Work behind the Hood</span>
+                        </a>
+                        <!-- <a href="/view/Arrays/03.ArrayPatterns.html" class="roadmap-link-btn">
+                            <span>03. Array Patterns</span>
+                        </a> -->
+                    </div>
+                    <div class="roadmap-item-meta">
+                        <span class="roadmap-badge">Basics</span>
+                        <span>⏱️ 300 min</span>
+                    </div>
+                </div>
+            </li>
+        </ul>
     </div>
 
     <!-- Navigation -->
@@ -1139,6 +1778,12 @@
             </p>
         </section>
 
+        <!-- Mobile Roadmap Toggle Button (shown only on mobile) -->
+        <!-- <button class="roadmap-mobile-toggle" id="roadmapMobileToggle" onclick="toggleMobileRoadmap()">
+            <span class="text">Dont know where to start? View Learning Path</span>
+            <span class="arrow">→</span>
+        </button> -->
+
         <!-- Search -->
         <div class="search-container">
             <div class="search-box">
@@ -1165,26 +1810,16 @@
             <div class="stat-card skeleton skeleton-item"></div>
         </div>
 
-        <!-- Content Section -->
-        <div class="content-section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    Learning Paths
-                </h2>
-                <div class="filter-tabs">
-                    <button class="filter-tab active" data-filter="all">All Topics</button>
-                    <button class="filter-tab" data-filter="fundamentals">Fundamentals</button>
-                    <button class="filter-tab" data-filter="advanced">Advanced</button>
-                </div>
+        <!-- Learning Roadmap (Main Content) -->
+        <div class="roadmap-container" id="roadmap">
+            <div class="roadmap-header">
+                <h3 class="roadmap-title">
+                    Don't know where to start? Try this Quick Roadmap
+                </h3>
             </div>
-
-            <!-- Animated List -->
-            <ul class="animated-list" id="content-list">
-                <!-- Content will be populated by JavaScript -->
-                <li class="list-item skeleton skeleton-item"></li>
-                <li class="list-item skeleton skeleton-item"></li>
-                <li class="list-item skeleton skeleton-item"></li>
-                <li class="list-item skeleton skeleton-item"></li>
+            
+            <ul class="roadmap-list" id="roadmapList">
+                
             </ul>
         </div>
 
@@ -1296,7 +1931,10 @@
                 if (data.navigation && Array.isArray(data.navigation)) {
                     navigationData = data.navigation;
                     renderStats(navigationData);
-                    renderContentList(navigationData);
+                    renderContentSidebar(navigationData);
+                    
+                    // Move roadmap items from temp storage to main roadmap
+                    moveRoadmapItems();
                 } else {
                     showError();
                 }
@@ -1354,8 +1992,8 @@
             `;
         }
 
-        function renderContentList(items) {
-            const contentList = document.getElementById('content-list');
+        function renderContentSidebar(items) {
+            const sidebarList = document.getElementById('sidebarList');
             
             let html = '';
             
@@ -1363,30 +2001,55 @@
                 if (item && item.type === 'folder') {
                     const fileCount = countFilesInNode(item);
                     const icon = iconMap[item.name] || iconMap['Default'];
-                    const isNew = index < 2; // Mark first two as new
                     
                     html += `
-                        <li class="list-item ${isNew ? 'new-item' : ''}" data-category="${item.name}">
-                            <div class="list-item-header">
-                                <div class="list-item-icon">${icon}</div>
-                                <div class="list-item-content">
-                                    <h3 class="list-item-title">${item.name}</h3>
-                                    <p class="list-item-count">${fileCount} ${fileCount === 1 ? 'resource' : 'resources'}</p>
-                                </div>
-                                ${isNew ? '<span class="list-item-badge">New</span>' : ''}
+                        <li class="sidebar-category">
+                            <div class="category-header" onclick="toggleCategory(this)">
+                                <span class="category-icon">${icon}</span>
+                                <span class="category-name">${item.name}</span>
+                                <span class="category-count">${fileCount}</span>
+                                <span class="category-arrow">→</span>
                             </div>
-                            <div class="list-item-sublist">
-                                ${renderSubItems(item.children)}
+                            <div class="category-items">
+                                ${renderCategoryItems(item.children)}
                             </div>
                         </li>
                     `;
                 }
             });
             
-            contentList.innerHTML = html;
+            sidebarList.innerHTML = html;
             
             // Also populate mobile sidebar
             renderMobileSidebar(items);
+        }
+
+        function renderCategoryItems(children) {
+            if (!children || !Array.isArray(children)) return '';
+            
+            let html = '';
+            
+            function processChildren(items) {
+                items.forEach(child => {
+                    if (!child) return;
+                    
+                    if (child.type === 'file') {
+                        const fileName = child.name || 'Untitled';
+                        const fileUrl = child.url || '#';
+                        
+                        html += `
+                            <a href="${fileUrl}" class="category-item">
+                                ${fileName}
+                            </a>
+                        `;
+                    } else if (child.type === 'folder' && child.children) {
+                        processChildren(child.children);
+                    }
+                });
+            }
+            
+            processChildren(children);
+            return html;
         }
 
         function renderMobileSidebar(items) {
@@ -1585,6 +2248,67 @@
         });
 
         // INITIALIZE
+        // SIDEBAR FUNCTIONS
+        function toggleSidebar() {
+            const sidebar = document.getElementById('contentSidebar');
+            const toggle = document.getElementById('sidebarToggle');
+            const list = document.getElementById('sidebarList');
+            
+            if (list.style.display === 'none') {
+                list.style.display = '';
+                toggle.textContent = '−';
+            } else {
+                list.style.display = 'none';
+                toggle.textContent = '+';
+            }
+        }
+
+        function toggleCategory(element) {
+            const category = element.closest('.sidebar-category');
+            category.classList.toggle('expanded');
+        }
+
+        // ROADMAP FUNCTIONS
+        function moveRoadmapItems() {
+            const tempItems = document.getElementById('tempRoadmapItems');
+            const roadmapList = document.getElementById('roadmapList');
+            
+            if (tempItems && roadmapList) {
+                const items = tempItems.querySelector('ul');
+                if (items) {
+                    roadmapList.innerHTML = items.innerHTML;
+                    tempItems.remove(); // Clean up temp storage
+                }
+            }
+        }
+
+        function toggleMobileRoadmap() {
+            const roadmap = document.getElementById('roadmap');
+            const overlay = document.getElementById('mobileOverlay');
+            
+            roadmap.classList.toggle('mobile-open');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = roadmap.classList.contains('mobile-open') ? 'hidden' : '';
+        }
+
+        function roadmapItemClick(url) {
+            if (url && url !== '#') {
+                window.location.href = url;
+            }
+        }
+
+
+        // Close roadmap when clicking overlay (mobile only)
+        const overlayElement = document.getElementById('mobileOverlay');
+        if (overlayElement) {
+            overlayElement.addEventListener('click', () => {
+                const roadmap = document.getElementById('roadmap');
+                if (roadmap && roadmap.classList.contains('mobile-open')) {
+                    toggleMobileRoadmap();
+                }
+            });
+        }
+
         window.addEventListener('load', () => {
             console.log('Dashboard loading...');
             createParticles();
