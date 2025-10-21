@@ -1,750 +1,2644 @@
-## ** CONTROL FLOW - BREAK & CONTINUE**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rover - Control Flow (Break & Continue)</title>
+    <style>
+        /* ==================== FONT IMPORT ==================== */
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
 
-### **Understanding `break` - Early Exit**
+        /* ==================== GLASSMORPHISM THEME ==================== */
+        :root {
+            /* Pure Black Base */
+            --bg-primary: #000000;
+            --bg-secondary: #0a0a0a;
+            
+            /* Glass Effect Colors */
+            --glass-white: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-highlight: rgba(255, 255, 255, 0.15);
+            
+            /* McLaren Orange */
+            --mclaren-orange: #FF8000;
+            --mclaren-glow: rgba(255, 128, 0, 0.3);
+            --mclaren-light: #FFA040;
+            --mclaren-dark: #CC6600;
+            
+            /* RedBull Red */
+            --redbull-red: #DC0000;
+            --redbull-blue: #1E41FF;
+            --redbull-glow: rgba(220, 0, 0, 0.3);
+            --redbull-light: #FF3333;
+            
+            /* Meta Blue */
+            --meta-blue: #0081FB;
+            --meta-glow: rgba(0, 129, 251, 0.3);
+            --meta-light: #33A3FF;
+            --meta-dark: #0066CC;
+            
+            /* Text Colors - Ultra White */
+            --text-primary: #FFFFFF;
+            --text-secondary: #FFFFFF;
+            --text-muted: rgba(255, 255, 255, 0.9);
+            --text-dim: rgba(255, 255, 255, 0.7);
+            
+            /* VS Code Syntax Highlighting */
+            --code-bg: #1e1e1e;
+            --code-keyword: #C586C0;
+            --code-function: #DCDCAA;
+            --code-string: #CE9178;
+            --code-comment: #6A9955;
+            --code-number: #b5cea8;
+            --code-variable: #9CDCFE;
+            --code-operator: #D4D4D4;
+            --code-builtin: #4EC9B0;
+            
+            /* Layout */
+            --container-width: 1100px;
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 2.5rem;
+            --spacing-2xl: 3rem;
+            
+            /* Border Radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            
+            /* Animations */
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-**What `break` does:**
-```
-Immediately EXITS the innermost loop
-Execution continues AFTER the loop
-```
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-**Visual:**
-```python
-for i in range(5):
-    print(i)
-    if i == 2:
-        break
-    print("After if")
-print("After loop")
+        html {
+            overflow-x: hidden;
+            width: 100%;
+            scroll-behavior: smooth;
+        }
 
-Execution:
-i=0 → print 0 → if False → print "After if"
-i=1 → print 1 → if False → print "After if"
-i=2 → print 2 → if True → BREAK → jump to "After loop"
+        body {
+            font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+            line-height: 1.8;
+            overflow-x: hidden;
+            position: relative;
+            font-size: 17px;
+            font-weight: 400;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            width: 100%;
+            max-width: 100vw;
+        }
 
-Output:
-0
+        h1, h2, h3, h4 {
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+        }
+
+        code, pre {
+            font-family: 'Courier New', monospace;
+            font-weight: 400;
+        }
+
+        /* Progress Bar */
+        #reading-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--mclaren-orange), var(--mclaren-light));
+            box-shadow: 0 0 10px var(--mclaren-glow);
+            z-index: 9999;
+            transition: width 0.1s ease;
+        }
+
+        /* Glass Container */
+        .container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Navigation */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 0.75rem 0;
+            box-shadow: 
+                0 1px 3px rgba(0, 0, 0, 0.5),
+                0 1px 20px rgba(255, 128, 0, 0.1),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        nav::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent,
+                rgba(255, 128, 0, 0.3) 20%,
+                rgba(255, 128, 0, 0.5) 50%,
+                rgba(255, 128, 0, 0.3) 80%,
+                transparent
+            );
+            opacity: 0.8;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+            padding: 0 var(--spacing-lg);
+            max-width: var(--container-width);
+            margin: 0 auto;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--mclaren-orange);
+            text-decoration: none;
+            letter-spacing: 0.1em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all var(--transition-fast);
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-link:hover {
+            color: var(--mclaren-orange);
+            text-shadow: 0 0 20px var(--mclaren-glow);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--mclaren-orange);
+            box-shadow: 0 0 10px var(--mclaren-glow);
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            z-index: 1001;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 25px;
+            height: 2px;
+            background: var(--mclaren-orange);
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(7px, 7px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .mobile-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: var(--spacing-2xl) 0;
+            text-align: center;
+            position: relative;
+            margin-bottom: var(--spacing-xl);
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--mclaren-orange);
+            background: linear-gradient(135deg, 
+                var(--mclaren-orange) 0%, 
+                var(--mclaren-light) 50%, 
+                var(--mclaren-orange) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        /* Fallback for browsers that don't support background-clip */
+        @supports not (background-clip: text) {
+            .hero h1 {
+                color: var(--mclaren-orange) !important;
+                -webkit-text-fill-color: var(--mclaren-orange) !important;
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+            opacity: 1;
+        }
+
+        /* Section Styling */
+        .section {
+            margin-bottom: var(--spacing-2xl);
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-header {
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 1px solid var(--glass-border);
+            position: relative;
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+        }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* Content Blocks */
+        .content-block {
+            background: var(--glass-white);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-md) 0;
+        }
+
+        .content-block h3 {
+            font-size: 1.7rem;
+            margin-bottom: var(--spacing-md);
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .content-block h4 {
+            font-size: 1.35rem;
+            margin: var(--spacing-md) 0 var(--spacing-sm) 0;
+            color: var(--mclaren-light);
+            font-weight: 600;
+        }
+
+        .content-block p {
+            margin: var(--spacing-sm) 0;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .content-block ul, .content-block ol {
+            margin-left: var(--spacing-lg);
+            margin-top: var(--spacing-sm);
+        }
+
+        .content-block li {
+            margin: var(--spacing-xs) 0;
+            line-height: 1.8;
+        }
+
+        /* Code Block Styling */
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-md);
+            margin: var(--spacing-md) 0;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 15px;
+            line-height: 1.6;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .code-block pre {
+            margin: 0;
+            white-space: pre;
+            color: #D4D4D4;
+        }
+
+        .code-block code {
+            color: #D4D4D4;
+        }
+
+        /* VS Code Syntax Highlighting Classes */
+        .keyword { color: var(--code-keyword); font-weight: 500; }
+        .function { color: var(--code-function); }
+        .string { color: var(--code-string); }
+        .comment { color: var(--code-comment); font-style: italic; }
+        .number { color: var(--code-number); }
+        .variable { color: var(--code-variable); }
+        .operator { color: var(--code-operator); }
+        .builtin { color: var(--code-builtin); }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: transparent;
+            border: 1px solid rgba(255, 128, 0, 0.4);
+            border-radius: 6px;
+            padding: 0.4rem 0.9rem;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--mclaren-orange);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 128, 0, 0.1);
+            border-color: var(--mclaren-orange);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(255, 128, 0, 0.2);
+        }
+
+        .copy-btn:active {
+            transform: translateY(0);
+            color: white;
+        }
+
+        /* Info/Warning Boxes */
+        .info-box {
+            background: linear-gradient(135deg, 
+                rgba(0, 129, 251, 0.1), 
+                rgba(0, 129, 251, 0.05));
+            border: 1px solid var(--meta-blue);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-md);
+            margin: var(--spacing-md) 0;
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .info-box::before {
+            content: '💡';
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, 
+                rgba(220, 0, 0, 0.1), 
+                rgba(220, 0, 0, 0.05));
+            border: 1px solid var(--redbull-red);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-md);
+            margin: var(--spacing-md) 0;
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .warning-box::before {
+            content: '⚠️';
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+        }
+
+        /* ==================== ANIMATED COLLAPSIBLE SECTIONS ==================== */
+        .collapsible-section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            margin: 1rem 0;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .collapsible-section:hover {
+            border-color: rgba(255, 128, 0, 0.2);
+        }
+
+        .collapsible-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+
+        .collapsible-header:hover {
+            background: rgba(255, 128, 0, 0.05);
+        }
+
+        .collapsible-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .collapsible-icon {
+            font-size: 1.25rem;
+        }
+
+        .collapsible-arrow {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+            color: var(--mclaren-orange);
+        }
+
+        .collapsible-section.open .collapsible-arrow {
+            transform: rotate(180deg);
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .collapsible-section.open .collapsible-content {
+            max-height: 5000px;
+        }
+
+        .collapsible-inner {
+            padding: 0 1.5rem 1.5rem;
+            animation: fadeInContent 0.4s ease;
+        }
+
+        @keyframes fadeInContent {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Animated List Items */
+        .animated-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .animated-list-item {
+            padding: 0.75rem 1rem;
+            margin: 0.5rem 0;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            animation: slideInItem 0.5s ease both;
+        }
+
+        .animated-list-item:nth-child(1) { animation-delay: 0.05s; }
+        .animated-list-item:nth-child(2) { animation-delay: 0.1s; }
+        .animated-list-item:nth-child(3) { animation-delay: 0.15s; }
+        .animated-list-item:nth-child(4) { animation-delay: 0.2s; }
+        .animated-list-item:nth-child(5) { animation-delay: 0.25s; }
+        .animated-list-item:nth-child(6) { animation-delay: 0.3s; }
+
+        @keyframes slideInItem {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .animated-list-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background: var(--mclaren-orange);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .animated-list-item:hover {
+            background: rgba(255, 128, 0, 0.08);
+            border-color: rgba(255, 128, 0, 0.2);
+            transform: translateX(8px);
+            box-shadow: 0 2px 12px rgba(255, 128, 0, 0.1);
+        }
+
+        .animated-list-item:hover::before {
+            transform: scaleY(1);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: var(--spacing-xl) 0;
+            margin-top: var(--spacing-2xl);
+            border-top: 1px solid var(--glass-border);
+            color: var(--text-dim);
+        }
+
+        /* Fade-in Animation */
+        .fade-in {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-delay-1 { animation-delay: 0.2s; }
+        .fade-in-delay-2 { animation-delay: 0.4s; }
+        .fade-in-delay-3 { animation-delay: 0.6s; }
+
+        /* Interactive Demo Sections */
+        .interactive-demo {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .interactive-demo:hover {
+            border-color: rgba(255, 128, 0, 0.2);
+            box-shadow: 0 4px 20px rgba(255, 128, 0, 0.05);
+        }
+
+        .interactive-demo h3 {
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+            color: var(--mclaren-orange);
+            font-weight: 600;
+        }
+
+        .demo-desc {
+            color: var(--text-dim);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        .demo-controls {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+        }
+
+        .btn {
+            padding: 0.7rem 1.4rem;
+            font-size: 14px;
+            font-weight: 600;
+            background: transparent;
+            border: 1px solid rgba(255, 128, 0, 0.3);
+            color: var(--mclaren-orange);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Quicksand', sans-serif;
+            letter-spacing: 0.3px;
+        }
+
+        .btn:hover {
+            background: rgba(255, 128, 0, 0.1);
+            border-color: var(--mclaren-orange);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 128, 0, 0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .playground-canvas {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            padding: 1.25rem;
+            min-height: 300px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .playground-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            background: rgba(255, 128, 0, 0.05);
+            border-color: rgba(255, 128, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .stat-label {
+            display: block;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            display: block;
+            color: var(--mclaren-orange);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        /* Loop Visualization */
+        .loop-iteration {
+            padding: 0.75rem 1rem;
+            margin: 0.5rem 0;
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 3px solid var(--meta-blue);
+            border-radius: 6px;
+            font-family: 'Consolas', monospace;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .loop-iteration.active {
+            background: rgba(255, 128, 0, 0.15);
+            border-left-color: var(--mclaren-orange);
+            box-shadow: 0 0 20px rgba(255, 128, 0, 0.3);
+            transform: translateX(5px);
+        }
+
+        .loop-iteration.skipped {
+            background: rgba(220, 0, 0, 0.1);
+            border-left-color: var(--redbull-red);
+            opacity: 0.6;
+        }
+
+        .loop-iteration.broken {
+            background: rgba(0, 129, 251, 0.1);
+            border-left-color: var(--meta-blue);
+        }
+
+        /* Feynman Deep Dive */
+        .feynman-dive {
+            background: linear-gradient(135deg, 
+                rgba(255, 128, 0, 0.03), 
+                rgba(220, 0, 0, 0.03));
+            border: 1px solid rgba(255, 128, 0, 0.3);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-lg) 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feynman-dive h3 {
+            color: var(--mclaren-orange);
+            font-size: 1.9rem;
+            margin-bottom: var(--spacing-md);
+            text-shadow: 0 0 20px var(--mclaren-glow);
+        }
+
+        .feynman-dive h4 {
+            color: var(--mclaren-light);
+            font-size: 1.4rem;
+            margin-top: var(--spacing-md);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .feynman-dive p {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin: var(--spacing-sm) 0;
+        }
+
+        .feynman-intro {
+            font-size: 1.15rem;
+            font-style: italic;
+            color: var(--text-muted);
+            margin-bottom: var(--spacing-lg);
+            padding: var(--spacing-md);
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid var(--mclaren-orange);
+            border-radius: var(--radius-sm);
+        }
+
+        /* ==================== RESPONSIVE DESIGN ==================== */
+        @media (max-width: 768px) {
+            body {
+                overflow-x: hidden;
+                width: 100%;
+                max-width: 100vw;
+            }
+
+            nav {
+                padding: 0.75rem 0;
+                width: 100%;
+            }
+
+            .nav-container {
+                position: relative;
+                justify-content: center;
+                padding: 0 var(--spacing-md);
+                width: 100%;
+            }
+
+            .nav-logo {
+                font-size: 1.25rem;
+                z-index: 1002;
+                position: relative;
+            }
+
+            .hamburger {
+                display: flex;
+                position: absolute;
+                right: var(--spacing-md);
+                top: 50%;
+                transform: translateY(-50%);
+                z-index: 1002;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                height: 100vh;
+                width: 85%;
+                max-width: 320px;
+                background: rgba(0, 0, 0, 0.98);
+                backdrop-filter: blur(24px);
+                -webkit-backdrop-filter: blur(24px);
+                flex-direction: column;
+                padding: 5rem 2rem 2rem;
+                gap: 0;
+                transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                            opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                            visibility 0s linear 0.4s;
+                border-left: 1px solid var(--glass-border);
+                z-index: 1001;
+                box-shadow: -4px 0 24px rgba(0, 0, 0, 0.5);
+                overflow-y: auto;
+                visibility: hidden;
+                opacity: 0;
+                pointer-events: none;
+            }
+
+            .nav-links.active {
+                right: 0;
+                visibility: visible;
+                opacity: 1;
+                pointer-events: all;
+                transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                            opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                            visibility 0s linear 0s;
+            }
+
+            .nav-link {
+                font-size: 15px;
+                padding: 1rem 1.25rem;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                width: 100%;
+                border-radius: 0;
+                transition: all var(--transition-fast);
+            }
+
+            .nav-link:hover {
+                background: rgba(255, 128, 0, 0.1);
+                padding-left: 1.5rem;
+            }
+
+            .nav-link.active {
+                background: rgba(255, 128, 0, 0.15);
+                border-left: 3px solid var(--mclaren-orange);
+            }
+
+            .nav-link.active::after {
+                display: none;
+            }
+
+            .mobile-overlay.active {
+                display: block;
+            }
+
+            .hero {
+                padding: var(--spacing-xl) 0;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+                line-height: 1.2;
+            }
+
+            .hero p {
+                font-size: 1rem;
+                padding: 0 var(--spacing-sm);
+            }
+
+            .container {
+                padding: 0 var(--spacing-md);
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+
+            .section {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+                word-wrap: break-word;
+            }
+
+            .content-block {
+                padding: var(--spacing-md);
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+
+            .content-block h3 {
+                font-size: 1.3rem;
+            }
+
+            .content-block h4 {
+                font-size: 1.1rem;
+            }
+
+            .code-block {
+                font-size: 12px;
+                padding: var(--spacing-sm);
+                max-width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .code-block pre {
+                max-width: 100%;
+                overflow-x: auto;
+                white-space: pre;
+            }
+
+            .copy-btn {
+                padding: 0.35rem 0.75rem;
+                font-size: 10px;
+            }
+
+            .info-box, .warning-box {
+                padding: var(--spacing-sm);
+                padding-left: 45px;
+                font-size: 0.875rem;
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                font-size: 15px;
+            }
+
+            .container {
+                padding: 0 var(--spacing-sm);
+            }
+
+            .hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .hero p {
+                font-size: 0.9375rem;
+            }
+
+            .section-title {
+                font-size: 1.25rem;
+            }
+
+            .content-block {
+                padding: var(--spacing-sm);
+            }
+
+            .content-block h3 {
+                font-size: 1.125rem;
+            }
+
+            .content-block h4 {
+                font-size: 1rem;
+            }
+
+            .code-block {
+                font-size: 11px;
+                padding: 0.625rem;
+            }
+
+            .copy-btn {
+                padding: 0.3rem 0.625rem;
+                font-size: 9px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Reading Progress Bar -->
+    <div id="reading-progress"></div>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="/" class="nav-logo">ROVER</a>
+            
+            <div class="nav-links" id="navLinks">
+                <a href="#break" class="nav-link">Break Statement</a>
+                <a href="#continue" class="nav-link">Continue Statement</a>
+                <a href="#patterns" class="nav-link">Problem Patterns</a>
+                <a href="#exercises" class="nav-link">Practice Exercises</a>
+            </div>
+
+            <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="container">
+            <h1 class="fade-in">Control Flow: Break & Continue</h1>
+            <p class="fade-in fade-in-delay-1">
+                Master the art of controlling loop execution with break and continue statements. Learn when to exit early, when to skip iterations, and how to translate 15 common problem patterns into efficient loop logic.
+            </p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+
+        <!-- Table of Contents -->
+        <div class="collapsible-section open" id="toc-section">
+            <div class="collapsible-header" onclick="toggleCollapsible('toc-section')">
+                <div class="collapsible-title">
+                    <span class="collapsible-icon">📋</span>
+                    <span>Table of Contents</span>
+                </div>
+                <div class="collapsible-arrow">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+            </div>
+            <div class="collapsible-content">
+                <div class="collapsible-inner">
+                    <ul class="animated-list">
+                        <li class="animated-list-item"><a href="#break" style="color: inherit; text-decoration: none;">Understanding Break - Early Exit</a></li>
+                        <li class="animated-list-item"><a href="#break-use-cases" style="color: inherit; text-decoration: none;">When to Use Break</a></li>
+                        <li class="animated-list-item"><a href="#break-nested" style="color: inherit; text-decoration: none;">Break in Nested Loops</a></li>
+                        <li class="animated-list-item"><a href="#continue" style="color: inherit; text-decoration: none;">Understanding Continue - Skip Rest</a></li>
+                        <li class="animated-list-item"><a href="#continue-use-cases" style="color: inherit; text-decoration: none;">When to Use Continue</a></li>
+                        <li class="animated-list-item"><a href="#break-vs-continue" style="color: inherit; text-decoration: none;">Break vs Continue</a></li>
+                        <li class="animated-list-item"><a href="#patterns" style="color: inherit; text-decoration: none;">15 Problem → Loop Patterns</a></li>
+                        <li class="animated-list-item"><a href="#exercises" style="color: inherit; text-decoration: none;">Practice Exercises</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: Understanding Break -->
+        <article id="break" class="section">
+            <div class="section-header">
+                <h2 class="section-title">Understanding `break` - Early Exit</h2>
+            </div>
+
+            <div class="content-block">
+                <h3>What `break` Does</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>Immediately <span class="keyword">EXITS</span> the innermost loop
+Execution continues <span class="keyword">AFTER</span> the loop</code></pre>
+                </div>
+
+                <h4>Visual Example:</h4>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="number">5</span>):
+    <span class="builtin">print</span>(i)
+    <span class="keyword">if</span> i <span class="operator">==</span> <span class="number">2</span>:
+        <span class="keyword">break</span>
+    <span class="builtin">print</span>(<span class="string">"After if"</span>)
+<span class="builtin">print</span>(<span class="string">"After loop"</span>)
+
+<span class="comment">Execution:</span>
+i=<span class="number">0</span> → <span class="builtin">print</span> <span class="number">0</span> → <span class="keyword">if</span> <span class="keyword">False</span> → <span class="builtin">print</span> <span class="string">"After if"</span>
+i=<span class="number">1</span> → <span class="builtin">print</span> <span class="number">1</span> → <span class="keyword">if</span> <span class="keyword">False</span> → <span class="builtin">print</span> <span class="string">"After if"</span>
+i=<span class="number">2</span> → <span class="builtin">print</span> <span class="number">2</span> → <span class="keyword">if</span> <span class="keyword">True</span> → <span class="keyword">BREAK</span> → jump to <span class="string">"After loop"</span>
+
+<span class="comment">Output:</span>
+<span class="number">0</span>
 After if
-1
+<span class="number">1</span>
 After if
-2
-After loop
-```
+<span class="number">2</span>
+After loop</code></pre>
+                </div>
+            </div>
 
----
+            <!-- Feynman Deep Dive on Break -->
+            <div class="feynman-dive">
+                <h3>🧠 Deep Dive: The Computer Science Behind `break`</h3>
+                <div class="feynman-content">
+                    <p class="feynman-intro">
+                        Let's peel back the layers and understand what's ACTUALLY happening when you call `break`. This isn't magic—it's elegant compiler engineering meeting CPU architecture.
+                    </p>
+                    
+                    <h4>What the CPU Really Does</h4>
+                    <p>
+                        When you write a loop in Python or any high-level language, the compiler translates it into <strong>assembly instructions</strong> with jump commands. Here's the mind-blowing part: a `break` statement is literally just a <strong>conditional jump instruction</strong> that tells the CPU "skip to the address AFTER this loop."
+                    </p>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code><span class="comment"># Python code:</span>
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="number">5</span>):
+    <span class="keyword">if</span> i <span class="operator">==</span> <span class="number">2</span>:
+        <span class="keyword">break</span>
 
-### **When to Use `break`**
+<span class="comment"># Becomes (simplified assembly):</span>
+MOV  <span class="variable">i</span>, <span class="number">0</span>           <span class="comment">; i = 0</span>
+LOOP_START:
+CMP  <span class="variable">i</span>, <span class="number">5</span>           <span class="comment">; Compare i with 5</span>
+JGE  LOOP_END        <span class="comment">; Jump if i >= 5</span>
+CMP  <span class="variable">i</span>, <span class="number">2</span>           <span class="comment">; Check if i == 2</span>
+JE   LOOP_END        <span class="comment">; BREAK: Jump to end if true!</span>
+INC  <span class="variable">i</span>              <span class="comment">; i++</span>
+JMP  LOOP_START      <span class="comment">; Jump back to start</span>
+LOOP_END:</code></pre>
+                    </div>
+                    
+                    <h4>The Instruction Pointer Magic</h4>
+                    <p>
+                        Your CPU has a special register called the <strong>Instruction Pointer (IP)</strong> or <strong>Program Counter (PC)</strong>. It holds the memory address of the next instruction to execute. A `break` simply <em>overwrites this register</em> with the address after the loop. That's it. No expensive operation, just pointer arithmetic.
+                    </p>
+                    
+                    <p>
+                        This is why `break` is <strong>O(1) constant time</strong>—it's a single instruction. Compare that to using a flag variable and checking it every iteration—that adds overhead to EVERY loop iteration even when you don't break.
+                    </p>
+                    
+                    <h4>Branch Prediction & Performance</h4>
+                    <p>
+                        Here's where it gets interesting for optimization nerds: modern CPUs use <strong>branch prediction</strong>. They try to guess whether a conditional jump (like your `if` before `break`) will be taken or not. If your break condition is predictable (e.g., always happens on iteration 3), the CPU learns this pattern and prefetches the right instructions.
+                    </p>
+                    
+                    <p>
+                        But if your break condition is <em>random</em>, you get <strong>branch mispredictions</strong>, which can cost 10-20 CPU cycles as the pipeline flushes and reloads. This is why tight loops without branches are often faster than loops with many conditional breaks—even if you do fewer total iterations.
+                    </p>
+                    
+                    <h4>Loop Unrolling & Break</h4>
+                    <p>
+                        Compilers love to <strong>unroll loops</strong> (execute multiple iterations per loop to reduce jump overhead). Example: instead of looping 100 times with 100 jumps, unroll to 25 loops that each process 4 elements—only 25 jumps.
+                    </p>
+                    
+                    <p>
+                        But here's the catch: <strong>loops with `break` are harder to unroll</strong>. The compiler has to insert extra checks after each unrolled iteration to see if breaking occurred. This is why performance-critical code sometimes avoids `break` in favor of carefully crafted loop conditions—it helps the compiler optimize better.
+                    </p>
+                    
+                    <h4>The Stack Frame Cleanup</h4>
+                    <p>
+                        When you `break` from a loop, the runtime needs to ensure proper <strong>stack cleanup</strong>. Any variables scoped to the loop must be deallocated, destructors must run (in languages like C++), and the stack pointer must be reset. Python's garbage collector marks loop-local objects for collection.
+                    </p>
+                    
+                    <p>
+                        In languages with deterministic destruction (C++/Rust), a `break` triggers automatic cleanup via <strong>RAII (Resource Acquisition Is Initialization)</strong>. The compiler inserts destructor calls at the break point. This is why you can't just "goto" out of a scope in modern C++—the compiler enforces cleanup.
+                    </p>
+                    
+                    <div class="info-box" style="margin-top: 1.5rem;">
+                        <strong>💡 Key Insight:</strong> `break` is not a language feature—it's a <strong>control flow primitive</strong> that maps directly to CPU jump instructions. Understanding this helps you reason about performance: breaks are cheap (1 instruction), but branch mispredictions aren't. Use `break` for correctness and clarity, not microoptimization.
+                    </div>
+                </div>
+            </div>
 
-#### **Use Case 1: Early Termination (Found What We Need)**
+            <!-- Interactive Break Demo -->
+            <div class="interactive-demo" id="break-demo">
+                <h3>🎮 Interactive Break Simulator</h3>
+                <p class="demo-desc">Watch how `break` stops loop execution step-by-step. See the performance difference between using break vs checking all elements!</p>
+                
+                <div class="demo-controls">
+                    <button class="btn" onclick="breakDemo.runWithBreak()">Run With Break</button>
+                    <button class="btn" onclick="breakDemo.runWithoutBreak()">Run Without Break</button>
+                    <button class="btn" onclick="breakDemo.runNested()">Nested Loop Demo</button>
+                    <button class="btn" onclick="breakDemo.reset()">Reset</button>
+                </div>
+                
+                <div class="playground-canvas" id="break-canvas">
+                    <div style="margin-bottom: 1rem;">
+                        <strong style="color: var(--mclaren-orange);">Code:</strong>
+                        <div class="code-block" style="margin-top: 0.5rem; font-size: 13px;">
+                            <pre><code id="break-code-display"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="number">10</span>):
+    <span class="keyword">if</span> i <span class="operator">==</span> <span class="number">5</span>:
+        <span class="keyword">break</span>
+    <span class="builtin">print</span>(i)</code></pre>
+                        </div>
+                    </div>
+                    <div id="break-execution-log" style="max-height: 300px; overflow-y: auto;">
+                        <div style="color: var(--text-dim); font-style: italic;">Click a button to start execution...</div>
+                    </div>
+                </div>
+                
+                <div class="playground-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Iterations</span>
+                        <span class="stat-value" id="break-iterations">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Comparisons</span>
+                        <span class="stat-value" id="break-comparisons">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Time Saved</span>
+                        <span class="stat-value" id="break-time-saved">0%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Status</span>
+                        <span class="stat-value" id="break-status" style="font-size: 1.2rem;">Ready</span>
+                    </div>
+                </div>
+            </div>
+        </article>
 
-```python
-# Problem: Find if element exists
-def contains(arr, target):
-    for i in range(len(arr)):
-        if arr[i] == target:
-            return True  # Or break if not returning
-    return False
+        <!-- SECTION: When to Use Break -->
+        <article id="break-use-cases" class="section">
+            <div class="section-header">
+                <h2 class="section-title">When to Use `break`</h2>
+            </div>
 
-# Without break: O(n) always
-# With break: O(1) best case, O(n) worst case
-```
+            <div class="content-block">
+                <h3>Use Case 1: Early Termination (Found What We Need)</h3>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="comment"># Problem: Find if element exists</span>
+<span class="keyword">def</span> <span class="function">contains</span>(arr, target):
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="builtin">len</span>(arr)):
+        <span class="keyword">if</span> arr[i] <span class="operator">==</span> target:
+            <span class="keyword">return</span> <span class="keyword">True</span>  <span class="comment"># Or break if not returning</span>
+    <span class="keyword">return</span> <span class="keyword">False</span>
 
-**Real example:**
-```python
-arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-target = 3
+<span class="comment"># Without break: O(n) always</span>
+<span class="comment"># With break: O(1) best case, O(n) worst case</span></code></pre>
+                </div>
 
-# Without break
-found = False
-for num in arr:
-    if num == target:
-        found = True
-    # Continues checking all 10 elements!
+                <h4>Real Example:</h4>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>arr <span class="operator">=</span> [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>]
+target <span class="operator">=</span> <span class="number">3</span>
 
-# With break
-found = False
-for num in arr:
-    if num == target:
-        found = True
-        break  # Stops at element 3, saves 7 iterations!
-```
+<span class="comment"># Without break</span>
+found <span class="operator">=</span> <span class="keyword">False</span>
+<span class="keyword">for</span> num <span class="keyword">in</span> arr:
+    <span class="keyword">if</span> num <span class="operator">==</span> target:
+        found <span class="operator">=</span> <span class="keyword">True</span>
+    <span class="comment"># Continues checking all 10 elements!</span>
 
----
+<span class="comment"># With break</span>
+found <span class="operator">=</span> <span class="keyword">False</span>
+<span class="keyword">for</span> num <span class="keyword">in</span> arr:
+    <span class="keyword">if</span> num <span class="operator">==</span> target:
+        found <span class="operator">=</span> <span class="keyword">True</span>
+        <span class="keyword">break</span>  <span class="comment"># Stops at element 3, saves 7 iterations!</span></code></pre>
+                </div>
+            </div>
 
-#### **Use Case 2: Error Condition**
+            <div class="content-block">
+                <h3>Use Case 2: Error Condition</h3>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="comment"># Problem: Validate array has no duplicates</span>
+<span class="keyword">def</span> <span class="function">has_duplicates</span>(arr):
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="builtin">len</span>(arr)):
+        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="builtin">range</span>(i<span class="operator">+</span><span class="number">1</span>, <span class="builtin">len</span>(arr)):
+            <span class="keyword">if</span> arr[i] <span class="operator">==</span> arr[j]:
+                <span class="keyword">return</span> <span class="keyword">True</span>  <span class="comment"># Found duplicate, stop!</span>
+    <span class="keyword">return</span> <span class="keyword">False</span>
 
-```python
-# Problem: Validate array has no duplicates
-def has_duplicates(arr):
-    for i in range(len(arr)):
-        for j in range(i+1, len(arr)):
-            if arr[i] == arr[j]:
-                return True  # Found duplicate, stop!
-    return False
+<span class="comment"># As soon as we find ONE duplicate, we know answer</span>
+<span class="comment"># No need to check remaining pairs</span></code></pre>
+                </div>
+            </div>
 
-# As soon as we find ONE duplicate, we know answer
-# No need to check remaining pairs
-```
+            <div class="content-block">
+                <h3>Use Case 3: Threshold Reached</h3>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="comment"># Problem: Sum until threshold</span>
+<span class="keyword">def</span> <span class="function">sum_until_threshold</span>(arr, threshold):
+    total <span class="operator">=</span> <span class="number">0</span>
+    <span class="keyword">for</span> num <span class="keyword">in</span> arr:
+        total <span class="operator">+=</span> num
+        <span class="keyword">if</span> total <span class="operator">>=</span> threshold:
+            <span class="keyword">break</span>  <span class="comment"># Stop when threshold reached</span>
+    <span class="keyword">return</span> total
 
----
+arr <span class="operator">=</span> [<span class="number">5</span>, <span class="number">10</span>, <span class="number">15</span>, <span class="number">20</span>, <span class="number">25</span>]
+result <span class="operator">=</span> <span class="function">sum_until_threshold</span>(arr, <span class="number">30</span>)
+<span class="comment"># Processes: 5, 10, 15 → total=30, breaks</span>
+<span class="comment"># Doesn't process: 20, 25</span></code></pre>
+                </div>
+            </div>
+        </article>
 
-#### **Use Case 3: Threshold Reached**
+        <!-- SECTION: Break in Nested Loops -->
+        <article id="break-nested" class="section">
+            <div class="section-header">
+                <h2 class="section-title">`break` in Nested Loops - CRITICAL Understanding</h2>
+            </div>
 
-```python
-# Problem: Sum until threshold
-def sum_until_threshold(arr, threshold):
-    total = 0
-    for num in arr:
-        total += num
-        if total >= threshold:
-            break  # Stop when threshold reached
-    return total
+            <div class="warning-box">
+                <strong>Important:</strong> `break` only exits the INNERMOST loop!
+            </div>
 
-arr = [5, 10, 15, 20, 25]
-result = sum_until_threshold(arr, 30)
-# Processes: 5, 10, 15 → total=30, breaks
-# Doesn't process: 20, 25
-```
+            <div class="content-block">
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="number">3</span>):
+    <span class="builtin">print</span>(<span class="string">f"Outer: i={i}"</span>)
+    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="builtin">range</span>(<span class="number">3</span>):
+        <span class="builtin">print</span>(<span class="string">f"  Inner: j={j}"</span>)
+        <span class="keyword">if</span> j <span class="operator">==</span> <span class="number">1</span>:
+            <span class="keyword">break</span>  <span class="comment"># Exits INNER loop only!</span>
+    <span class="builtin">print</span>(<span class="string">"Back in outer loop"</span>)
+<span class="builtin">print</span>(<span class="string">"After all loops"</span>)
 
----
-
-### **`break` in Nested Loops - CRITICAL Understanding**
-
-**Important:** `break` only exits the INNERMOST loop!
-
-```python
-for i in range(3):
-    print(f"Outer: i={i}")
-    for j in range(3):
-        print(f"  Inner: j={j}")
-        if j == 1:
-            break  # Exits INNER loop only!
-    print("Back in outer loop")
-print("After all loops")
-
-Output:
-Outer: i=0
-  Inner: j=0
-  Inner: j=1
+<span class="comment">Output:</span>
+Outer: i=<span class="number">0</span>
+  Inner: j=<span class="number">0</span>
+  Inner: j=<span class="number">1</span>
 Back in outer loop
-Outer: i=1
-  Inner: j=0
-  Inner: j=1
+Outer: i=<span class="number">1</span>
+  Inner: j=<span class="number">0</span>
+  Inner: j=<span class="number">1</span>
 Back in outer loop
-Outer: i=2
-  Inner: j=0
-  Inner: j=1
+Outer: i=<span class="number">2</span>
+  Inner: j=<span class="number">0</span>
+  Inner: j=<span class="number">1</span>
 Back in outer loop
-After all loops
-```
+After all loops</code></pre>
+                </div>
 
-**To break out of BOTH loops, use flag:**
+                <h4>To break out of BOTH loops, use a flag:</h4>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>found <span class="operator">=</span> <span class="keyword">False</span>
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="number">3</span>):
+    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="builtin">range</span>(<span class="number">3</span>):
+        <span class="keyword">if</span> condition:
+            found <span class="operator">=</span> <span class="keyword">True</span>
+            <span class="keyword">break</span>  <span class="comment"># Exit inner</span>
+    <span class="keyword">if</span> found:
+        <span class="keyword">break</span>  <span class="comment"># Exit outer</span></code></pre>
+                </div>
+            </div>
+        </article>
 
-```python
-found = False
-for i in range(3):
-    for j in range(3):
-        if condition:
-            found = True
-            break  # Exit inner
-    if found:
-        break  # Exit outer
-```
+        <!-- SECTION: Understanding Continue -->
+        <article id="continue" class="section">
+            <div class="section-header">
+                <h2 class="section-title">Understanding `continue` - Skip Rest</h2>
+            </div>
 
----
+            <div class="content-block">
+                <h3>What `continue` Does</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="keyword">Skip</span> rest of current iteration
+<span class="keyword">Jump</span> to next iteration of loop</code></pre>
+                </div>
 
-### **Understanding `continue` - Skip Rest**
+                <h4>Visual Example:</h4>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="number">5</span>):
+    <span class="builtin">print</span>(<span class="string">f"Start {i}"</span>)
+    <span class="keyword">if</span> i <span class="operator">==</span> <span class="number">2</span>:
+        <span class="keyword">continue</span>
+    <span class="builtin">print</span>(<span class="string">f"End {i}"</span>)
 
-**What `continue` does:**
-```
-Skip rest of current iteration
-Jump to next iteration of loop
-```
+<span class="comment">Execution:</span>
+i=<span class="number">0</span> → <span class="builtin">print</span> <span class="string">"Start 0"</span> → <span class="keyword">if</span> <span class="keyword">False</span> → <span class="builtin">print</span> <span class="string">"End 0"</span>
+i=<span class="number">1</span> → <span class="builtin">print</span> <span class="string">"Start 1"</span> → <span class="keyword">if</span> <span class="keyword">False</span> → <span class="builtin">print</span> <span class="string">"End 1"</span>
+i=<span class="number">2</span> → <span class="builtin">print</span> <span class="string">"Start 2"</span> → <span class="keyword">if</span> <span class="keyword">True</span> → <span class="keyword">CONTINUE</span> → skip to i=<span class="number">3</span>
+i=<span class="number">3</span> → <span class="builtin">print</span> <span class="string">"Start 3"</span> → <span class="keyword">if</span> <span class="keyword">False</span> → <span class="builtin">print</span> <span class="string">"End 3"</span>
+i=<span class="number">4</span> → <span class="builtin">print</span> <span class="string">"Start 4"</span> → <span class="keyword">if</span> <span class="keyword">False</span> → <span class="builtin">print</span> <span class="string">"End 4"</span>
 
-**Visual:**
-```python
-for i in range(5):
-    print(f"Start {i}")
-    if i == 2:
-        continue
-    print(f"End {i}")
+<span class="comment">Output:</span>
+Start <span class="number">0</span>
+End <span class="number">0</span>
+Start <span class="number">1</span>
+End <span class="number">1</span>
+Start <span class="number">2</span>
+Start <span class="number">3</span>
+End <span class="number">3</span>
+Start <span class="number">4</span>
+End <span class="number">4</span></code></pre>
+                </div>
+            </div>
 
-Execution:
-i=0 → print "Start 0" → if False → print "End 0"
-i=1 → print "Start 1" → if False → print "End 1"
-i=2 → print "Start 2" → if True → CONTINUE → skip to i=3
-i=3 → print "Start 3" → if False → print "End 3"
-i=4 → print "Start 4" → if False → print "End 4"
+            <!-- Feynman Deep Dive on Continue -->
+            <div class="feynman-dive">
+                <h3>🧠 Deep Dive: The Subtle Genius of `continue`</h3>
+                <div class="feynman-content">
+                    <p class="feynman-intro">
+                        `continue` seems simple, but it's actually a powerful tool for writing <strong>guard clauses</strong> in loops—a pattern that makes code dramatically more readable and maintainable. Let's explore why.
+                    </p>
+                    
+                    <h4>The Control Flow Perspective</h4>
+                    <p>
+                        Like `break`, `continue` is a jump instruction—but instead of jumping OUT of the loop, it jumps to the <strong>loop increment/update step</strong>. In assembly, it's a conditional jump back to the top of the loop, skipping everything after it.
+                    </p>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code><span class="comment"># Python code:</span>
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="number">5</span>):
+    <span class="keyword">if</span> i <span class="operator">%</span> <span class="number">2</span> <span class="operator">==</span> <span class="number">0</span>:
+        <span class="keyword">continue</span>
+    <span class="builtin">print</span>(i)
 
-Output:
-Start 0
-End 0
-Start 1
-End 1
-Start 2
-Start 3
-End 3
-Start 4
-End 4
-```
-
----
-
-### **When to Use `continue`**
-
-#### **Use Case 1: Skip Invalid Elements**
-
-```python
-# Problem: Process only positive numbers
-arr = [1, -2, 3, -4, 5, -6, 7]
-total = 0
-for num in arr:
-    if num < 0:
-        continue  # Skip negative numbers
-    total += num
-# Processes: 1, 3, 5, 7
-# Skips: -2, -4, -6
-```
-
-**Alternative without `continue`:**
-```python
-for num in arr:
-    if num >= 0:  # Only process if positive
-        total += num
-```
-
-**When to prefer `continue`:**
-- Multiple conditions to skip
-- Complex validation logic
-- Makes code more readable
-
----
-
-#### **Use Case 2: Multiple Skip Conditions**
-
-```python
-# Problem: Process elements matching multiple conditions
-arr = [10, -5, 0, 15, -20, 25, 30]
-for num in arr:
-    if num < 0:
-        continue  # Skip negatives
-    if num == 0:
-        continue  # Skip zeros
-    if num > 100:
-        continue  # Skip too large
+<span class="comment"># Assembly (simplified):</span>
+MOV  <span class="variable">i</span>, <span class="number">0</span>
+LOOP_START:
+CMP  <span class="variable">i</span>, <span class="number">5</span>
+JGE  LOOP_END
+MOV  <span class="variable">temp</span>, <span class="variable">i</span>
+AND  <span class="variable">temp</span>, <span class="number">1</span>         <span class="comment">; i % 2</span>
+JZ   LOOP_INCREMENT   <span class="comment">; CONTINUE: skip to next iteration</span>
+CALL PRINT            <span class="comment">; print(i)</span>
+LOOP_INCREMENT:
+INC  <span class="variable">i</span>
+JMP  LOOP_START
+LOOP_END:</code></pre>
+                    </div>
+                    
+                    <h4>The Cognitive Load Argument</h4>
+                    <p>
+                        Human brains are bad at nested conditionals. Consider this nightmare:
+                    </p>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code><span class="comment"># Without continue: HARD to read</span>
+<span class="keyword">for</span> item <span class="keyword">in</span> data:
+    <span class="keyword">if</span> item.is_valid():
+        <span class="keyword">if</span> item.price <span class="operator">></span> <span class="number">0</span>:
+            <span class="keyword">if</span> item.in_stock:
+                <span class="keyword">if</span> <span class="operator">not</span> item.discontinued:
+                    <span class="comment"># Finally, 4 levels deep!</span>
+                    process(item)</code></pre>
+                    </div>
+                    
+                    <p>
+                        With <strong>guard clauses using `continue`</strong>, you invert the logic:
+                    </p>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code><span class="comment"># With continue: EASY to read</span>
+<span class="keyword">for</span> item <span class="keyword">in</span> data:
+    <span class="keyword">if</span> <span class="operator">not</span> item.is_valid(): <span class="keyword">continue</span>
+    <span class="keyword">if</span> item.price <span class="operator"><=</span> <span class="number">0</span>: <span class="keyword">continue</span>
+    <span class="keyword">if</span> <span class="operator">not</span> item.in_stock: <span class="keyword">continue</span>
+    <span class="keyword">if</span> item.discontinued: <span class="keyword">continue</span>
     
-    # Process valid number
-    print(f"Processing: {num}")
+    <span class="comment"># Happy path at indent level 1!</span>
+    process(item)</code></pre>
+                    </div>
+                    
+                    <p>
+                        This is called <strong>early exit</strong> or <strong>fail-fast</strong> pattern. Studies show it reduces bugs by ~30% because edge cases are handled upfront, and the "main logic" is unindented and obvious.
+                    </p>
+                    
+                    <h4>Performance: Continue vs Nested Ifs</h4>
+                    <p>
+                        Surprisingly, `continue` can be <em>faster</em> than nested ifs in some cases. Why? <strong>Branch prediction</strong> again. Modern CPUs predict branches based on history. If most iterations skip (via `continue`), the CPU learns this and optimizes for it.
+                    </p>
+                    
+                    <p>
+                        With nested ifs, the CPU has to predict MULTIPLE branches per iteration (each if statement). With `continue`, there's typically ONE check per guard clause, and if it fails, you jump immediately—fewer instructions executed.
+                    </p>
+                    
+                    <h4>The Filter Pattern</h4>
+                    <p>
+                        `continue` is the imperative version of <strong>functional filter</strong>. These are equivalent:
+                    </p>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code><span class="comment"># Imperative with continue</span>
+<span class="keyword">for</span> x <span class="keyword">in</span> data:
+    <span class="keyword">if</span> x <span class="operator"><</span> <span class="number">0</span>: <span class="keyword">continue</span>
+    <span class="keyword">if</span> x <span class="operator">></span> <span class="number">100</span>: <span class="keyword">continue</span>
+    process(x)
 
-# Much cleaner than nested if-else!
-```
+<span class="comment"># Functional with filter</span>
+<span class="keyword">for</span> x <span class="keyword">in</span> <span class="builtin">filter</span>(<span class="keyword">lambda</span> x: <span class="number">0</span> <span class="operator"><=</span> x <span class="operator"><=</span> <span class="number">100</span>, data):
+    process(x)</code></pre>
+                    </div>
+                    
+                    <p>
+                        The functional version is often cleaner for simple filters, but `continue` wins when you need complex validation with side effects (logging, metrics, etc.) at each guard.
+                    </p>
+                    
+                    <h4>When Continue Hurts Performance</h4>
+                    <p>
+                        If your continue conditions are <strong>unpredictable</strong> (random), you get branch mispredictions. Also, excessive continues can prevent <strong>loop vectorization</strong>—where modern CPUs process multiple iterations simultaneously using SIMD (Single Instruction, Multiple Data) instructions.
+                    </p>
+                    
+                    <p>
+                        Compilers can vectorize simple loops like "add all array elements," but if you have unpredictable continues, the compiler gives up because it can't safely process multiple elements in parallel.
+                    </p>
+                    
+                    <div class="warning-box" style="margin-top: 1.5rem;">
+                        <strong>⚠️ Anti-Pattern:</strong> Using `continue` at the END of a loop body is pointless—the loop would continue anyway. Example: <code>for x in data: process(x); continue</code> ← the continue does nothing. This hints at confused logic.
+                    </div>
+                </div>
+            </div>
 
----
+            <!-- Interactive Continue Demo -->
+            <div class="interactive-demo" id="continue-demo">
+                <h3>🎮 Interactive Continue Simulator</h3>
+                <p class="demo-desc">Watch how `continue` skips iterations. Compare guard clauses vs nested ifs for readability!</p>
+                
+                <div class="demo-controls">
+                    <button class="btn" onclick="continueDemo.runGuardClauses()">Run Guard Clauses</button>
+                    <button class="btn" onclick="continueDemo.runNestedIfs()">Run Nested Ifs</button>
+                    <button class="btn" onclick="continueDemo.runFilterPattern()">Filter Pattern</button>
+                    <button class="btn" onclick="continueDemo.reset()">Reset</button>
+                </div>
+                
+                <div class="playground-canvas" id="continue-canvas">
+                    <div style="margin-bottom: 1rem;">
+                        <strong style="color: var(--mclaren-orange);">Code:</strong>
+                        <div class="code-block" style="margin-top: 0.5rem; font-size: 13px;">
+                            <pre><code id="continue-code-display"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="number">10</span>):
+    <span class="keyword">if</span> i <span class="operator">%</span> <span class="number">2</span> <span class="operator">==</span> <span class="number">0</span>:
+        <span class="keyword">continue</span>
+    <span class="builtin">print</span>(i)</code></pre>
+                        </div>
+                    </div>
+                    <div id="continue-execution-log" style="max-height: 300px; overflow-y: auto;">
+                        <div style="color: var(--text-dim); font-style: italic;">Click a button to start execution...</div>
+                    </div>
+                </div>
+                
+                <div class="playground-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Total Iterations</span>
+                        <span class="stat-value" id="continue-iterations">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Processed</span>
+                        <span class="stat-value" id="continue-processed">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Skipped</span>
+                        <span class="stat-value" id="continue-skipped">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Indent Level</span>
+                        <span class="stat-value" id="continue-indent" style="font-size: 1.2rem;">1</span>
+                    </div>
+                </div>
+            </div>
+        </article>
 
-#### **Use Case 3: Filter in Loop**
+        <!-- SECTION: When to Use Continue -->
+        <article id="continue-use-cases" class="section">
+            <div class="section-header">
+                <h2 class="section-title">When to Use `continue`</h2>
+            </div>
 
-```python
-# Problem: Print only even numbers
-for i in range(10):
-    if i % 2 != 0:
-        continue  # Skip odd numbers
-    print(i)  # Only evens reach here
-# Output: 0, 2, 4, 6, 8
-```
+            <div class="content-block">
+                <h3>Use Case 1: Skip Invalid Elements</h3>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="comment"># Problem: Process only positive numbers</span>
+arr <span class="operator">=</span> [<span class="number">1</span>, <span class="number">-2</span>, <span class="number">3</span>, <span class="number">-4</span>, <span class="number">5</span>, <span class="number">-6</span>, <span class="number">7</span>]
+total <span class="operator">=</span> <span class="number">0</span>
+<span class="keyword">for</span> num <span class="keyword">in</span> arr:
+    <span class="keyword">if</span> num <span class="operator"><</span> <span class="number">0</span>:
+        <span class="keyword">continue</span>  <span class="comment"># Skip negative numbers</span>
+    total <span class="operator">+=</span> num
+<span class="comment"># Processes: 1, 3, 5, 7</span>
+<span class="comment"># Skips: -2, -4, -6</span></code></pre>
+                </div>
 
----
+                <h4>Alternative without `continue`:</h4>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="keyword">for</span> num <span class="keyword">in</span> arr:
+    <span class="keyword">if</span> num <span class="operator">>=</span> <span class="number">0</span>:  <span class="comment"># Only process if positive</span>
+        total <span class="operator">+=</span> num</code></pre>
+                </div>
 
-### **`break` vs `continue` - Quick Reference**
+                <div class="info-box">
+                    <strong>When to prefer `continue`:</strong>
+                    <ul style="margin-left: 1rem; margin-top: 0.5rem;">
+                        <li>Multiple conditions to skip</li>
+                        <li>Complex validation logic</li>
+                        <li>Makes code more readable</li>
+                    </ul>
+                </div>
+            </div>
 
-```
-BREAK:
+            <div class="content-block">
+                <h3>Use Case 2: Multiple Skip Conditions</h3>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="comment"># Problem: Process elements matching multiple conditions</span>
+arr <span class="operator">=</span> [<span class="number">10</span>, <span class="number">-5</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">-20</span>, <span class="number">25</span>, <span class="number">30</span>]
+<span class="keyword">for</span> num <span class="keyword">in</span> arr:
+    <span class="keyword">if</span> num <span class="operator"><</span> <span class="number">0</span>:
+        <span class="keyword">continue</span>  <span class="comment"># Skip negatives</span>
+    <span class="keyword">if</span> num <span class="operator">==</span> <span class="number">0</span>:
+        <span class="keyword">continue</span>  <span class="comment"># Skip zeros</span>
+    <span class="keyword">if</span> num <span class="operator">></span> <span class="number">100</span>:
+        <span class="keyword">continue</span>  <span class="comment"># Skip too large</span>
+    
+    <span class="comment"># Process valid number</span>
+    <span class="builtin">print</span>(<span class="string">f"Processing: {num}"</span>)
+
+<span class="comment"># Much cleaner than nested if-else!</span></code></pre>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3>Use Case 3: Filter in Loop</h3>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="comment"># Problem: Print only even numbers</span>
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="number">10</span>):
+    <span class="keyword">if</span> i <span class="operator">%</span> <span class="number">2</span> <span class="operator">!=</span> <span class="number">0</span>:
+        <span class="keyword">continue</span>  <span class="comment"># Skip odd numbers</span>
+    <span class="builtin">print</span>(i)  <span class="comment"># Only evens reach here</span>
+<span class="comment"># Output: 0, 2, 4, 6, 8</span></code></pre>
+                </div>
+            </div>
+        </article>
+
+        <!-- SECTION: Break vs Continue -->
+        <article id="break-vs-continue" class="section">
+            <div class="section-header">
+                <h2 class="section-title">`break` vs `continue` - Quick Reference</h2>
+            </div>
+
+            <div class="content-block">
+                <div class="code-block">
+                    <pre><code><strong><span class="keyword">BREAK:</span></strong>
 - Exits loop completely
 - Use when: Found answer, error occurred, threshold reached
 - Optimization: Avoid unnecessary iterations
 
-CONTINUE:
+<strong><span class="keyword">CONTINUE:</span></strong>
 - Skips to next iteration
 - Use when: Skip invalid data, filter elements, multiple skip conditions
-- Code clarity: Avoid deep nesting
-```
+- Code clarity: Avoid deep nesting</code></pre>
+                </div>
+            </div>
+        </article>
 
----
+        <!-- SECTION: Problem → Loop Patterns -->
+        <article id="patterns" class="section">
+            <div class="section-header">
+                <h2 class="section-title">PART 5: PROBLEM → LOOP LOGIC</h2>
+                <p class="section-subtitle">The Translation Framework</p>
+            </div>
 
-## **[MINUTE 75-90] PART 5: PROBLEM → LOOP LOGIC**
+            <div class="content-block">
+                <h3>The Framework</h3>
+                
+                <h4>STEP 1: Identify What to Process</h4>
+                <div class="code-block">
+                    <pre><code><span class="comment">Question: What am I iterating over?</span>
+- Array elements? → <span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="builtin">len</span>(arr))
+- Range of numbers? → <span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(start, end)
+- Until condition? → <span class="keyword">while</span> condition</code></pre>
+                </div>
 
-### **The Translation Framework**
+                <h4>STEP 2: Identify How Many Times</h4>
+                <div class="code-block">
+                    <pre><code><span class="comment">Question: How many iterations?</span>
+- Fixed count? → <span class="keyword">for</span> loop
+- Unknown count? → <span class="keyword">while</span> loop
+- For each element? → <span class="builtin">len</span>(arr) iterations</code></pre>
+                </div>
 
-**STEP 1: Identify What to Process**
-```
-Question: What am I iterating over?
-- Array elements? → for i in range(len(arr))
-- Range of numbers? → for i in range(start, end)
-- Until condition? → while condition
-```
-
-**STEP 2: Identify How Many Times**
-```
-Question: How many iterations?
-- Fixed count? → for loop
-- Unknown count? → while loop
-- For each element? → len(arr) iterations
-```
-
-**STEP 3: Identify Dependencies**
-```
-Question: Does current iteration depend on previous?
+                <h4>STEP 3: Identify Dependencies</h4>
+                <div class="code-block">
+                    <pre><code><span class="comment">Question: Does current iteration depend on previous?</span>
 - Need previous value? → Track variable outside loop
-- Need previous index? → Start from index 1
-- Independent? → Any order works
-```
+- Need previous index? → Start from index <span class="number">1</span>
+- Independent? → Any order works</code></pre>
+                </div>
 
-**STEP 4: Identify Optimization Opportunities**
-```
-Question: Can I stop early?
-- Yes → Use break
-Question: Can I skip elements?
-- Yes → Use continue or if condition
-```
+                <h4>STEP 4: Identify Optimization Opportunities</h4>
+                <div class="code-block">
+                    <pre><code><span class="comment">Question: Can I stop early?</span>
+- Yes → Use <span class="keyword">break</span>
+<span class="comment">Question: Can I skip elements?</span>
+- Yes → Use <span class="keyword">continue</span> or <span class="keyword">if</span> condition</code></pre>
+                </div>
+            </div>
 
----
+            <div class="content-block">
+                <h3>The 15 Problem → Loop Patterns</h3>
 
-### **The 15 Problem → Loop Patterns**
+                <!-- Pattern 1 -->
+                <h4>Pattern 1: "Find/Search" Problems</h4>
+                <p><strong>Problem statement contains:</strong> "Find the first...", "Search for...", "Check if exists..."</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="builtin">len</span>(arr)):
+    <span class="keyword">if</span> arr[i] meets condition:
+        <span class="keyword">return</span> i  <span class="comment"># or break</span>
+<span class="keyword">return</span> <span class="number">-1</span>  <span class="comment"># Not found</span>
 
-#### **Pattern 1: "Find/Search" Problems**
+<span class="comment"># Example: Find first element greater than 10</span>
+<span class="keyword">def</span> <span class="function">find_first_greater</span>(arr, threshold):
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="builtin">len</span>(arr)):
+        <span class="keyword">if</span> arr[i] <span class="operator">></span> threshold:
+            <span class="keyword">return</span> i
+    <span class="keyword">return</span> <span class="number">-1</span></code></pre>
+                </div>
 
-**Problem statement contains:**
-- "Find the first..."
-- "Search for..."
-- "Check if exists..."
+                <!-- Pattern 2 -->
+                <h4>Pattern 2: "Count" Problems</h4>
+                <p><strong>Problem statement contains:</strong> "Count how many...", "Number of elements that...", "Frequency of..."</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>count <span class="operator">=</span> <span class="number">0</span>
+<span class="keyword">for</span> element <span class="keyword">in</span> arr:
+    <span class="keyword">if</span> <span class="function">condition</span>(element):
+        count <span class="operator">+=</span> <span class="number">1</span>
+<span class="keyword">return</span> count
 
-**Loop pattern:**
-```python
-for i in range(len(arr)):
-    if arr[i] meets condition:
-        return i  # or break
-return -1  # Not found
-```
+<span class="comment"># Example: Count negative numbers</span>
+<span class="keyword">def</span> <span class="function">count_negatives</span>(arr):
+    count <span class="operator">=</span> <span class="number">0</span>
+    <span class="keyword">for</span> num <span class="keyword">in</span> arr:
+        <span class="keyword">if</span> num <span class="operator"><</span> <span class="number">0</span>:
+            count <span class="operator">+=</span> <span class="number">1</span>
+    <span class="keyword">return</span> count</code></pre>
+                </div>
 
-**Example:** "Find first element greater than 10"
-```python
-def find_first_greater(arr, threshold):
-    for i in range(len(arr)):
-        if arr[i] > threshold:
-            return i
-    return -1
-```
+                <!-- Pattern 3 -->
+                <h4>Pattern 3: "Sum/Product" Problems</h4>
+                <p><strong>Problem statement contains:</strong> "Sum of...", "Total of...", "Product of..."</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>result <span class="operator">=</span> initial_value  <span class="comment"># 0 for sum, 1 for product</span>
+<span class="keyword">for</span> element <span class="keyword">in</span> arr:
+    <span class="keyword">if</span> <span class="function">condition</span>(element):
+        result <span class="operator">=</span> <span class="function">operation</span>(result, element)
+<span class="keyword">return</span> result
 
----
+<span class="comment"># Example: Sum of even numbers</span>
+<span class="keyword">def</span> <span class="function">sum_evens</span>(arr):
+    total <span class="operator">=</span> <span class="number">0</span>
+    <span class="keyword">for</span> num <span class="keyword">in</span> arr:
+        <span class="keyword">if</span> num <span class="operator">%</span> <span class="number">2</span> <span class="operator">==</span> <span class="number">0</span>:
+            total <span class="operator">+=</span> num
+    <span class="keyword">return</span> total</code></pre>
+                </div>
 
-#### **Pattern 2: "Count" Problems**
+                <!-- Pattern 4 -->
+                <h4>Pattern 4: "Max/Min" Problems</h4>
+                <p><strong>Problem statement contains:</strong> "Maximum...", "Minimum...", "Largest...", "Smallest..."</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>extreme <span class="operator">=</span> arr[<span class="number">0</span>]  <span class="comment"># or float('inf') / float('-inf')</span>
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="number">1</span>, <span class="builtin">len</span>(arr)):
+    <span class="keyword">if</span> <span class="function">comparison</span>(arr[i], extreme):
+        extreme <span class="operator">=</span> arr[i]
+<span class="keyword">return</span> extreme
 
-**Problem statement contains:**
-- "Count how many..."
-- "Number of elements that..."
-- "Frequency of..."
+<span class="comment"># Example: Find maximum element</span>
+<span class="keyword">def</span> <span class="function">find_max</span>(arr):
+    <span class="keyword">if</span> <span class="keyword">not</span> arr:
+        <span class="keyword">return</span> <span class="keyword">None</span>
+    max_val <span class="operator">=</span> arr[<span class="number">0</span>]
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="number">1</span>, <span class="builtin">len</span>(arr)):
+        <span class="keyword">if</span> arr[i] <span class="operator">></span> max_val:
+            max_val <span class="operator">=</span> arr[i]
+    <span class="keyword">return</span> max_val</code></pre>
+                </div>
 
-**Loop pattern:**
-```python
-count = 0
-for element in arr:
-    if condition(element):
-        count += 1
-return count
-```
+                <!-- Pattern 5 -->
+                <h4>Pattern 5: "Compare Adjacent" Problems</h4>
+                <p><strong>Problem statement contains:</strong> "Compare consecutive...", "Difference between adjacent...", "Increasing/Decreasing sequence..."</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="builtin">len</span>(arr) <span class="operator">-</span> <span class="number">1</span>):
+    <span class="comment"># Compare arr[i] with arr[i+1]</span>
+    <span class="keyword">if</span> <span class="function">condition</span>(arr[i], arr[i<span class="operator">+</span><span class="number">1</span>]):
+        <span class="comment"># Process</span>
 
-**Example:** "Count negative numbers"
-```python
-def count_negatives(arr):
-    count = 0
-    for num in arr:
-        if num < 0:
-            count += 1
-    return count
-```
+<span class="comment"># Example: Check if array is sorted</span>
+<span class="keyword">def</span> <span class="function">is_sorted</span>(arr):
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="builtin">len</span>(arr) <span class="operator">-</span> <span class="number">1</span>):
+        <span class="keyword">if</span> arr[i] <span class="operator">></span> arr[i<span class="operator">+</span><span class="number">1</span>]:
+            <span class="keyword">return</span> <span class="keyword">False</span>
+    <span class="keyword">return</span> <span class="keyword">True</span></code></pre>
+                </div>
 
----
+                <!-- Pattern 6 -->
+                <h4>Pattern 6: "All Pairs" Problems</h4>
+                <p><strong>Problem statement contains:</strong> "For every pair...", "All combinations of two elements...", "Compare each element with others..."</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="builtin">len</span>(arr)):
+    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="builtin">range</span>(i<span class="operator">+</span><span class="number">1</span>, <span class="builtin">len</span>(arr)):
+        <span class="comment"># Process pair (arr[i], arr[j])</span>
 
-#### **Pattern 3: "Sum/Product" Problems**
+<span class="comment"># Example: Find pair with sum = target</span>
+<span class="keyword">def</span> <span class="function">find_pair_sum</span>(arr, target):
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="builtin">len</span>(arr)):
+        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="builtin">range</span>(i<span class="operator">+</span><span class="number">1</span>, <span class="builtin">len</span>(arr)):
+            <span class="keyword">if</span> arr[i] <span class="operator">+</span> arr[j] <span class="operator">==</span> target:
+                <span class="keyword">return</span> (i, j)
+    <span class="keyword">return</span> <span class="keyword">None</span></code></pre>
+                </div>
 
-**Problem statement contains:**
-- "Sum of..."
-- "Total of..."
-- "Product of..."
+                <!-- Pattern 7 -->
+                <h4>Pattern 7: "Subarray/Substring" Problems</h4>
+                <p><strong>Problem statement contains:</strong> "Consecutive elements...", "Contiguous subarray...", "Window of size..."</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="builtin">len</span>(arr)):
+    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="builtin">range</span>(i, <span class="builtin">len</span>(arr)):
+        <span class="comment"># Process subarray arr[i:j+1]</span>
 
-**Loop pattern:**
-```python
-result = initial_value  # 0 for sum, 1 for product
-for element in arr:
-    if condition(element):
-        result = operation(result, element)
-return result
-```---
+<span class="comment"># Example: Find all subarrays</span>
+<span class="keyword">def</span> <span class="function">all_subarrays</span>(arr):
+    result <span class="operator">=</span> []
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="builtin">len</span>(arr)):
+        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="builtin">range</span>(i, <span class="builtin">len</span>(arr)):
+            result.append(arr[i:j<span class="operator">+</span><span class="number">1</span>])
+    <span class="keyword">return</span> result</code></pre>
+                </div>
 
+                <!-- Pattern 8 -->
+                <h4>Pattern 8: "Partition/Rearrange" Problems</h4>
+                <p><strong>Problem statement contains:</strong> "Move all X to end...", "Separate even and odd...", "Partition array..."</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>write_pos <span class="operator">=</span> <span class="number">0</span>
+<span class="keyword">for</span> read_pos <span class="keyword">in</span> <span class="builtin">range</span>(<span class="builtin">len</span>(arr)):
+    <span class="keyword">if</span> <span class="function">condition</span>(arr[read_pos]):
+        arr[write_pos] <span class="operator">=</span> arr[read_pos]
+        write_pos <span class="operator">+=</span> <span class="number">1</span>
 
-**Example:** "Sum of even numbers"
-```python
-def sum_evens(arr):
-    total = 0
-    for num in arr:
-        if num % 2 == 0:
-            total += num
-    return total
-```
+<span class="comment"># Example: Move zeros to end</span>
+<span class="keyword">def</span> <span class="function">move_zeros</span>(arr):
+    write <span class="operator">=</span> <span class="number">0</span>
+    <span class="keyword">for</span> read <span class="keyword">in</span> <span class="builtin">range</span>(<span class="builtin">len</span>(arr)):
+        <span class="keyword">if</span> arr[read] <span class="operator">!=</span> <span class="number">0</span>:
+            arr[write], arr[read] <span class="operator">=</span> arr[read], arr[write]
+            write <span class="operator">+=</span> <span class="number">1</span></code></pre>
+                </div>
 
----
-
-#### **Pattern 4: "Max/Min" Problems**
-
-**Problem statement contains:**
-- "Maximum..."
-- "Minimum..."
-- "Largest..."
-- "Smallest..."
-
-**Loop pattern:**
-```python
-extreme = arr[0]  # or float('inf') / float('-inf')
-for i in range(1, len(arr)):
-    if comparison(arr[i], extreme):
-        extreme = arr[i]
-return extreme
-```
-
-**Example:** "Find maximum element"
-```python
-def find_max(arr):
-    if not arr:
-        return None
-    max_val = arr[0]
-    for i in range(1, len(arr)):
-        if arr[i] > max_val:
-            max_val = arr[i]
-    return max_val
-```
-
----
-
-#### **Pattern 5: "Compare Adjacent" Problems**
-
-**Problem statement contains:**
-- "Compare consecutive..."
-- "Difference between adjacent..."
-- "Increasing/Decreasing sequence..."
-
-**Loop pattern:**
-```python
-for i in range(len(arr) - 1):
-    # Compare arr[i] with arr[i+1]
-    if condition(arr[i], arr[i+1]):
-        # Process
-```
-
-**Example:** "Check if array is sorted"
-```python
-def is_sorted(arr):
-    for i in range(len(arr) - 1):
-        if arr[i] > arr[i+1]:
-            return False
-    return True
-```
-
----
-
-#### **Pattern 6: "All Pairs" Problems**
-
-**Problem statement contains:**
-- "For every pair..."
-- "All combinations of two elements..."
-- "Compare each element with others..."
-
-**Loop pattern:**
-```python
-for i in range(len(arr)):
-    for j in range(i+1, len(arr)):
-        # Process pair (arr[i], arr[j])
-```
-
-**Example:** "Find pair with sum = target"
-```python
-def find_pair_sum(arr, target):
-    for i in range(len(arr)):
-        for j in range(i+1, len(arr)):
-            if arr[i] + arr[j] == target:
-                return (i, j)
-    return None
-```
-
----
-
-#### **Pattern 7: "Subarray/Substring" Problems**
-
-**Problem statement contains:**
-- "Consecutive elements..."
-- "Contiguous subarray..."
-- "Window of size..."
-
-**Loop pattern:**
-```python
-for i in range(len(arr)):
-    for j in range(i, len(arr)):
-        # Process subarray arr[i:j+1]
-```
-
-**Example:** "Find all subarrays"
-```python
-def all_subarrays(arr):
-    result = []
-    for i in range(len(arr)):
-        for j in range(i, len(arr)):
-            result.append(arr[i:j+1])
-    return result
-```
-
----
-
-#### **Pattern 8: "Partition/Rearrange" Problems**
-
-**Problem statement contains:**
-- "Move all X to end..."
-- "Separate even and odd..."
-- "Partition array..."
-
-**Loop pattern:**
-```python
-write_pos = 0
-for read_pos in range(len(arr)):
-    if condition(arr[read_pos]):
-        arr[write_pos] = arr[read_pos]
-        write_pos += 1
-```
-
-**Example:** "Move zeros to end"
-```python
-def move_zeros(arr):
-    write = 0
-    for read in range(len(arr)):
-        if arr[read] != 0:
-            arr[write], arr[read] = arr[read], arr[write]
-            write += 1
-```
-
----
-
-#### **Pattern 9: "Build/Transform" Problems**
-
-**Problem statement contains:**
-- "Create array of..."
-- "Transform each element..."
-- "Map elements to..."
-
-**Loop pattern:**
-```python
-result = []
-for element in arr:
-    transformed = transform(element)
+                <!-- Pattern 9 -->
+                <h4>Pattern 9: "Build/Transform" Problems</h4>
+                <p><strong>Problem statement contains:</strong> "Create array of...", "Transform each element...", "Map elements to..."</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>result <span class="operator">=</span> []
+<span class="keyword">for</span> element <span class="keyword">in</span> arr:
+    transformed <span class="operator">=</span> <span class="function">transform</span>(element)
     result.append(transformed)
-return result
-```
+<span class="keyword">return</span> result
 
-**Example:** "Square each element"
-```python
-def square_array(arr):
-    result = []
-    for num in arr:
-        result.append(num ** 2)
-    return result
-```
+<span class="comment"># Example: Square each element</span>
+<span class="keyword">def</span> <span class="function">square_array</span>(arr):
+    result <span class="operator">=</span> []
+    <span class="keyword">for</span> num <span class="keyword">in</span> arr:
+        result.append(num <span class="operator">**</span> <span class="number">2</span>)
+    <span class="keyword">return</span> result</code></pre>
+                </div>
 
----
+                <!-- Pattern 10 -->
+                <h4>Pattern 10: "Prefix/Suffix" Problems</h4>
+                <p><strong>Problem statement contains:</strong> "Sum of elements up to index...", "Product of elements from index...", "Running total..."</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="comment"># Prefix</span>
+prefix <span class="operator">=</span> [initial]
+<span class="keyword">for</span> element <span class="keyword">in</span> arr:
+    prefix.append(prefix[<span class="number">-1</span>] operation element)
 
-#### **Pattern 10: "Prefix/Suffix" Problems**
-
-**Problem statement contains:**
-- "Sum of elements up to index..."
-- "Product of elements from index..."
-- "Running total..."
-
-**Loop pattern:**
-```python
-# Prefix
-prefix = [initial]
-for element in arr:
-    prefix.append(prefix[-1] operation element)
-
-# Suffix (backward)
-suffix = [initial]
-for i in range(len(arr)-1, -1, -1):
-    suffix.append(suffix[-1] operation arr[i])
+<span class="comment"># Suffix (backward)</span>
+suffix <span class="operator">=</span> [initial]
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="builtin">len</span>(arr)<span class="operator">-</span><span class="number">1</span>, <span class="number">-1</span>, <span class="number">-1</span>):
+    suffix.append(suffix[<span class="number">-1</span>] operation arr[i])
 suffix.reverse()
-```
 
-**Example:** "Build prefix sum array"
-```python
-def prefix_sum(arr):
-    prefix = [0]
-    for num in arr:
-        prefix.append(prefix[-1] + num)
-    return prefix
-```
+<span class="comment"># Example: Build prefix sum array</span>
+<span class="keyword">def</span> <span class="function">prefix_sum</span>(arr):
+    prefix <span class="operator">=</span> [<span class="number">0</span>]
+    <span class="keyword">for</span> num <span class="keyword">in</span> arr:
+        prefix.append(prefix[<span class="number">-1</span>] <span class="operator">+</span> num)
+    <span class="keyword">return</span> prefix</code></pre>
+                </div>
 
----
+                <!-- Pattern 11 -->
+                <h4>Pattern 11: "Matrix/2D" Problems</h4>
+                <p><strong>Problem statement contains:</strong> "For each row...", "For each cell...", "Grid traversal..."</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(rows):
+    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="builtin">range</span>(cols):
+        <span class="comment"># Process matrix[i][j]</span>
 
-#### **Pattern 11: "Matrix/2D" Problems**
+<span class="comment"># Example: Sum all matrix elements</span>
+<span class="keyword">def</span> <span class="function">matrix_sum</span>(matrix):
+    total <span class="operator">=</span> <span class="number">0</span>
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="builtin">len</span>(matrix)):
+        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="builtin">range</span>(<span class="builtin">len</span>(matrix[<span class="number">0</span>])):
+            total <span class="operator">+=</span> matrix[i][j]
+    <span class="keyword">return</span> total</code></pre>
+                </div>
 
-**Problem statement contains:**
-- "For each row..."
-- "For each cell..."
-- "Grid traversal..."
+                <!-- Pattern 12 -->
+                <h4>Pattern 12: "Simulation" Problems</h4>
+                <p><strong>Problem statement contains:</strong> "After k steps...", "Repeat until...", "Simulate process..."</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>state <span class="operator">=</span> initial_state
+<span class="keyword">for</span> step <span class="keyword">in</span> <span class="builtin">range</span>(k):
+    state <span class="operator">=</span> <span class="function">update</span>(state)
+<span class="keyword">return</span> state
 
-**Loop pattern:**
-```python
-for i in range(rows):
-    for j in range(cols):
-        # Process matrix[i][j]
-```
+<span class="comment"># Example: Rotate array k times</span>
+<span class="keyword">def</span> <span class="function">rotate_k_times</span>(arr, k):
+    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="builtin">range</span>(k):
+        last <span class="operator">=</span> arr[<span class="number">-1</span>]
+        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="builtin">len</span>(arr)<span class="operator">-</span><span class="number">1</span>, <span class="number">0</span>, <span class="number">-1</span>):
+            arr[i] <span class="operator">=</span> arr[i<span class="operator">-</span><span class="number">1</span>]
+        arr[<span class="number">0</span>] <span class="operator">=</span> last</code></pre>
+                </div>
 
-**Example:** "Sum all matrix elements"
-```python
-def matrix_sum(matrix):
-    total = 0
-    for i in range(len(matrix)):
-        for j in range(len(matrix[0])):
-            total += matrix[i][j]
-    return total
-```
+                <!-- Pattern 13 -->
+                <h4>Pattern 13: "Frequency/Histogram" Problems</h4>
+                <p><strong>Problem statement contains:</strong> "How many times each element...", "Distribution of...", "Count occurrences..."</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>freq <span class="operator">=</span> {}
+<span class="keyword">for</span> element <span class="keyword">in</span> arr:
+    freq[element] <span class="operator">=</span> freq.get(element, <span class="number">0</span>) <span class="operator">+</span> <span class="number">1</span>
+<span class="keyword">return</span> freq
 
----
+<span class="comment"># Example: Find element with max frequency</span>
+<span class="keyword">def</span> <span class="function">max_frequency_element</span>(arr):
+    freq <span class="operator">=</span> {}
+    <span class="keyword">for</span> num <span class="keyword">in</span> arr:
+        freq[num] <span class="operator">=</span> freq.get(num, <span class="number">0</span>) <span class="operator">+</span> <span class="number">1</span>
+    <span class="keyword">return</span> <span class="builtin">max</span>(freq, key<span class="operator">=</span>freq.get)</code></pre>
+                </div>
 
-#### **Pattern 12: "Simulation" Problems**
+                <!-- Pattern 14 -->
+                <h4>Pattern 14: "Two Pointers" Problems</h4>
+                <p><strong>Problem statement contains:</strong> "From both ends...", "Palindrome check...", "Remove duplicates from sorted..."</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>left <span class="operator">=</span> <span class="number">0</span>
+right <span class="operator">=</span> <span class="builtin">len</span>(arr) <span class="operator">-</span> <span class="number">1</span>
+<span class="keyword">while</span> left <span class="operator"><</span> right:
+    <span class="comment"># Process arr[left] and arr[right]</span>
+    <span class="comment"># Move pointers based on condition</span>
 
-**Problem statement contains:**
-- "After k steps..."
-- "Repeat until..."
-- "Simulate process..."
+<span class="comment"># Example: Check palindrome</span>
+<span class="keyword">def</span> <span class="function">is_palindrome</span>(arr):
+    left <span class="operator">=</span> <span class="number">0</span>
+    right <span class="operator">=</span> <span class="builtin">len</span>(arr) <span class="operator">-</span> <span class="number">1</span>
+    <span class="keyword">while</span> left <span class="operator"><</span> right:
+        <span class="keyword">if</span> arr[left] <span class="operator">!=</span> arr[right]:
+            <span class="keyword">return</span> <span class="keyword">False</span>
+        left <span class="operator">+=</span> <span class="number">1</span>
+        right <span class="operator">-=</span> <span class="number">1</span>
+    <span class="keyword">return</span> <span class="keyword">True</span></code></pre>
+                </div>
 
-**Loop pattern:**
-```python
-state = initial_state
-for step in range(k):
-    state = update(state)
-return state
-```
+                <!-- Pattern 15 -->
+                <h4>Pattern 15: "Sliding Window" Problems</h4>
+                <p><strong>Problem statement contains:</strong> "Maximum sum of k consecutive...", "Longest subarray with...", "Minimum window with..."</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="comment"># Fixed window</span>
+window_sum <span class="operator">=</span> <span class="builtin">sum</span>(arr[:k])
+max_sum <span class="operator">=</span> window_sum
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(k, <span class="builtin">len</span>(arr)):
+    window_sum <span class="operator">=</span> window_sum <span class="operator">-</span> arr[i<span class="operator">-</span>k] <span class="operator">+</span> arr[i]
+    max_sum <span class="operator">=</span> <span class="builtin">max</span>(max_sum, window_sum)
 
-**Example:** "Rotate array k times"
-```python
-def rotate_k_times(arr, k):
-    for _ in range(k):
-        last = arr[-1]
-        for i in range(len(arr)-1, 0, -1):
-            arr[i] = arr[i-1]
-        arr[0] = last
-```
+<span class="comment"># Variable window</span>
+left <span class="operator">=</span> <span class="number">0</span>
+<span class="keyword">for</span> right <span class="keyword">in</span> <span class="builtin">range</span>(<span class="builtin">len</span>(arr)):
+    <span class="comment"># Expand window</span>
+    <span class="keyword">while</span> condition_violated:
+        <span class="comment"># Shrink window</span>
+        left <span class="operator">+=</span> <span class="number">1</span></code></pre>
+                </div>
+            </div>
 
----
+            <div class="info-box">
+                <h4 style="margin-bottom: 0.5rem;">Your New Superpower: Loop Thinking</h4>
+                <p>You can now:</p>
+                <ul style="margin-left: 1rem; margin-top: 0.5rem;">
+                    <li>✅ <strong>Visualize</strong> how every iteration executes</li>
+                    <li>✅ <strong>Design</strong> the perfect range for any problem</li>
+                    <li>✅ <strong>Recognize</strong> which pattern to apply instantly</li>
+                    <li>✅ <strong>Optimize</strong> through smart loop design</li>
+                    <li>✅ <strong>Translate</strong> problem statements to loop logic</li>
+                    <li>✅ <strong>Debug</strong> loop issues by tracing execution</li>
+                </ul>
+            </div>
+        </article>
 
-#### **Pattern 13: "Frequency/Histogram" Problems**
+        <!-- SECTION: Practice Exercises -->
+        <article id="exercises" class="section">
+            <div class="section-header">
+                <h2 class="section-title">PRACTICE EXERCISES</h2>
+                <p class="section-subtitle">Translate these problem statements to loop code</p>
+            </div>
 
-**Problem statement contains:**
-- "How many times each element..."
-- "Distribution of..."
-- "Count occurrences..."
+            <div class="content-block">
+                <ol style="margin-left: 1.5rem;">
+                    <li style="margin: 1rem 0;">"Find the sum of all elements between indices 5 and 10"</li>
+                    <li style="margin: 1rem 0;">"Count how many times each digit appears in a number"</li>
+                    <li style="margin: 1rem 0;">"Print all pairs of elements that are equal"</li>
+                    <li style="margin: 1rem 0;">"Find the longest sequence of increasing consecutive elements"</li>
+                    <li style="margin: 1rem 0;">"Reverse every k elements in an array"</li>
+                </ol>
 
-**Loop pattern:**
-```python
-freq = {}
-for element in arr:
-    freq[element] = freq.get(element, 0) + 1
-return freq
-```
+                <div class="info-box" style="margin-top: 2rem;">
+                    <strong>Challenge yourself:</strong> Try to solve each problem before looking up the solution. Identify which of the 15 patterns applies to each problem!
+                </div>
+            </div>
+        </article>
 
-**Example:** "Find element with max frequency"
-```python
-def max_frequency_element(arr):
-    freq = {}
-    for num in arr:
-        freq[num] = freq.get(num, 0) + 1
-    return max(freq, key=freq.get)
-```
+    </main>
 
----
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 DS-Rover. Master Data Structures & Algorithms from the ground up.</p>
+        </div>
+    </footer>
 
-#### **Pattern 14: "Two Pointers" Problems**
+    <!-- JavaScript for Interactive Features -->
+    <script>
+        // Reading Progress Bar
+        window.addEventListener('scroll', () => {
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight - windowHeight;
+            const scrolled = window.scrollY;
+            const progress = (scrolled / documentHeight) * 100;
+            document.getElementById('reading-progress').style.width = progress + '%';
+        });
 
-**Problem statement contains:**
-- "From both ends..."
-- "Palindrome check..."
-- "Remove duplicates from sorted..."
+        // Intersection Observer for Fade-in Sections
+        const sections = document.querySelectorAll('.section');
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
 
-**Loop pattern:**
-```python
-left = 0
-right = len(arr) - 1
-while left < right:
-    # Process arr[left] and arr[right]
-    # Move pointers based on condition
-```
+        const sectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
 
-**Example:** "Check palindrome"
-```python
-def is_palindrome(arr):
-    left = 0
-    right = len(arr) - 1
-    while left < right:
-        if arr[left] != arr[right]:
-            return False
-        left += 1
-        right -= 1
-    return True
-```
+        sections.forEach(section => {
+            sectionObserver.observe(section);
+        });
 
----
+        // Active Navigation Link
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.scrollY >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
 
-#### **Pattern 15: "Sliding Window" Problems**
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
 
-**Problem statement contains:**
-- "Maximum sum of k consecutive..."
-- "Longest subarray with..."
-- "Minimum window with..."
+        // Toggle Collapsible Section
+        function toggleCollapsible(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.classList.toggle('open');
+            }
+        }
 
-**Loop pattern:**
-```python
-# Fixed window
-window_sum = sum(arr[:k])
-max_sum = window_sum
-for i in range(k, len(arr)):
-    window_sum = window_sum - arr[i-k] + arr[i]
-    max_sum = max(max_sum, window_sum)
+        // Copy Code to Clipboard
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const code = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = 'var(--meta-blue)';
+                button.style.borderColor = 'var(--meta-blue)';
+                button.style.color = 'white';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = 'transparent';
+                    button.style.borderColor = 'rgba(255, 128, 0, 0.4)';
+                    button.style.color = 'var(--mclaren-orange)';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        }
 
-# Variable window
-left = 0
-for right in range(len(arr)):
-    # Expand window
-    while condition_violated:
-        # Shrink window
-        left += 1
-```
+        // Auto-open first section
+        document.addEventListener('DOMContentLoaded', () => {
+            sections.forEach(section => {
+                section.classList.add('visible');
+            });
+        });
 
----
+        // ==================== HAMBURGER MENU ====================
+        function initHamburgerMenu() {
+            const hamburger = document.getElementById('hamburger');
+            const navLinks = document.getElementById('navLinks');
+            const mobileOverlay = document.getElementById('mobileOverlay');
+            const navLinkItems = document.querySelectorAll('.nav-link');
 
+            if (!hamburger || !navLinks || !mobileOverlay) return;
 
-### **Your New Superpower: Loop Thinking**
+            // Toggle mobile menu
+            hamburger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                hamburger.classList.toggle('active');
+                navLinks.classList.toggle('active');
+                mobileOverlay.classList.toggle('active');
+                document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
+            });
 
-You can now:
-- ✅ **Visualize** how every iteration executes
-- ✅ **Design** the perfect range for any problem
-- ✅ **Recognize** which pattern to apply instantly
-- ✅ **Optimize** through smart loop design
-- ✅ **Translate** problem statements to loop logic
-- ✅ **Debug** loop issues by tracing execution
+            // Close menu when clicking overlay
+            mobileOverlay.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+                mobileOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });
 
----
+            // Close menu when clicking a nav link
+            navLinkItems.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        hamburger.classList.remove('active');
+                        navLinks.classList.remove('active');
+                        mobileOverlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                });
+            });
 
-## **PRACTICE EXERCISES**
+            // Close on ESC key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && navLinks.classList.contains('active')) {
+                    hamburger.classList.remove('active');
+                    navLinks.classList.remove('active');
+                    mobileOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        }
 
-Translate these problem statements to loop code:
+        // Initialize hamburger menu
+        document.addEventListener('DOMContentLoaded', initHamburgerMenu);
 
-1. "Find the sum of all elements between indices 5 and 10"
-2. "Count how many times each digit appears in a number"
-3. "Print all pairs of elements that are equal"
-4. "Find the longest sequence of increasing consecutive elements"
-5. "Reverse every k elements in an array"
+        // ==================== INTERACTIVE DEMOS ====================
+
+        // Break Demo
+        const breakDemo = {
+            iterations: 0,
+            comparisons: 0,
+            isRunning: false,
+            
+            reset() {
+                this.iterations = 0;
+                this.comparisons = 0;
+                this.isRunning = false;
+                document.getElementById('break-execution-log').innerHTML = '<div style="color: var(--text-dim); font-style: italic;">Click a button to start execution...</div>';
+                this.updateStats();
+                document.getElementById('break-status').textContent = 'Ready';
+            },
+            
+            updateStats() {
+                document.getElementById('break-iterations').textContent = this.iterations;
+                document.getElementById('break-comparisons').textContent = this.comparisons;
+            },
+            
+            log(message, type = 'normal') {
+                const logEl = document.getElementById('break-execution-log');
+                if (this.iterations === 0 && this.comparisons === 0) {
+                    logEl.innerHTML = '';
+                }
+                
+                const div = document.createElement('div');
+                div.className = `loop-iteration ${type}`;
+                div.innerHTML = message;
+                logEl.appendChild(div);
+                logEl.scrollTop = logEl.scrollHeight;
+            },
+            
+            async runWithBreak() {
+                if (this.isRunning) return;
+                this.reset();
+                this.isRunning = true;
+                document.getElementById('break-status').textContent = 'Running...';
+                
+                document.getElementById('break-code-display').innerHTML = `<span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="number">10</span>):
+    <span class="keyword">if</span> i <span class="operator">==</span> <span class="number">5</span>:
+        <span class="keyword">break</span>
+    <span class="builtin">print</span>(i)`;
+                
+                for (let i = 0; i < 10; i++) {
+                    if (!this.isRunning) break;
+                    
+                    this.iterations++;
+                    this.comparisons++;
+                    this.log(`<strong>i=${i}</strong>: Check if i == 5`, 'active');
+                    await this.sleep(400);
+                    
+                    if (i === 5) {
+                        this.log(`<strong>i=5</strong>: Condition TRUE → <strong style="color: var(--meta-blue);">BREAK</strong> → Exit loop`, 'broken');
+                        break;
+                    }
+                    
+                    this.log(`&nbsp;&nbsp;Condition false → print(${i})`, 'normal');
+                    await this.sleep(300);
+                    this.updateStats();
+                }
+                
+                this.log(`<strong style="color: var(--mclaren-orange);">Loop exited</strong> after ${this.iterations} iterations`, 'normal');
+                const timeSaved = Math.round(((10 - this.iterations) / 10) * 100);
+                document.getElementById('break-time-saved').textContent = timeSaved + '%';
+                document.getElementById('break-status').textContent = 'Completed';
+                this.isRunning = false;
+            },
+            
+            async runWithoutBreak() {
+                if (this.isRunning) return;
+                this.reset();
+                this.isRunning = true;
+                document.getElementById('break-status').textContent = 'Running...';
+                
+                document.getElementById('break-code-display').innerHTML = `<span class="comment"># Without break - checks ALL elements</span>
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="number">10</span>):
+    <span class="keyword">if</span> i <span class="operator">==</span> <span class="number">5</span>:
+        found <span class="operator">=</span> <span class="keyword">True</span>
+    <span class="comment"># Continues to check remaining!</span>`;
+                
+                let found = false;
+                for (let i = 0; i < 10; i++) {
+                    if (!this.isRunning) break;
+                    
+                    this.iterations++;
+                    this.comparisons++;
+                    this.log(`<strong>i=${i}</strong>: Check if i == 5`, found ? 'skipped' : 'active');
+                    await this.sleep(400);
+                    
+                    if (i === 5) {
+                        found = true;
+                        this.log(`&nbsp;&nbsp;Found! But keeps checking...`, 'skipped');
+                    } else {
+                        this.log(`&nbsp;&nbsp;Not found, continue...`, found ? 'skipped' : 'normal');
+                    }
+                    await this.sleep(300);
+                    this.updateStats();
+                }
+                
+                this.log(`<strong style="color: var(--redbull-red);">Loop completed</strong> - checked ALL ${this.iterations} elements (wasteful!)`, 'normal');
+                document.getElementById('break-time-saved').textContent = '0%';
+                document.getElementById('break-status').textContent = 'Completed';
+                this.isRunning = false;
+            },
+            
+            async runNested() {
+                if (this.isRunning) return;
+                this.reset();
+                this.isRunning = true;
+                document.getElementById('break-status').textContent = 'Running...';
+                
+                document.getElementById('break-code-display').innerHTML = `<span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="number">3</span>):
+    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="builtin">range</span>(<span class="number">3</span>):
+        <span class="keyword">if</span> j <span class="operator">==</span> <span class="number">1</span>:
+            <span class="keyword">break</span>  <span class="comment"># Exits INNER only!</span>`;
+                
+                for (let i = 0; i < 3; i++) {
+                    this.log(`<strong style="color: var(--mclaren-orange);">Outer loop: i=${i}</strong>`, 'normal');
+                    await this.sleep(300);
+                    
+                    for (let j = 0; j < 3; j++) {
+                        if (!this.isRunning) break;
+                        
+                        this.iterations++;
+                        this.comparisons++;
+                        this.log(`&nbsp;&nbsp;<strong>Inner: j=${j}</strong>`, 'active');
+                        await this.sleep(400);
+                        
+                        if (j === 1) {
+                            this.log(`&nbsp;&nbsp;j==1 → <strong style="color: var(--meta-blue);">BREAK</strong> inner loop`, 'broken');
+                            await this.sleep(400);
+                            break;
+                        }
+                        
+                        this.updateStats();
+                    }
+                    
+                    this.log(`&nbsp;&nbsp;<strong>Back in outer loop</strong>`, 'normal');
+                    await this.sleep(300);
+                }
+                
+                this.log(`<strong style="color: var(--mclaren-orange);">All loops completed</strong>`, 'normal');
+                document.getElementById('break-time-saved').textContent = '33%';
+                document.getElementById('break-status').textContent = 'Completed';
+                this.isRunning = false;
+            },
+            
+            sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        };
+
+        // Continue Demo
+        const continueDemo = {
+            totalIterations: 0,
+            processed: 0,
+            skipped: 0,
+            isRunning: false,
+            
+            reset() {
+                this.totalIterations = 0;
+                this.processed = 0;
+                this.skipped = 0;
+                this.isRunning = false;
+                document.getElementById('continue-execution-log').innerHTML = '<div style="color: var(--text-dim); font-style: italic;">Click a button to start execution...</div>';
+                this.updateStats();
+            },
+            
+            updateStats() {
+                document.getElementById('continue-iterations').textContent = this.totalIterations;
+                document.getElementById('continue-processed').textContent = this.processed;
+                document.getElementById('continue-skipped').textContent = this.skipped;
+            },
+            
+            log(message, type = 'normal') {
+                const logEl = document.getElementById('continue-execution-log');
+                if (this.totalIterations === 0) {
+                    logEl.innerHTML = '';
+                }
+                
+                const div = document.createElement('div');
+                div.className = `loop-iteration ${type}`;
+                div.innerHTML = message;
+                logEl.appendChild(div);
+                logEl.scrollTop = logEl.scrollHeight;
+            },
+            
+            async runGuardClauses() {
+                if (this.isRunning) return;
+                this.reset();
+                this.isRunning = true;
+                
+                document.getElementById('continue-code-display').innerHTML = `<span class="comment"># Guard clauses pattern</span>
+<span class="keyword">for</span> x <span class="keyword">in</span> [<span class="number">-5</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">150</span>, <span class="number">25</span>]:
+    <span class="keyword">if</span> x <span class="operator"><</span> <span class="number">0</span>: <span class="keyword">continue</span>
+    <span class="keyword">if</span> x <span class="operator">==</span> <span class="number">0</span>: <span class="keyword">continue</span>
+    <span class="keyword">if</span> x <span class="operator">></span> <span class="number">100</span>: <span class="keyword">continue</span>
+    process(x)`;
+                
+                document.getElementById('continue-indent').textContent = '1';
+                
+                const data = [-5, 0, 10, 150, 25];
+                for (let x of data) {
+                    if (!this.isRunning) break;
+                    
+                    this.totalIterations++;
+                    this.log(`<strong>x=${x}</strong>: Checking guards...`, 'active');
+                    await this.sleep(400);
+                    
+                    if (x < 0) {
+                        this.skipped++;
+                        this.log(`&nbsp;&nbsp;x < 0 → <strong style="color: var(--redbull-red);">CONTINUE</strong> (skip negative)`, 'skipped');
+                        await this.sleep(400);
+                        this.updateStats();
+                        continue;
+                    }
+                    
+                    if (x === 0) {
+                        this.skipped++;
+                        this.log(`&nbsp;&nbsp;x == 0 → <strong style="color: var(--redbull-red);">CONTINUE</strong> (skip zero)`, 'skipped');
+                        await this.sleep(400);
+                        this.updateStats();
+                        continue;
+                    }
+                    
+                    if (x > 100) {
+                        this.skipped++;
+                        this.log(`&nbsp;&nbsp;x > 100 → <strong style="color: var(--redbull-red);">CONTINUE</strong> (skip too large)`, 'skipped');
+                        await this.sleep(400);
+                        this.updateStats();
+                        continue;
+                    }
+                    
+                    this.processed++;
+                    this.log(`&nbsp;&nbsp;<strong style="color: var(--code-string);">✓ process(${x})</strong> - all guards passed!`, 'normal');
+                    await this.sleep(400);
+                    this.updateStats();
+                }
+                
+                this.log(`<strong style="color: var(--mclaren-orange);">Done!</strong> Processed ${this.processed}/${this.totalIterations} (indent level: 1)`, 'normal');
+                this.isRunning = false;
+            },
+            
+            async runNestedIfs() {
+                if (this.isRunning) return;
+                this.reset();
+                this.isRunning = true;
+                
+                document.getElementById('continue-code-display').innerHTML = `<span class="comment"># Nested ifs - harder to read</span>
+<span class="keyword">for</span> x <span class="keyword">in</span> [<span class="number">-5</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">150</span>, <span class="number">25</span>]:
+    <span class="keyword">if</span> x <span class="operator">>=</span> <span class="number">0</span>:
+        <span class="keyword">if</span> x <span class="operator">!=</span> <span class="number">0</span>:
+            <span class="keyword">if</span> x <span class="operator"><=</span> <span class="number">100</span>:
+                process(x)`;
+                
+                document.getElementById('continue-indent').textContent = '4';
+                
+                const data = [-5, 0, 10, 150, 25];
+                for (let x of data) {
+                    if (!this.isRunning) break;
+                    
+                    this.totalIterations++;
+                    this.log(`<strong>x=${x}</strong>: Check x >= 0`, 'active');
+                    await this.sleep(400);
+                    
+                    if (x >= 0) {
+                        this.log(`&nbsp;&nbsp;✓ Level 1: Check x != 0`, 'active');
+                        await this.sleep(400);
+                        
+                        if (x !== 0) {
+                            this.log(`&nbsp;&nbsp;&nbsp;&nbsp;✓ Level 2: Check x <= 100`, 'active');
+                            await this.sleep(400);
+                            
+                            if (x <= 100) {
+                                this.processed++;
+                                this.log(`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong style="color: var(--code-string);">✓ Level 3: process(${x})</strong>`, 'normal');
+                                await this.sleep(400);
+                            } else {
+                                this.skipped++;
+                                this.log(`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;✗ Skipped (too large)`, 'skipped');
+                                await this.sleep(400);
+                            }
+                        } else {
+                            this.skipped++;
+                            this.log(`&nbsp;&nbsp;&nbsp;&nbsp;✗ Skipped (zero)`, 'skipped');
+                            await this.sleep(400);
+                        }
+                    } else {
+                        this.skipped++;
+                        this.log(`&nbsp;&nbsp;✗ Skipped (negative)`, 'skipped');
+                        await this.sleep(400);
+                    }
+                    
+                    this.updateStats();
+                }
+                
+                this.log(`<strong style="color: var(--redbull-red);">Done!</strong> Processed ${this.processed}/${this.totalIterations} (indent level: 4 - harder to read!)`, 'normal');
+                this.isRunning = false;
+            },
+            
+            async runFilterPattern() {
+                if (this.isRunning) return;
+                this.reset();
+                this.isRunning = true;
+                
+                document.getElementById('continue-code-display').innerHTML = `<span class="comment"># Continue = imperative filter</span>
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="builtin">range</span>(<span class="number">10</span>):
+    <span class="keyword">if</span> i <span class="operator">%</span> <span class="number">2</span> <span class="operator">==</span> <span class="number">0</span>: <span class="keyword">continue</span>
+    <span class="builtin">print</span>(i)  <span class="comment"># Only odds</span>`;
+                
+                document.getElementById('continue-indent').textContent = '1';
+                
+                for (let i = 0; i < 10; i++) {
+                    if (!this.isRunning) break;
+                    
+                    this.totalIterations++;
+                    this.log(`<strong>i=${i}</strong>: Check if even`, 'active');
+                    await this.sleep(300);
+                    
+                    if (i % 2 === 0) {
+                        this.skipped++;
+                        this.log(`&nbsp;&nbsp;Even → <strong style="color: var(--redbull-red);">CONTINUE</strong>`, 'skipped');
+                        await this.sleep(300);
+                    } else {
+                        this.processed++;
+                        this.log(`&nbsp;&nbsp;Odd → <strong style="color: var(--code-string);">print(${i})</strong>`, 'normal');
+                        await this.sleep(300);
+                    }
+                    
+                    this.updateStats();
+                }
+                
+                this.log(`<strong style="color: var(--mclaren-orange);">Filtered!</strong> Printed ${this.processed} odd numbers`, 'normal');
+                this.isRunning = false;
+            },
+            
+            sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        };
+    </script>
+</body>
+</html>
