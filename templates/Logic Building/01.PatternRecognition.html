@@ -1,0 +1,2782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rover - Pattern Recognition & Logic Building</title>
+    <style>
+        /* ==================== FONT IMPORT ==================== */
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+
+        /* ==================== GLASSMORPHISM THEME ==================== */
+        :root {
+            /* Pure Black Base */
+            --bg-primary: #000000;
+            --bg-secondary: #0a0a0a;
+            
+            /* Glass Effect Colors */
+            --glass-white: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-highlight: rgba(255, 255, 255, 0.15);
+            
+            /* McLaren Orange */
+            --mclaren-orange: #FF8000;
+            --mclaren-glow: rgba(255, 128, 0, 0.3);
+            --mclaren-light: #FFA040;
+            --mclaren-dark: #CC6600;
+            
+            /* RedBull Red */
+            --redbull-red: #DC0000;
+            --redbull-blue: #1E41FF;
+            --redbull-glow: rgba(220, 0, 0, 0.3);
+            --redbull-light: #FF3333;
+            
+            /* Meta Blue */
+            --meta-blue: #0081FB;
+            --meta-glow: rgba(0, 129, 251, 0.3);
+            --meta-light: #33A3FF;
+            --meta-dark: #0066CC;
+            
+            /* Text Colors - Ultra White */
+            --text-primary: #FFFFFF;
+            --text-secondary: #FFFFFF;
+            --text-muted: rgba(255, 255, 255, 0.9);
+            --text-dim: rgba(255, 255, 255, 0.7);
+            
+            /* Code Syntax */
+            --code-bg: rgba(20, 20, 20, 0.6);
+            --code-keyword: #FF8000;
+            --code-function: #0081FB;
+            --code-string: #3fb950;
+            --code-comment: rgba(255, 255, 255, 0.4);
+            --code-number: #DC0000;
+            --code-variable: #FFA040;
+            
+            /* Layout */
+            --container-width: 1100px;
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 2.5rem;
+            --spacing-2xl: 3rem;
+            
+            /* Border Radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            
+            /* Animations */
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            overflow-x: hidden;
+            width: 100%;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+            line-height: 1.7;
+            overflow-x: hidden;
+            position: relative;
+            font-size: 16px;
+            font-weight: 400;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            width: 100%;
+            max-width: 100vw;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+        }
+
+        code, pre {
+            font-family: 'Courier New', monospace;
+            font-weight: 400;
+        }
+
+        /* Progress Bar */
+        #reading-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--mclaren-orange), var(--mclaren-light));
+            box-shadow: 0 0 10px var(--mclaren-glow);
+            z-index: 9999;
+            transition: width 0.1s ease;
+        }
+
+        /* Glass Container */
+        .container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Navigation */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 0.75rem 0;
+            box-shadow: 
+                0 1px 3px rgba(0, 0, 0, 0.5),
+                0 1px 20px rgba(255, 128, 0, 0.1),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        nav::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent,
+                rgba(255, 128, 0, 0.3) 20%,
+                rgba(255, 128, 0, 0.5) 50%,
+                rgba(255, 128, 0, 0.3) 80%,
+                transparent
+            );
+            opacity: 0.8;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+            padding: 0 var(--spacing-lg);
+            max-width: var(--container-width);
+            margin: 0 auto;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--mclaren-orange);
+            text-decoration: none;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all var(--transition-fast);
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-link:hover {
+            color: var(--mclaren-orange);
+            text-shadow: 0 0 20px var(--mclaren-glow);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--mclaren-orange);
+            box-shadow: 0 0 10px var(--mclaren-glow);
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            z-index: 1002;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 25px;
+            height: 2px;
+            background: var(--mclaren-orange);
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(7px, 7px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .mobile-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: var(--spacing-2xl) 0;
+            text-align: center;
+            position: relative;
+            margin-bottom: var(--spacing-xl);
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--mclaren-orange);
+            background: linear-gradient(135deg, 
+                var(--mclaren-orange) 0%, 
+                var(--mclaren-light) 50%, 
+                var(--mclaren-orange) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @supports not (background-clip: text) {
+            .hero h1 {
+                color: var(--mclaren-orange) !important;
+                -webkit-text-fill-color: var(--mclaren-orange) !important;
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Section Styling */
+        .section {
+            margin-bottom: var(--spacing-2xl);
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-header {
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+        }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* Explanatory Blocks */
+        .practical-approach {
+            background: linear-gradient(135deg, 
+                rgba(0, 129, 251, 0.1), 
+                rgba(0, 129, 251, 0.05));
+            border: 1px solid var(--meta-blue);
+            border-left: 4px solid var(--meta-blue);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-md);
+            margin: var(--spacing-lg) 0;
+        }
+
+        .practical-approach h3 {
+            color: var(--meta-blue);
+            font-size: 1.2rem;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .practical-approach ul {
+            margin-left: var(--spacing-lg);
+            margin-top: var(--spacing-sm);
+        }
+
+        .practical-approach li {
+            margin: var(--spacing-xs) 0;
+            line-height: 1.8;
+        }
+
+        .theoretical-dive {
+            background: linear-gradient(135deg, 
+                rgba(255, 128, 0, 0.1), 
+                rgba(255, 128, 0, 0.05));
+            border: 1px solid var(--mclaren-orange);
+            border-left: 4px solid var(--mclaren-orange);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-md);
+            margin: var(--spacing-lg) 0;
+        }
+
+        .theoretical-dive h3 {
+            color: var(--mclaren-orange);
+            font-size: 1.2rem;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .theoretical-dive h4 {
+            color: var(--mclaren-light);
+            font-size: 1.05rem;
+            margin-top: var(--spacing-md);
+            margin-bottom: var(--spacing-xs);
+            font-weight: 600;
+        }
+
+        .theoretical-dive p {
+            margin: var(--spacing-sm) 0;
+            line-height: 1.8;
+        }
+
+        .theory-section {
+            background: rgba(0, 0, 0, 0.3);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-sm);
+            margin: var(--spacing-sm) 0;
+            border-left: 3px solid rgba(255, 128, 0, 0.5);
+        }
+
+        /* Content Blocks */
+        .content-block {
+            background: var(--glass-white);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-md) 0;
+        }
+
+        .content-block h3 {
+            font-size: 1.7rem;
+            margin-bottom: var(--spacing-md);
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .content-block h4 {
+            font-size: 1.35rem;
+            margin: var(--spacing-md) 0 var(--spacing-sm) 0;
+            color: var(--mclaren-light);
+            font-weight: 600;
+        }
+
+        .content-block p {
+            margin: var(--spacing-sm) 0;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .content-block ul, .content-block ol {
+            margin-left: var(--spacing-lg);
+            margin-top: var(--spacing-sm);
+        }
+
+        .content-block li {
+            margin: var(--spacing-xs) 0;
+            line-height: 1.8;
+        }
+
+        /* Code Block Styling - Enhanced */
+        .code-block {
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.8), rgba(10, 10, 10, 0.9));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            margin: var(--spacing-md) 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: all var(--transition-normal);
+        }
+
+        .code-block:hover {
+            border-color: rgba(255, 128, 0, 0.3);
+            box-shadow: 0 6px 20px rgba(255, 128, 0, 0.15);
+        }
+
+        .code-block pre {
+            margin: 0;
+            white-space: pre;
+        }
+
+        .code-block code {
+            color: var(--text-primary);
+        }
+
+        /* Syntax Highlighting */
+        .keyword { color: var(--code-keyword); font-weight: 600; }
+        .function { color: var(--code-function); font-weight: 600; }
+        .string { color: var(--code-string); }
+        .comment { color: var(--code-comment); font-style: italic; }
+        .number { color: var(--code-number); font-weight: 600; }
+        .variable { color: var(--code-variable); }
+        .operator { color: var(--text-primary); }
+        .output { color: #3fb950; }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: transparent;
+            border: 1px solid rgba(255, 128, 0, 0.4);
+            border-radius: 6px;
+            padding: 0.4rem 0.9rem;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--mclaren-orange);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 128, 0, 0.1);
+            border-color: var(--mclaren-orange);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(255, 128, 0, 0.2);
+        }
+
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Feynman-Style Deep Dive */
+        .feynman-dive {
+            background: linear-gradient(135deg, 
+                rgba(255, 128, 0, 0.03), 
+                rgba(220, 0, 0, 0.03));
+            border: 1px solid rgba(255, 128, 0, 0.3);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-lg) 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feynman-dive h3 {
+            color: var(--mclaren-orange);
+            font-size: 1.8rem;
+            margin-bottom: var(--spacing-lg);
+            text-shadow: 0 0 20px var(--mclaren-glow);
+        }
+
+        .feynman-dive h4 {
+            color: var(--mclaren-light);
+            font-size: 1.3rem;
+            margin-top: var(--spacing-lg);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .feynman-intro {
+            font-size: 1.1rem;
+            font-style: italic;
+            color: var(--text-muted);
+            margin-bottom: var(--spacing-lg);
+            padding: var(--spacing-md);
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid var(--mclaren-orange);
+            border-radius: var(--radius-sm);
+        }
+
+        /* Table of Contents */
+        .toc {
+            background: var(--glass-white);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-xl) 0;
+        }
+
+        .toc h2 {
+            font-size: 1.5rem;
+            margin-bottom: var(--spacing-md);
+            color: var(--mclaren-orange);
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .toc li {
+            margin: var(--spacing-sm) 0;
+            padding-left: var(--spacing-md);
+            border-left: 2px solid transparent;
+            transition: all var(--transition-fast);
+        }
+
+        .toc li:hover {
+            border-left-color: var(--mclaren-orange);
+            padding-left: calc(var(--spacing-md) + 5px);
+        }
+
+        .toc a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+
+        .toc a:hover {
+            color: var(--mclaren-orange);
+        }
+
+        /* Collapsible Sections */
+        .collapsible-section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            margin: 1rem 0;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .collapsible-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+
+        .collapsible-header:hover {
+            background: rgba(255, 128, 0, 0.05);
+        }
+
+        .collapsible-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .collapsible-arrow {
+            transition: transform 0.3s ease;
+            color: var(--mclaren-orange);
+        }
+
+        .collapsible-section.open .collapsible-arrow {
+            transform: rotate(180deg);
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .collapsible-section.open .collapsible-content {
+            max-height: 10000px;
+        }
+
+        .collapsible-inner {
+            padding: 0 1.5rem 1.5rem;
+        }
+
+        /* Animated List */
+        .animated-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .animated-list-item {
+            padding: 0.75rem 1rem;
+            margin: 0.5rem 0;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .animated-list-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background: var(--mclaren-orange);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .animated-list-item:hover {
+            background: rgba(255, 128, 0, 0.08);
+            border-color: rgba(255, 128, 0, 0.2);
+            transform: translateX(8px);
+        }
+
+        .animated-list-item:hover::before {
+            transform: scaleY(1);
+        }
+
+        /* Scroll to Top Button */
+        .scroll-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: var(--mclaren-orange);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: all var(--transition-normal);
+            z-index: 998;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(255, 128, 0, 0.4);
+        }
+
+        .scroll-to-top.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .scroll-to-top:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 6px 25px rgba(255, 128, 0, 0.6);
+        }
+
+        /* Interactive Demo */
+        .interactive-demo {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .interactive-demo:hover {
+            border-color: rgba(255, 128, 0, 0.2);
+            box-shadow: 0 4px 20px rgba(255, 128, 0, 0.05);
+        }
+
+        .interactive-demo h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--mclaren-orange);
+            font-weight: 600;
+        }
+
+        .demo-desc {
+            color: var(--text-dim);
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .demo-controls {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+        }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            font-size: 13px;
+            font-weight: 600;
+            background: transparent;
+            border: 1px solid rgba(255, 128, 0, 0.3);
+            color: var(--mclaren-orange);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        .btn:hover {
+            background: rgba(255, 128, 0, 0.1);
+            border-color: var(--mclaren-orange);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 128, 0, 0.15);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .playground-canvas {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            padding: 1.25rem;
+            min-height: 200px;
+        }
+
+        /* Array Element Visualization */
+        .array-element {
+            min-width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--meta-blue), var(--meta-dark));
+            border: 2px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+            transition: all var(--transition-normal);
+            position: relative;
+        }
+
+        .array-element.highlight {
+            background: linear-gradient(135deg, var(--mclaren-orange), var(--mclaren-dark));
+            transform: scale(1.15);
+            box-shadow: 0 10px 30px var(--mclaren-glow);
+            z-index: 10;
+        }
+
+        .array-element.found {
+            background: linear-gradient(135deg, #3fb950, #2ea043);
+            animation: bounce 0.5s ease;
+        }
+
+        .array-element.duplicate {
+            background: linear-gradient(135deg, var(--redbull-red), #AA0000);
+            opacity: 0.5;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .array-index {
+            position: absolute;
+            top: -25px;
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .pointer-label {
+            position: absolute;
+            bottom: -25px;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .pointer-read {
+            background: var(--meta-blue);
+            color: white;
+        }
+
+        .pointer-write {
+            background: var(--mclaren-orange);
+            color: black;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 0 1.5rem;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                overflow-x: hidden;
+                width: 100%;
+                max-width: 100vw;
+            }
+
+            nav {
+                padding: 0.75rem 0;
+                width: 100%;
+            }
+
+            .nav-container {
+                position: relative;
+                justify-content: center;
+                padding: 0 var(--spacing-md);
+                width: 100%;
+            }
+
+            .nav-logo {
+                font-size: 1.25rem;
+                z-index: 1002;
+            }
+
+            .hamburger {
+                display: flex;
+                position: absolute;
+                right: var(--spacing-md);
+                top: 50%;
+                transform: translateY(-50%);
+                z-index: 1002;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                height: 100vh;
+                width: 85%;
+                max-width: 320px;
+                background: rgba(0, 0, 0, 0.98);
+                backdrop-filter: blur(24px);
+                -webkit-backdrop-filter: blur(24px);
+                flex-direction: column;
+                padding: 5rem 2rem 2rem;
+                gap: 0;
+                transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                            opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                            visibility 0s linear 0.4s;
+                border-left: 1px solid var(--glass-border);
+                z-index: 1001;
+                box-shadow: -4px 0 24px rgba(0, 0, 0, 0.5);
+                overflow-y: auto;
+                visibility: hidden;
+                opacity: 0;
+                pointer-events: none;
+            }
+
+            .nav-links.active {
+                right: 0;
+                visibility: visible;
+                opacity: 1;
+                pointer-events: all;
+                transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                            opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                            visibility 0s linear 0s;
+            }
+
+            .nav-link {
+                font-size: 15px;
+                padding: 1rem 1.25rem;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                width: 100%;
+                border-radius: 0;
+            }
+
+            .nav-link:hover {
+                background: rgba(255, 128, 0, 0.1);
+                padding-left: 1.5rem;
+            }
+
+            .nav-link.active {
+                background: rgba(255, 128, 0, 0.15);
+                border-left: 3px solid var(--mclaren-orange);
+            }
+
+            .nav-link.active::after {
+                display: none;
+            }
+
+            .hero {
+                padding: var(--spacing-xl) 0;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+                line-height: 1.2;
+            }
+
+            .hero p {
+                font-size: 1rem;
+                padding: 0 var(--spacing-sm);
+            }
+
+            .container {
+                padding: 0 var(--spacing-md);
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+
+            .section {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+                word-wrap: break-word;
+            }
+
+            .content-block {
+                padding: var(--spacing-md);
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+
+            .code-block {
+                max-width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                font-size: 12px;
+                padding: var(--spacing-sm);
+            }
+
+            .code-block pre {
+                max-width: 100%;
+                overflow-x: auto;
+                white-space: pre;
+            }
+
+            .practical-approach,
+            .theoretical-dive,
+            .feynman-dive {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+                padding: var(--spacing-sm);
+            }
+
+            .theory-section {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .toc {
+                width: 100%;
+                max-width: 100%;
+                padding: var(--spacing-md);
+            }
+
+            .collapsible-section {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 var(--spacing-sm);
+            }
+
+            .hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .hero p {
+                font-size: 0.9375rem;
+            }
+
+            .section-title {
+                font-size: 1.25rem;
+            }
+
+            .code-block {
+                font-size: 11px;
+                padding: 0.625rem;
+            }
+
+            .copy-btn {
+                padding: 0.3rem 0.625rem;
+                font-size: 9px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Reading Progress Bar -->
+    <div id="reading-progress"></div>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="/" class="nav-logo">ROVER</a>
+            
+            <div class="nav-links" id="navLinks">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/dashboard" class="nav-link">Dashboard</a>
+                <a href="#patterns" class="nav-link">Patterns</a>
+                <a href="#training" class="nav-link">Training</a>
+                <a href="#optimization" class="nav-link">Optimization</a>
+            </div>
+
+            <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="container">
+            <h1>Pattern Recognition & Logic Building</h1>
+            <p>Master the art of algorithmic thinking through ROVER's comprehensive pattern recognition training protocol. Learn to identify, understand, and apply the 5 universal problem-solving patterns that unlock 95% of DSA problems.</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+
+        <!-- Table of Contents -->
+        <div class="collapsible-section open" id="toc-section">
+            <div class="collapsible-header" onclick="toggleCollapsible('toc-section')">
+                <div class="collapsible-title">
+                    <span>Table of Contents</span>
+                </div>
+                <div class="collapsible-arrow">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+            </div>
+            <div class="collapsible-content">
+                <div class="collapsible-inner">
+                    <ul class="animated-list">
+                        <li class="animated-list-item"><a href="#patterns" style="color: inherit; text-decoration: none;">The 5 Universal Problem-Solving Patterns</a></li>
+                        <li class="animated-list-item"><a href="#training" style="color: inherit; text-decoration: none;">Pattern Recognition Training</a></li>
+                        <li class="animated-list-item"><a href="#complexity" style="color: inherit; text-decoration: none;">Complexity Analysis Logic Building</a></li>
+                        <li class="animated-list-item"><a href="#optimization" style="color: inherit; text-decoration: none;">The Art of Optimization Thinking</a></li>
+                        <li class="animated-list-item"><a href="#mental-models" style="color: inherit; text-decoration: none;">Mental Models & Problem Decomposition</a></li>
+                        <li class="animated-list-item"><a href="#synthesis" style="color: inherit; text-decoration: none;">Final Synthesis</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: THE 5 UNIVERSAL PROBLEM-SOLVING PATTERNS -->
+        <article id="patterns" class="section">
+            <div class="section-header">
+                <h2 class="section-title">[MINUTE 0-10] THE 5 UNIVERSAL PROBLEM-SOLVING PATTERNS</h2>
+            </div>
+
+            <!-- Practical approach -->
+            <div class="practical-approach">
+                <h3>Step-by-step practical approach</h3>
+                <ul>
+                    <li><strong>Start with understanding:</strong> Read each pattern's "Core Idea" first - this is your mental anchor for the entire pattern</li>
+                    <li><strong>Study the example:</strong> Don't just read it - trace through it step by step with pen and paper</li>
+                    <li><strong>Identify the transformation:</strong> Notice how each pattern transforms a problem from one complexity class to another (e.g., O(n²) → O(n))</li>
+                    <li><strong>Code it yourself:</strong> Implement each pattern example in your IDE to build muscle memory</li>
+                    <li><strong>Find similar problems:</strong> Look for LeetCode/HackerRank problems that match each pattern</li>
+                    <li><strong>Create a pattern library:</strong> Document these 5 patterns in your own words - this becomes your problem-solving toolkit</li>
+                </ul>
+            </div>
+
+            <!-- Theoretical dive -->
+            <div class="theoretical-dive">
+                <h3>Deep theoretical dive</h3>
+                
+                <div class="theory-section">
+                    <h4>Pattern Recognition as Algorithmic Abstraction</h4>
+                    <p>
+                        Pattern recognition in algorithms is fundamentally about identifying structural similarities between problems. When you recognize that "find pair with sum = target" maps to the Counter/Tracker pattern, you're applying abstract algebra - you've identified an isomorphism between the problem structure and a known solution template. This is why computer scientists study discrete mathematics: patterns are mathematical structures (graphs, trees, sequences) dressed up as coding problems.
+                    </p>
+                </div>
+
+                <div class="theory-section">
+                    <h4>The Space-Time Tradeoff Continuum</h4>
+                    <p>
+                        All 5 patterns live on the space-time tradeoff spectrum. Counter/Tracker explicitly trades O(n) space for O(1) lookups. Two Pointers achieves O(1) space but requires sorted data (O(n log n) preprocessing). Divide & Conquer uses O(log n) stack space for O(n log n) time. Understanding these tradeoffs isn't just about memorizing complexities - it's about recognizing that every algorithmic decision sacrifices one resource to optimize another.
+                    </p>
+                </div>
+
+                <div class="theory-section">
+                    <h4>Pattern Composition & Hybrid Algorithms</h4>
+                    <p>
+                        Real-world problems rarely map cleanly to a single pattern. The most powerful algorithms combine patterns: sliding window + hash map for substring problems, divide & conquer + memoization for dynamic programming, two pointers + greedy for interval scheduling. Mastery isn't just recognizing individual patterns - it's seeing how they can be composed to solve complex problems that no single pattern handles alone.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Pattern 1: Counter/Tracker -->
+            <div class="content-block">
+                <h3>PATTERN 1: THE COUNTER/TRACKER - THE MEMORY FOUNDATION</h3>
+                <p><strong>Core Idea:</strong> Keep track of what you've seen - this is the foundation of all memory-efficient algorithms.</p>
+                
+                <div class="feynman-dive">
+                    <h3>The Philosophy Behind Tracking</h3>
+                    <p class="feynman-intro">
+                        Imagine your brain as you read a book - you naturally remember characters, plot points, and themes you've encountered. The Counter/Tracker pattern mimics this human cognitive ability in code. Instead of repeatedly scanning through data (expensive), we maintain a "memory" of what we've seen, allowing instant recall.
+                    </p>
+                    
+                    <h4>Key Insight: The Fundamental Space-Time Tradeoff</h4>
+                    <p>
+                        We sacrifice a small amount of space (O(n) in worst case) to gain massive time savings (from O(n²) to O(n)). This is the fundamental space-time tradeoff that powers modern computing. Hash maps are the data structure that makes this magic happen - they give us O(1) average-case lookup by trading memory for speed.
+                    </p>
+                    
+                    <h4>Why This Pattern Appears Everywhere</h4>
+                    <p>
+                        This pattern appears in: detecting duplicate entries in databases, finding cycles in linked lists, implementing caching systems, tracking visited nodes in graphs, counting character frequencies in strings, and building lookup tables. Master this pattern, and you've unlocked solutions to hundreds of real-world problems.
+                    </p>
+                </div>
+
+                <p><strong>Example: Find first repeating character in "programming"</strong></p>
+                
+                <p>Step-by-step execution:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>Input: "programming"
+Goal: Find first character that repeats
+
+Step 1: 'p' → seen = {'p': True}
+Step 2: 'r' → seen = {'p': True, 'r': True}  
+Step 3: 'o' → seen = {'p': True, 'r': True, 'o': True}
+Step 4: 'g' → seen = {'p': True, 'r': True, 'o': True, 'g': True}
+Step 5: 'r' → 'r' is already in seen! Return 'r'
+
+The insight: We're trading O(n) space to get O(1) lookup time</code></pre>
+                </div>
+
+                <p><strong>When to use this pattern:</strong></p>
+                <ul>
+                    <li>Finding duplicates (like in our example)</li>
+                    <li>Counting occurrences of elements</li>
+                    <li>Checking if something exists in a collection</li>
+                    <li>Tracking visited nodes in graphs</li>
+                </ul>
+
+                <p><strong>The deeper logic:</strong> Hash maps give us O(1) average time complexity for lookups, which transforms many O(n²) problems into O(n) problems. This is the space-time tradeoff in action.</p>
+            </div>
+
+            <!-- Pattern 2: Two Pointers -->
+            <div class="content-block">
+                <h3>PATTERN 2: THE TWO POINTERS - THE NAVIGATION ART</h3>
+                <p><strong>Core Idea:</strong> Process from both ends or maintain a window - the art of intelligent navigation.</p>
+                
+                <div class="feynman-dive">
+                    <h3>The Dance of Two Pointers</h3>
+                    <p class="feynman-intro">
+                        Think of two pointers as two dancers on opposite sides of a stage, moving in perfect choreography. They can approach each other (like checking palindromes), move together at different speeds (like detecting cycles with fast/slow pointers), or slide as a window maintaining a specific size or condition.
+                    </p>
+                    
+                    <h4>The Power of Eliminating Nested Loops</h4>
+                    <p>
+                        By processing data from multiple positions simultaneously, we eliminate the need for nested loops. What would take O(n²) with brute force becomes O(n) with two pointers. This is algorithmic elegance at its finest - we're using the problem's structure (sorted array, bidirectional search) to avoid redundant work.
+                    </p>
+                    
+                    <h4>Real-World Analogy</h4>
+                    <p>
+                        Imagine searching for a word in a sorted dictionary. Instead of starting from the beginning, you open it in the middle, then adjust left or right based on alphabetical order. Two pointers work the same way - smart navigation beats blind iteration every time. This is binary search thinking applied to array manipulation.
+                    </p>
+                </div>
+
+                <p><strong>Example: Check if "racecar" is a palindrome</strong></p>
+                
+                <p>Step-by-step execution:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>String: "racecar"
+        ↑     ↑
+       left  right
+
+Step 1: left=0, right=6 → 'r' == 'r' → Move inward
+Step 2: left=1, right=5 → 'a' == 'a' → Move inward  
+Step 3: left=2, right=4 → 'c' == 'c' → Move inward
+Step 4: left=3, right=3 → left >= right → Stop, it's a palindrome!
+
+The insight: Instead of checking all pairs O(n²), we only check n/2 pairs O(n)</code></pre>
+                </div>
+
+                <p><strong>Three variations:</strong></p>
+                <ol>
+                    <li><strong>Opposite Ends:</strong> Start from both ends, move toward center (like palindrome checking)</li>
+                    <li><strong>Same End (Fast/Slow):</strong> Both start at beginning, move at different speeds (like cycle detection)</li>
+                    <li><strong>Sliding Window:</strong> Maintain a range, slide it across data (like fixed window problems)</li>
+                </ol>
+
+                <p><strong>The deeper logic:</strong> We eliminate redundant comparisons by using the structure of the problem. In palindromes, we only need to check symmetric positions.</p>
+            </div>
+
+            <!-- Pattern 3: Divide & Conquer -->
+            <div class="content-block">
+                <h3>PATTERN 3: THE DIVIDE & CONQUER - THE RECURSIVE MASTERY</h3>
+                <p><strong>Core Idea:</strong> Break big problem into smaller identical problems - the recursive master's approach.</p>
+                
+                <div class="feynman-dive">
+                    <h3>The Recursion Tree Philosophy</h3>
+                    <p class="feynman-intro">
+                        Divide & Conquer is how nature solves complex problems. A tree doesn't grow all at once - it splits into branches, which split into smaller branches. Each branch follows the same growth pattern (recursion), creating exponential complexity from simple rules.
+                    </p>
+                    
+                    <h4>The Magic of Logarithms</h4>
+                    <p>
+                        By halving the problem space at each step, we achieve O(log n) complexity. This is why binary search beats linear search - searching 1 billion items takes only 30 comparisons! Each division doubles your efficiency. This logarithmic behavior is why divide & conquer algorithms scale so well to massive datasets.
+                    </p>
+                    
+                    <h4>Three Sacred Steps</h4>
+                    <p><strong>DIVIDE:</strong> Split the problem into independent subproblems</p>
+                    <p><strong>CONQUER:</strong> Solve each subproblem recursively (or directly if small enough)</p>
+                    <p><strong>COMBINE:</strong> Merge the solutions into the final answer</p>
+                    
+                    <h4>Real-World Applications</h4>
+                    <p>
+                        Merge sort powers Google's distributed sorting, quicksort is the default in most programming languages, and the Fast Fourier Transform (FFT) using divide & conquer revolutionized signal processing - it's why MP3s exist! MapReduce, the foundation of big data processing, is divide & conquer applied to distributed computing.
+                    </p>
+                </div>
+
+                <p><strong>Example: Find maximum in [3, 7, 2, 9, 1] using divide and conquer</strong></p>
+                
+                <p>Step-by-step execution:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>Original: [3, 7, 2, 9, 1]
+Divide: [3, 7, 2] and [9, 1]
+Divide: [3, 7] and [2], [9] and [1]
+Base cases: [3], [7], [2], [9], [1]
+Combine: max(3,7)=7, max(7,2)=7, max(9,1)=9, max(7,9)=9
+
+The recursion tree:
+                [3,7,2,9,1]
+                /         \
+           [3,7,2]       [9,1]
+           /     \       /    \
+        [3,7]    [2]   [9]   [1]
+        /   \     |     |     |
+      [3]   [7]   2     9     1
+       |     |
+       3     7</code></pre>
+                </div>
+
+                <p><strong>When to use:</strong></p>
+                <ul>
+                    <li>Sorting algorithms (merge sort, quick sort)</li>
+                    <li>Searching in sorted data (binary search)</li>
+                    <li>Tree problems (traversals, operations)</li>
+                    <li>Large number multiplication (Karatsuba algorithm)</li>
+                </ul>
+
+                <p><strong>The deeper logic:</strong> We break the problem into identical subproblems, solve them recursively, then combine results. This often gives us O(n log n) complexity, which is much better than O(n²).</p>
+            </div>
+
+            <!-- Pattern 4: Builder/Accumulator -->
+            <div class="content-block">
+                <h3>PATTERN 4: THE BUILDER/ACCUMULATOR - THE INCREMENTAL CONSTRUCTION</h3>
+                <p><strong>Core Idea:</strong> Build result step by step - the iterative approach to complex construction.</p>
+                
+                <div class="feynman-dive">
+                    <h3>The Art of Incremental Growth</h3>
+                    <p class="feynman-intro">
+                        Think of building a snowman: you start with a small snowball and roll it, gradually accumulating more snow. Each rotation adds to what you already have. The Builder/Accumulator pattern works the same way - start with a base case (empty result), then incrementally add to it.
+                    </p>
+                    
+                    <h4>State Evolution</h4>
+                    <p>
+                        Unlike recursion which breaks down, or loops which iterate, the accumulator pattern evolves state. Each iteration transforms the current state into the next state, like cellular automata or dynamic programming. You're not just processing - you're growing the solution.
+                    </p>
+                    
+                    <h4>When to Choose This Pattern</h4>
+                    <p>
+                        Use this for: generating combinations, permutations, or power sets; building strings character by character; accumulating results from stream processing; dynamic programming where each state builds on previous states.
+                    </p>
+                    
+                    <h4>Real-World Applications</h4>
+                    <p>
+                        Pascal's triangle for binomial coefficients, Fibonacci with memoization, building syntax trees in compilers, and React's state updates - all use incremental accumulation to construct complex results from simple rules.
+                    </p>
+                </div>
+
+                <p><strong>Example: Generate all subsets of [1, 2, 3]</strong></p>
+                
+                <p>Step-by-step execution:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>Start: [[]]
+Add 1: [[]] + [[1]] → [[], [1]]
+Add 2: [[], [1]] + [[2], [1,2]] → [[], [1], [2], [1,2]]
+Add 3: [[], [1], [2], [1,2]] + [[3], [1,3], [2,3], [1,2,3]] 
+       → [[], [1], [2], [1,2], [3], [1,3], [2,3], [1,2,3]]
+
+The insight: Each new element doubles the number of subsets</code></pre>
+                </div>
+
+                <p><strong>When to use:</strong></p>
+                <ul>
+                    <li>Generating combinations/permutations</li>
+                    <li>Building strings/arrays incrementally</li>
+                    <li>Dynamic programming approaches</li>
+                    <li>Path construction in graphs</li>
+                </ul>
+
+                <p><strong>The deeper logic:</strong> We build complex structures by adding one element at a time to all existing structures. This is fundamental to many algorithmic approaches.</p>
+            </div>
+
+            <!-- Pattern 5: Optimizer -->
+            <div class="content-block">
+                <h3>PATTERN 5: THE OPTIMIZER (GREEDY/DYNAMIC) - THE INTELLIGENT DECISION MAKING</h3>
+                <p><strong>Core Idea:</strong> Make optimal choices at each step - the art of intelligent decision making.</p>
+                
+                <div class="feynman-dive">
+                    <h3>Greedy vs Dynamic Programming: When to Trust Your Instincts</h3>
+                    <p class="feynman-intro">
+                        Greedy algorithms make the locally optimal choice at each step, hoping it leads to a global optimum. Like climbing a mountain by always going upward - works if there's only one peak, fails if there are local maxima.
+                    </p>
+                    
+                    <h4>When Greedy Works</h4>
+                    <p><strong>Optimal Substructure:</strong> Global optimum contains optimal solutions to subproblems</p>
+                    <p><strong>Greedy Choice Property:</strong> Local optimal choices lead to global optimum</p>
+                    <p><strong>Examples:</strong> Dijkstra's shortest path, Huffman coding, activity selection, fractional knapsack</p>
+                    
+                    <h4>When Greedy Fails</h4>
+                    <p>
+                        If your problem has overlapping subproblems or making a greedy choice now blocks a better choice later, you need Dynamic Programming (DP). DP explores all possibilities systematically, memoizing results to avoid recomputation.
+                    </p>
+                    
+                    <h4>The Trade-off</h4>
+                    <p>
+                        Greedy is fast (O(n log n) typical) but doesn't always work. DP is slower (O(n²) or O(n³) common) but guarantees optimal solutions when greedy fails. The key skill? Recognizing which paradigm fits your problem.
+                    </p>
+                    
+                    <h4>Real-World Applications</h4>
+                    <p>
+                        GPS routing (Dijkstra's), file compression (Huffman), job scheduling (greedy intervals), video encoding (DP for optimal bit allocation), and stock trading strategies (DP for max profit with multiple transactions).
+                    </p>
+                </div>
+
+                <p><strong>Example: Coin change with [25, 10, 5, 1] coins for amount 67</strong></p>
+                
+                <p>Step-by-step execution:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>Amount: 67
+Step 1: 67 >= 25 → Take 25, amount = 42, result = [25]
+Step 2: 42 >= 25 → Take 25, amount = 17, result = [25, 25]
+Step 3: 17 >= 10 → Take 10, amount = 7, result = [25, 25, 10]
+Step 4: 7 >= 5 → Take 5, amount = 2, result = [25, 25, 10, 5]
+Step 5: 2 >= 1 → Take 1, amount = 1, result = [25, 25, 10, 5, 1]
+Step 6: 1 >= 1 → Take 1, amount = 0, result = [25, 25, 10, 5, 1, 1]
+
+The insight: Greedy works because our coin system is canonical</code></pre>
+                </div>
+
+                <p><strong>When to use:</strong></p>
+                <ul>
+                    <li>Optimization problems (minimize/maximize)</li>
+                    <li>Scheduling problems</li>
+                    <li>Path finding (when greedy choice property holds)</li>
+                    <li>Resource allocation problems</li>
+                </ul>
+
+                <p><strong>The deeper logic:</strong> We make locally optimal choices hoping for global optimality. This works when the problem has optimal substructure and greedy choice property.</p>
+            </div>
+
+        </article>
+
+        <!-- Section 2: PATTERN RECOGNITION TRAINING -->
+        <article id="training" class="section">
+            <div class="section-header">
+                <h2 class="section-title">[MINUTE 10-25] PATTERN RECOGNITION TRAINING - THE MASTERY DRILL</h2>
+            </div>
+
+            <!-- Practical approach -->
+            <div class="practical-approach">
+                <h3>Step-by-step practical approach</h3>
+                <ul>
+                    <li><strong>Problem-first thinking:</strong> Before looking at solutions, spend 2 minutes identifying which pattern the problem might use</li>
+                    <li><strong>Pattern matching drill:</strong> For each problem, ask "What am I looking for?" (pairs → hash map, sorted manipulation → two pointers, etc.)</li>
+                    <li><strong>Complexity analysis:</strong> Always analyze the naive approach first, then identify how the pattern optimizes it</li>
+                    <li><strong>Code both versions:</strong> Implement naive O(n²) and optimized O(n) solutions side by side to see the difference</li>
+                    <li><strong>Test edge cases:</strong> Empty arrays, single elements, all duplicates - patterns should handle these gracefully</li>
+                    <li><strong>Time yourself:</strong> Can you recognize the pattern in under 30 seconds? This is the speed you need in interviews</li>
+                </ul>
+            </div>
+
+            <!-- Theoretical dive -->
+            <div class="theoretical-dive">
+                <h3>Deep theoretical dive</h3>
+                
+                <div class="theory-section">
+                    <h4>Problem Transformation & Algorithmic Thinking</h4>
+                    <p>
+                        Most optimization comes not from clever coding, but from reframing the question. Instead of asking "Does any pair sum to target?", ask "For each number x, does (target - x) exist?" This transforms a nested loop problem into a lookup problem. This cognitive shift from brute-force enumeration to intelligent search is what separates novice from expert programmers.
+                    </p>
+                </div>
+
+                <div class="theory-section">
+                    <h4>Hash Maps: The Universal Optimizer</h4>
+                    <p>
+                        Hash maps provide O(1) average-case lookup by using hash functions to distribute data across buckets. When you need to check "have I seen this before?", a hash map turns an O(n) search into O(1). This single data structure choice is the difference between O(n²) and O(n) for countless problems. Understanding when to reach for a hash map is perhaps the most valuable pattern recognition skill in competitive programming.
+                    </p>
+                </div>
+
+                <div class="theory-section">
+                    <h4>Pattern Generalization Principle</h4>
+                    <p>
+                        "Find a pair/triplet that satisfies condition" problems almost always benefit from hash maps or two pointers. You're looking for relationships between elements, not processing elements independently. Once you see this meta-pattern, you can solve dozens of LeetCode problems using the same fundamental approach with minor variations.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Exercise 1: Two Sum Problem -->
+            <div class="content-block">
+                <h3>Exercise 1: Pattern Identification - The Recognition Game</h3>
+                
+                <p><strong>Problem A: "Find if array has two numbers that sum to target"</strong></p>
+                
+                <p>The naive approach (O(n²)):</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="keyword">def</span> <span class="function">two_sum_naive</span>(<span class="variable">arr</span>, <span class="variable">target</span>):
+    <span class="keyword">for</span> <span class="variable">i</span> <span class="keyword">in</span> <span class="function">range</span>(<span class="function">len</span>(<span class="variable">arr</span>)):
+        <span class="keyword">for</span> <span class="variable">j</span> <span class="keyword">in</span> <span class="function">range</span>(<span class="variable">i</span><span class="operator">+</span><span class="number">1</span>, <span class="function">len</span>(<span class="variable">arr</span>)):
+            <span class="keyword">if</span> <span class="variable">arr</span>[<span class="variable">i</span>] <span class="operator">+</span> <span class="variable">arr</span>[<span class="variable">j</span>] <span class="operator">==</span> <span class="variable">target</span>:
+                <span class="keyword">return</span> [<span class="variable">i</span>, <span class="variable">j</span>]
+    <span class="keyword">return</span> []</code></pre>
+                </div>
+                
+                <p>The ROVER Master approach (O(n)):</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="keyword">def</span> <span class="function">two_sum_optimal</span>(<span class="variable">arr</span>, <span class="variable">target</span>):
+    <span class="variable">seen</span> <span class="operator">=</span> {}   <span class="comment"># Track what we've seen</span>
+    <span class="keyword">for</span> <span class="variable">i</span>, <span class="variable">num</span> <span class="keyword">in</span> <span class="function">enumerate</span>(<span class="variable">arr</span>):
+        <span class="variable">complement</span> <span class="operator">=</span> <span class="variable">target</span> <span class="operator">-</span> <span class="variable">num</span>
+        <span class="keyword">if</span> <span class="variable">complement</span> <span class="keyword">in</span> <span class="variable">seen</span>:
+            <span class="keyword">return</span> [<span class="variable">seen</span>[<span class="variable">complement</span>], <span class="variable">i</span>]
+        <span class="variable">seen</span>[<span class="variable">num</span>] <span class="operator">=</span> <span class="variable">i</span>
+    <span class="keyword">return</span> []</code></pre>
+                </div>
+                
+                <p>Step-by-step simulation with arr=[2,7,11,15], target=9:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>i=0, num=2: complement=7, not in seen, seen={2:0}
+i=1, num=7: complement=2, found in seen at index 0! Return [0,1]
+
+Why this is better:
+Naive: Check n×(n-1)/2 pairs = O(n²)
+Optimal: Single pass with O(1) lookups = O(n)</code></pre>
+                </div>
+
+                <p><strong>The deeper insight:</strong> We transform the problem from "find two numbers that sum to target" to "for each number, check if its complement exists." This is the power of problem transformation.</p>
+            </div>
+
+            <!-- Interactive Demo: Two Sum Visualizer -->
+            <div class="interactive-demo">
+                <h3>Interactive: Two Sum Visualizer</h3>
+                <p class="demo-desc">Watch how the hash map approach finds the solution in one pass. Enter your own array and target!</p>
+                
+                <div class="demo-controls">
+                    <label style="color: var(--text-muted);">Array (comma-separated):</label>
+                    <input type="text" id="twosum-array" value="2,7,11,15" 
+                           style="padding: 0.5rem; background: var(--code-bg); border: 1px solid var(--glass-border); color: white; border-radius: 6px; width: 200px;">
+                    <label style="color: var(--text-muted);">Target:</label>
+                    <input type="number" id="twosum-target" value="9" 
+                           style="width: 80px; padding: 0.5rem; background: var(--code-bg); border: 1px solid var(--glass-border); color: white; border-radius: 6px;">
+                    <button class="btn" onclick="twoSumDemo.solve()">Find Pair</button>
+                    <button class="btn" onclick="twoSumDemo.reset()">Reset</button>
+                </div>
+                
+                <div class="playground-canvas">
+                    <div id="twosum-visual" style="display: flex; gap: 8px; padding: var(--spacing-md); flex-wrap: wrap; justify-content: center;">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 8px;">
+                        <div style="color: var(--text-muted);">Hash Map: <span id="twosum-hashmap" style="color: var(--meta-blue); font-family: 'Courier New', monospace;">{}</span></div>
+                        <div style="color: var(--text-muted); margin-top: 10px;">Current Step: <span id="twosum-step" style="color: var(--mclaren-orange);">-</span></div>
+                        <div style="color: var(--text-muted); margin-top: 10px;">Result: <span id="twosum-result" style="color: #3fb950; font-weight: 600;">-</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exercise 1B: Remove Duplicates -->
+            <div class="content-block">
+                <p><strong>Problem B: "Remove duplicates from sorted array in-place"</strong></p>
+                
+                <p>The pattern recognition: Array is SORTED + in-place modification → Perfect for TWO POINTERS pattern!</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="keyword">def</span> <span class="function">remove_duplicates</span>(<span class="variable">arr</span>):
+    <span class="keyword">if</span> <span class="keyword">not</span> <span class="variable">arr</span>:
+        <span class="keyword">return</span> <span class="number">0</span>
+    
+    <span class="variable">write_pos</span> <span class="operator">=</span> <span class="number">1</span>   <span class="comment"># Where to write next unique element</span>
+    
+    <span class="keyword">for</span> <span class="variable">read_pos</span> <span class="keyword">in</span> <span class="function">range</span>(<span class="number">1</span>, <span class="function">len</span>(<span class="variable">arr</span>)):
+        <span class="keyword">if</span> <span class="variable">arr</span>[<span class="variable">read_pos</span>] <span class="operator">!=</span> <span class="variable">arr</span>[<span class="variable">read_pos</span> <span class="operator">-</span> <span class="number">1</span>]:
+            <span class="variable">arr</span>[<span class="variable">write_pos</span>] <span class="operator">=</span> <span class="variable">arr</span>[<span class="variable">read_pos</span>]
+            <span class="variable">write_pos</span> <span class="operator">+=</span> <span class="number">1</span>
+    
+    <span class="keyword">return</span> <span class="variable">write_pos</span></code></pre>
+                </div>
+                
+                <p>Step-by-step simulation with arr=[1,1,2,2,3,4,4]:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>read=1: arr[1]==arr[0] (1==1), skip
+read=2: arr[2]!=arr[1] (2!=1), write 2 at pos 1, write_pos=2
+read=3: arr[3]==arr[2] (2==2), skip
+read=4: arr[4]!=arr[3] (3!=2), write 3 at pos 2, write_pos=3
+read=5: arr[5]!=arr[4] (4!=3), write 4 at pos 3, write_pos=4
+read=6: arr[6]==arr[5] (4==4), skip
+Result: [1,2,3,4,,,], length=4
+
+The insight: Maintain two invariants - elements before write_pos are unique, elements after read_pos are unprocessed</code></pre>
+                </div>
+            </div>
+
+            <!-- Interactive Demo: Remove Duplicates -->
+            <div class="interactive-demo">
+                <h3>Interactive: Remove Duplicates Visualizer</h3>
+                <p class="demo-desc">Watch the two-pointer technique in action. See read and write pointers move through the array!</p>
+                
+                <div class="demo-controls">
+                    <label style="color: var(--text-muted);">Sorted Array (comma-separated):</label>
+                    <input type="text" id="dedup-array" value="1,1,2,2,3,4,4" 
+                           style="padding: 0.5rem; background: var(--code-bg); border: 1px solid var(--glass-border); color: white; border-radius: 6px; width: 250px;">
+                    <button class="btn" onclick="dedupDemo.start()">Start Animation</button>
+                    <button class="btn" onclick="dedupDemo.reset()">Reset</button>
+                </div>
+                
+                <div class="playground-canvas">
+                    <div id="dedup-visual" style="display: flex; gap: 8px; padding: var(--spacing-md); flex-wrap: wrap; justify-content: center;">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 8px;">
+                        <div style="color: var(--text-muted);">Read Pointer: <span id="dedup-read" style="color: var(--meta-blue); font-weight: 600;">-</span></div>
+                        <div style="color: var(--text-muted); margin-top: 8px;">Write Pointer: <span id="dedup-write" style="color: var(--mclaren-orange); font-weight: 600;">-</span></div>
+                        <div style="color: var(--text-muted); margin-top: 8px;">Action: <span id="dedup-action" style="color: var(--text-muted);">-</span></div>
+                    </div>
+                </div>
+            </div>
+
+        </article>
+
+        <!-- Section 3: COMPLEXITY ANALYSIS LOGIC BUILDING -->
+        <article id="complexity" class="section">
+            <div class="section-header">
+                <h2 class="section-title">[MINUTE 25-40] COMPLEXITY ANALYSIS LOGIC BUILDING - THE SYSTEMATIC FRAMEWORK</h2>
+            </div>
+
+            <!-- Practical approach -->
+            <div class="practical-approach">
+                <h3>Step-by-step practical approach</h3>
+                <ul>
+                    <li><strong>Mark operations:</strong> Go through code line by line, marking each operation's cost (O(1), O(n), O(log n))</li>
+                    <li><strong>Count loops:</strong> Single loop = O(n), nested loops = multiply complexities, halving loops = O(log n)</li>
+                    <li><strong>Check hidden costs:</strong> That .sort()? O(n log n). That .contains() on a list? O(n). Don't assume O(1)</li>
+                    <li><strong>Draw recursion trees:</strong> For recursive functions, sketch the call tree to count total nodes</li>
+                    <li><strong>Identify dominant term:</strong> O(n) + O(n²) + O(log n) = O(n²) - the largest term wins</li>
+                    <li><strong>Practice on real code:</strong> Analyze your own code and open-source projects to build intuition</li>
+                </ul>
+            </div>
+
+            <!-- Theoretical dive -->
+            <div class="theoretical-dive">
+                <h3>Deep theoretical dive</h3>
+                
+                <div class="theory-section">
+                    <h4>Big O Notation & Asymptotic Analysis</h4>
+                    <p>
+                        Big O describes how an algorithm's runtime grows as input size approaches infinity. It ignores constants and lower-order terms because they become insignificant for large n. O(2n + 100) = O(n) because the 100 becomes negligible when n = 1,000,000. This abstraction lets us compare algorithms independently of hardware or language - a fundamental O(n²) algorithm will eventually be slower than an O(n log n) algorithm regardless of implementation details.
+                    </p>
+                </div>
+
+                <div class="theory-section">
+                    <h4>Hidden Complexity in Library Functions</h4>
+                    <p>
+                        Beginners often miss hidden loops in library functions. Array.prototype.sort() is O(n log n), not O(1). String concatenation in a loop creates new string objects each time, turning O(n) into O(n²) in many languages. List.contains() searches linearly in O(n). Always check documentation for time complexity - these hidden costs are the #1 source of unexpected slowdowns.
+                    </p>
+                </div>
+
+                <div class="theory-section">
+                    <h4>Recursion Tree Analysis</h4>
+                    <p>
+                        For recursive functions, draw the call tree. Each node is a function call, each edge is a recursive invocation. Count total nodes for time complexity, tree height for space complexity (stack frames). Fibonacci's naive recursion creates a binary tree with 2^n nodes - exponential! Memoization reduces this to n nodes by caching. The visual tree makes complexity obvious.
+                    </p>
+                </div>
+
+                <div class="theory-section">
+                    <h4>Amortized Analysis</h4>
+                    <p>
+                        Some operations are expensive occasionally but cheap on average. Dynamic array append is O(1) amortized - even though resizing costs O(n), it happens so rarely that the average per operation is constant. This is why Python lists and Java ArrayLists feel fast despite occasional resizes. Amortized analysis requires thinking about operation sequences, not individual operations.
+                    </p>
+                </div>
+            </div>
+
+            <!-- The Step-by-Step Analysis Method -->
+            <div class="content-block">
+                <h3>The Step-by-Step Analysis Method - ROVER's Systematic Approach</h3>
+                
+                <p><strong>STEP 1: Mark the Operations</strong></p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="keyword">def</span> <span class="function">example_analysis</span>(<span class="variable">arr</span>):
+    <span class="variable">n</span> <span class="operator">=</span> <span class="function">len</span>(<span class="variable">arr</span>)             <span class="comment"># ← 1 operation, O(1)</span>
+    <span class="variable">max_val</span> <span class="operator">=</span> <span class="variable">arr</span>[<span class="number">0</span>]         <span class="comment"># ← 1 operation, O(1)</span>
+    <span class="variable">min_val</span> <span class="operator">=</span> <span class="variable">arr</span>[<span class="number">0</span>]         <span class="comment"># ← 1 operation, O(1)</span>
+    
+    <span class="keyword">for</span> <span class="variable">i</span> <span class="keyword">in</span> <span class="function">range</span>(<span class="variable">n</span>):       <span class="comment"># ← n iterations</span>
+        <span class="keyword">if</span> <span class="variable">arr</span>[<span class="variable">i</span>] <span class="operator">></span> <span class="variable">max_val</span>:     <span class="comment"># ← 1 comparison × n = O(n)</span>
+            <span class="variable">max_val</span> <span class="operator">=</span> <span class="variable">arr</span>[<span class="variable">i</span>]      <span class="comment"># ← 1 assignment × (worst: n) = O(n)</span>
+        <span class="keyword">if</span> <span class="variable">arr</span>[<span class="variable">i</span>] <span class="operator"><</span> <span class="variable">min_val</span>:     <span class="comment"># ← 1 comparison × n = O(n)</span>
+            <span class="variable">min_val</span> <span class="operator">=</span> <span class="variable">arr</span>[<span class="variable">i</span>]      <span class="comment"># ← 1 assignment × (worst: n) = O(n)</span>
+    
+    <span class="keyword">return</span> <span class="variable">max_val</span> <span class="operator">-</span> <span class="variable">min_val</span>   <span class="comment"># ← 1 operation, O(1)</span>
+
+<span class="comment"># Total: O(1) + O(1) + O(1) + O(n) + O(n) + O(n) + O(n) + O(1) = O(n)</span></code></pre>
+                </div>
+                
+                <p><strong>STEP 2: Identify the Loops</strong></p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="keyword">def</span> <span class="function">loop_analysis</span>(<span class="variable">matrix</span>):
+    <span class="variable">rows</span> <span class="operator">=</span> <span class="function">len</span>(<span class="variable">matrix</span>)         <span class="comment"># O(1)</span>
+    <span class="variable">cols</span> <span class="operator">=</span> <span class="function">len</span>(<span class="variable">matrix</span>[<span class="number">0</span>])      <span class="comment"># O(1)</span>
+    
+    <span class="comment"># Single loop: O(rows)</span>
+    <span class="keyword">for</span> <span class="variable">i</span> <span class="keyword">in</span> <span class="function">range</span>(<span class="variable">rows</span>):
+        <span class="function">print</span>(<span class="variable">i</span>)
+    
+    <span class="comment"># Nested loops: O(rows × cols)</span>
+    <span class="keyword">for</span> <span class="variable">i</span> <span class="keyword">in</span> <span class="function">range</span>(<span class="variable">rows</span>):
+        <span class="keyword">for</span> <span class="variable">j</span> <span class="keyword">in</span> <span class="function">range</span>(<span class="variable">cols</span>):
+            <span class="function">print</span>(<span class="variable">matrix</span>[<span class="variable">i</span>][<span class="variable">j</span>])
+    
+    <span class="comment"># Logarithmic: O(log rows)</span>
+    <span class="variable">k</span> <span class="operator">=</span> <span class="variable">rows</span>
+    <span class="keyword">while</span> <span class="variable">k</span> <span class="operator">></span> <span class="number">1</span>:
+        <span class="variable">k</span> <span class="operator">=</span> <span class="variable">k</span> <span class="operator">//</span> <span class="number">2</span>
+    
+<span class="comment"># Total: O(1) + O(1) + O(rows) + O(rows × cols) + O(log rows) = O(rows × cols)</span></code></pre>
+                </div>
+                
+                <p><strong>STEP 3: Analyze Recursive Calls</strong></p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="keyword">def</span> <span class="function">recursive_analysis</span>(<span class="variable">n</span>):
+    <span class="keyword">if</span> <span class="variable">n</span> <span class="operator"><=</span> <span class="number">1</span>:                <span class="comment"># O(1)</span>
+        <span class="keyword">return</span> <span class="number">1</span>
+    
+    <span class="variable">result</span> <span class="operator">=</span> <span class="number">0</span>                <span class="comment"># O(1)</span>
+    <span class="variable">result</span> <span class="operator">+=</span> <span class="function">recursive_analysis</span>(<span class="variable">n</span><span class="operator">-</span><span class="number">1</span>)   <span class="comment"># T(n-1)</span>
+    <span class="variable">result</span> <span class="operator">+=</span> <span class="function">recursive_analysis</span>(<span class="variable">n</span><span class="operator">-</span><span class="number">2</span>)   <span class="comment"># T(n-2)</span>
+    <span class="keyword">return</span> <span class="variable">result</span>             <span class="comment"># O(1)</span>
+
+<span class="comment"># Recurrence: T(n) = T(n-1) + T(n-2) + O(1)</span>
+<span class="comment"># Creates binary tree: Number of nodes ≈ 2ⁿ, so O(2ⁿ)</span></code></pre>
+                </div>
+            </div>
+
+            <!-- Interactive Demo: Complexity Analyzer -->
+            <div class="interactive-demo">
+                <h3>Interactive: Complexity Analyzer</h3>
+                <p class="demo-desc">Analyze different code patterns and see their complexity visualized!</p>
+                
+                <div class="demo-controls">
+                    <label style="color: var(--text-muted);">Select code pattern:</label>
+                    <select id="complexity-pattern" style="padding: 0.75rem; background: var(--code-bg); border: 1px solid var(--glass-border); color: white; border-radius: 6px; font-family: 'Quicksand', sans-serif; width: 250px;">
+                        <option value="single">Single Loop - O(n)</option>
+                        <option value="nested">Nested Loops - O(n²)</option>
+                        <option value="logarithmic">Binary Search - O(log n)</option>
+                        <option value="linearithmic">Merge Sort - O(n log n)</option>
+                        <option value="exponential">Fibonacci Recursion - O(2ⁿ)</option>
+                    </select>
+                    <label style="color: var(--text-muted);">Input size (n):</label>
+                    <input type="number" id="complexity-n" value="8" min="1" max="20" 
+                           style="width: 80px; padding: 0.5rem; background: var(--code-bg); border: 1px solid var(--glass-border); color: white; border-radius: 6px;">
+                    <button class="btn" onclick="complexityDemo.analyze()">Analyze</button>
+                </div>
+                
+                <div class="playground-canvas">
+                    <div id="complexity-code" style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 6px; margin-bottom: 20px; font-family: 'Courier New', monospace; font-size: 13px;">
+                        <!-- Code will appear here -->
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <h4 style="color: var(--meta-blue); margin-bottom: 10px;">Operation Count</h4>
+                            <div id="complexity-count" style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 6px; height: 150px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--mclaren-orange); font-weight: 600;">
+                                0
+                            </div>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--mclaren-orange); margin-bottom: 10px;">Complexity Class</h4>
+                            <div id="complexity-class" style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 6px; height: 150px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #3fb950; font-weight: 600;">
+                                -
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(0, 129, 251, 0.1); border: 1px solid var(--meta-blue); border-radius: 6px;">
+                        <strong style="color: var(--meta-blue);">Analysis:</strong>
+                        <p id="complexity-explanation" style="margin-top: 10px; color: var(--text-muted);">
+                            Select a pattern and click "Analyze"
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exercise 2: Complexity Pattern Recognition -->
+            <div class="content-block">
+                <h3>Exercise 2: Complexity Pattern Recognition - The Rapid Analysis</h3>
+                
+                <p><strong>Quick rules for spotting complexity:</strong></p>
+                
+                <ol>
+                    <li><strong>Single loop = O(n):</strong> One iteration per input element</li>
+                    <li><strong>Nested loops = O(n²):</strong> For each element, process all other elements</li>
+                    <li><strong>Halving = O(log n):</strong> Problem size reduces by half each time (binary search, balanced trees)</li>
+                    <li><strong>Recursive halving = O(log n):</strong> One recursive call with halved input (divide & conquer base case)</li>
+                    <li><strong>Multiple recursive calls = Often exponential:</strong> Binary tree of calls (Fibonacci naive, all subsets)</li>
+                    <li><strong>Hash map operations = O(1) average:</strong> But O(n) worst case with hash collisions</li>
+                    <li><strong>Sorting = O(n log n):</strong> Best possible for comparison-based sorting</li>
+                </ol>
+            </div>
+
+            <!-- Interactive Demo: Complexity Quiz -->
+            <div class="interactive-demo">
+                <h3>Interactive: Complexity Quiz Game</h3>
+                <p class="demo-desc">Test your complexity analysis skills! Can you identify the Big O of these code snippets?</p>
+                
+                <div class="demo-controls">
+                    <button class="btn" onclick="complexityQuiz.newQuestion()">New Question</button>
+                    <button class="btn" onclick="complexityQuiz.showAnswer()">Show Answer</button>
+                </div>
+                
+                <div class="playground-canvas">
+                    <div id="quiz-question" style="padding: 20px; background: rgba(0, 129, 251, 0.1); border: 1px solid var(--meta-blue); border-radius: 8px; margin-bottom: 20px;">
+                        <div id="quiz-code" style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 13px; margin-bottom: 15px;">
+                            <!-- Code snippet -->
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px;">
+                            <button class="btn" onclick="complexityQuiz.guess('O(1)')">O(1)</button>
+                            <button class="btn" onclick="complexityQuiz.guess('O(log n)')">O(log n)</button>
+                            <button class="btn" onclick="complexityQuiz.guess('O(n)')">O(n)</button>
+                            <button class="btn" onclick="complexityQuiz.guess('O(n log n)')">O(n log n)</button>
+                            <button class="btn" onclick="complexityQuiz.guess('O(n²)')">O(n²)</button>
+                            <button class="btn" onclick="complexityQuiz.guess('O(2ⁿ)')">O(2ⁿ)</button>
+                        </div>
+                    </div>
+                    <div id="quiz-feedback" style="padding: 15px; background: rgba(0,0,0,0.3); border-radius: 6px; display: none;">
+                        <!-- Feedback will appear here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Common Complexity Pitfalls -->
+            <div class="content-block">
+                <h3>Common Complexity Pitfalls - The Hidden Traps</h3>
+                
+                <p><strong>Pitfall 1: Hidden Function Costs</strong></p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="keyword">def</span> <span class="function">sneaky_complexity</span>(<span class="variable">arr</span>):
+    <span class="keyword">for</span> <span class="variable">i</span> <span class="keyword">in</span> <span class="function">range</span>(<span class="function">len</span>(<span class="variable">arr</span>)):
+        <span class="keyword">if</span> <span class="variable">i</span> <span class="keyword">in</span> <span class="variable">arr</span>:            <span class="comment"># O(n) - searches entire array linearly!</span>
+            <span class="variable">arr</span>.<span class="function">remove</span>(<span class="variable">i</span>)       <span class="comment"># O(n) - shifts all elements after removed element</span>
+            <span class="variable">arr</span>.<span class="function">sort</span>()          <span class="comment"># O(n log n) - sorts entire array again</span>
+
+<span class="comment"># Actual complexity: O(n) × (O(n) + O(n) + O(n log n)) = O(n² log n)</span></code></pre>
+                </div>
+                
+                <p><strong>Pitfall 2: String Operations</strong></p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="keyword">def</span> <span class="function">string_complexity</span>(<span class="variable">n</span>):
+    <span class="variable">result</span> <span class="operator">=</span> <span class="string">""</span>
+    <span class="keyword">for</span> <span class="variable">i</span> <span class="keyword">in</span> <span class="function">range</span>(<span class="variable">n</span>):
+        <span class="variable">result</span> <span class="operator">=</span> <span class="variable">result</span> <span class="operator">+</span> <span class="function">str</span>(<span class="variable">i</span>)   <span class="comment"># Creates NEW string object each time!</span>
+
+<span class="comment"># In many languages: O(1) + O(2) + O(3) + ... + O(n) = O(n²)</span>
+
+<span class="comment"># Better approach:</span>
+<span class="keyword">def</span> <span class="function">string_complexity_better</span>(<span class="variable">n</span>):
+    <span class="variable">result</span> <span class="operator">=</span> []
+    <span class="keyword">for</span> <span class="variable">i</span> <span class="keyword">in</span> <span class="function">range</span>(<span class="variable">n</span>):
+        <span class="variable">result</span>.<span class="function">append</span>(<span class="function">str</span>(<span class="variable">i</span>))   <span class="comment"># O(1) amortized</span>
+    <span class="keyword">return</span> <span class="string">""</span>.<span class="function">join</span>(<span class="variable">result</span>)      <span class="comment"># O(n) - single concatenation</span>
+<span class="comment"># Total: O(n) - much better!</span></code></pre>
+                </div>
+            </div>
+
+        </article>
+
+        <!-- Section 4: THE ART OF OPTIMIZATION THINKING -->
+        <article id="optimization" class="section">
+            <div class="section-header">
+                <h2 class="section-title">[MINUTE 40-50] THE ART OF OPTIMIZATION THINKING - THE MASTERY PRINCIPLES</h2>
+            </div>
+
+            <!-- Practical approach -->
+            <div class="practical-approach">
+                <h3>Step-by-step practical approach</h3>
+                <ul>
+                    <li><strong>Question checklist:</strong> For every problem, ask the 5 optimization questions (eliminate work, reuse computations, trade space for time, reorganize data, exit early)</li>
+                    <li><strong>Multi-solution mindset:</strong> Always code at least 2 approaches - brute force for correctness, optimized for efficiency</li>
+                    <li><strong>Bottleneck identification:</strong> Profile or mentally trace which part of your code runs most often - that's what to optimize</li>
+                    <li><strong>Data structure audit:</strong> List all data structures in your solution - could any be swapped for better performance?</li>
+                    <li><strong>Space-time analysis:</strong> Explicitly state "I'm trading X space for Y time improvement" when optimizing</li>
+                    <li><strong>Benchmark mindset:</strong> For production code, actually measure before/after optimization - intuition can be wrong</li>
+                </ul>
+            </div>
+
+            <!-- Theoretical dive -->
+            <div class="theoretical-dive">
+                <h3>Deep theoretical dive</h3>
+                
+                <div class="theory-section">
+                    <h4>The Optimization Hierarchy</h4>
+                    <p>
+                        Optimization follows a hierarchy: algorithmic improvements (changing O(n²) to O(n)) give orders of magnitude speedup, data structure choices (array vs hash map) give constant factor improvements, and micro-optimizations (loop unrolling, cache-friendly access) give small percentage gains. Always optimize algorithmically first - a 10x algorithmic improvement beats a 2x micro-optimization every time.
+                    </p>
+                </div>
+
+                <div class="theory-section">
+                    <h4>Premature Optimization is Evil (But Not Always)</h4>
+                    <p>
+                        Donald Knuth's famous quote "premature optimization is the root of all evil" applies to micro-optimizations, not algorithmic choices. Using O(n²) when O(n) exists is not premature optimization - it's a fundamental algorithmic mistake. The quote means: don't optimize code that runs once or isn't a bottleneck. Do optimize your core algorithms from the start.
+                    </p>
+                </div>
+
+                <div class="theory-section">
+                    <h4>Precomputation & Lazy Evaluation Tradeoffs</h4>
+                    <p>
+                        Precomputation trades upfront time for faster queries (prefix sums, DP tables). Lazy evaluation trades complexity for deferred work (generators, range objects). Choose precomputation when: (1) Setup cost is reasonable, (2) Many queries expected, (3) Data doesn't change. Choose lazy when: (1) Might not need all results, (2) Memory is limited, (3) Working with infinite sequences.
+                    </p>
+                </div>
+            </div>
+
+            <!-- The Optimization Mindset -->
+            <div class="content-block">
+                <h3>The Optimization Mindset - ROVER's Philosophy</h3>
+                
+                <p><strong>Ask these questions for EVERY problem:</strong></p>
+                
+                <ol>
+                    <li><strong>Can I eliminate unnecessary work?</strong> → Remove redundant operations</li>
+                    <li><strong>Can I reuse previous computations?</strong> → Memoization, caching, precomputation</li>
+                    <li><strong>Can I trade space for time?</strong> → Hash maps, prefix sums, lookup tables</li>
+                    <li><strong>Can I reorganize data for faster access?</strong> → Sorting, indexing, different data structures</li>
+                    <li><strong>Can I exit early?</strong> → Early termination, pruning, short-circuiting</li>
+                </ol>
+            </div>
+
+            <!-- Optimization Technique 1: Precomputation -->
+            <div class="content-block">
+                <h3>Optimization Technique 1: Precomputation - The Setup Payoff</h3>
+                
+                <p><strong>Problem: Multiple queries for sum of range [left, right]</strong></p>
+                
+                <p>The slow approach:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="keyword">class</span> <span class="class-name">RangeSumSlow</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(<span class="variable">self</span>, <span class="variable">arr</span>):
+        <span class="variable">self</span>.<span class="variable">arr</span> <span class="operator">=</span> <span class="variable">arr</span>
+    
+    <span class="keyword">def</span> <span class="function">sum_range</span>(<span class="variable">self</span>, <span class="variable">left</span>, <span class="variable">right</span>):
+        <span class="variable">total</span> <span class="operator">=</span> <span class="number">0</span>
+        <span class="keyword">for</span> <span class="variable">i</span> <span class="keyword">in</span> <span class="function">range</span>(<span class="variable">left</span>, <span class="variable">right</span><span class="operator">+</span><span class="number">1</span>):
+            <span class="variable">total</span> <span class="operator">+=</span> <span class="variable">self</span>.<span class="variable">arr</span>[<span class="variable">i</span>]
+        <span class="keyword">return</span> <span class="variable">total</span>
+    <span class="comment"># Each query: O(n) - inefficient for multiple queries!</span></code></pre>
+                </div>
+                
+                <p>The optimized approach:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="keyword">class</span> <span class="class-name">RangeSumFast</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(<span class="variable">self</span>, <span class="variable">arr</span>):
+        <span class="variable">self</span>.<span class="variable">arr</span> <span class="operator">=</span> <span class="variable">arr</span>
+        <span class="comment"># Precompute prefix sums - O(n) setup</span>
+        <span class="variable">self</span>.<span class="variable">prefix</span> <span class="operator">=</span> [<span class="number">0</span>]
+        <span class="keyword">for</span> <span class="variable">num</span> <span class="keyword">in</span> <span class="variable">arr</span>:
+            <span class="variable">self</span>.<span class="variable">prefix</span>.<span class="function">append</span>(<span class="variable">self</span>.<span class="variable">prefix</span>[<span class="operator">-</span><span class="number">1</span>] <span class="operator">+</span> <span class="variable">num</span>)
+    
+    <span class="keyword">def</span> <span class="function">sum_range</span>(<span class="variable">self</span>, <span class="variable">left</span>, <span class="variable">right</span>):
+        <span class="keyword">return</span> <span class="variable">self</span>.<span class="variable">prefix</span>[<span class="variable">right</span><span class="operator">+</span><span class="number">1</span>] <span class="operator">-</span> <span class="variable">self</span>.<span class="variable">prefix</span>[<span class="variable">left</span>]
+    <span class="comment"># Each query: O(1)!</span>
+
+<span class="comment"># Example: arr = [1, 2, 3, 4, 5]</span>
+<span class="comment"># prefix = [0, 1, 3, 6, 10, 15]</span>
+<span class="comment"># sum(1,3) = prefix[4] - prefix[1] = 10 - 1 = 9</span>
+<span class="comment"># Indeed: arr[1] + arr[2] + arr[3] = 2 + 3 + 4 = 9</span></code></pre>
+                </div>
+
+                <p><strong>The deeper insight:</strong> We trade O(n) space to get O(1) queries. This is the space-time tradeoff principle in action.</p>
+            </div>
+
+        </article>
+
+        <!-- Section 5: MENTAL MODELS & PROBLEM DECOMPOSITION -->
+        <article id="mental-models" class="section">
+            <div class="section-header">
+                <h2 class="section-title">[MINUTE 50-60] MENTAL MODELS & PROBLEM DECOMPOSITION - THE FRAMEWORK MASTERY</h2>
+            </div>
+
+            <!-- Practical approach -->
+            <div class="practical-approach">
+                <h3>Step-by-step practical approach</h3>
+                <ul>
+                    <li><strong>UMPIRE method:</strong> Use this framework for every problem - it forces systematic thinking</li>
+                    <li><strong>Input/Output contract:</strong> Before coding, write down exactly what goes in and what comes out</li>
+                    <li><strong>Black box thinking:</strong> Separate interface (what it does) from implementation (how it does it)</li>
+                    <li><strong>State machine visualization:</strong> For complex logic, draw states and transitions before coding</li>
+                    <li><strong>Invariant identification:</strong> What property stays true throughout the algorithm? Write it down</li>
+                    <li><strong>Decomposition practice:</strong> Break every complex problem into 2-3 subproblems explicitly</li>
+                </ul>
+            </div>
+
+            <!-- Theoretical dive -->
+            <div class="theoretical-dive">
+                <h3>Deep theoretical dive</h3>
+                
+                <div class="theory-section">
+                    <h4>Formal Methods & Correctness Proofs</h4>
+                    <p>
+                        Mental models like "input→output transformation" and "state machines" come from formal methods in computer science. Invariants are predicates that must hold at specific program points (loop invariants, class invariants). Proving algorithm correctness requires showing that invariants are maintained and that the algorithm terminates. While you won't write formal proofs in interviews, thinking in terms of invariants makes code correctness obvious.
+                    </p>
+                </div>
+
+                <div class="theory-section">
+                    <h4>Problem Decomposition as Divide & Conquer</h4>
+                    <p>
+                        Decomposing problems into subproblems is the same principle as divide & conquer, but applied to problem-solving rather than algorithms. "Merge k sorted lists" decomposes into "merge two lists" (base case) + "combine k lists" (recursive structure). This decomposition makes complex problems tractable - solve the simple case, then build up.
+                    </p>
+                </div>
+
+                <div class="theory-section">
+                    <h4>State Machines & Finite Automata Theory</h4>
+                    <p>
+                        The state machine mental model comes from automata theory. Many problems are finite state machines: current state + input → next state. Parentheses validation, string parsing, regex matching - all are state machines. Understanding state transitions makes these "tricky" problems trivial. The stack in parentheses validation IS the state - it tracks unmatched opening brackets.
+                    </p>
+                </div>
+            </div>
+
+            <!-- The UMPIRE Method -->
+            <div class="content-block">
+                <h3>The UMPIRE Method - ROVER's Problem-Solving Framework</h3>
+                
+                <ul>
+                    <li><strong>U</strong> - Understand the problem completely</li>
+                    <li><strong>M</strong> - Match with known patterns</li>
+                    <li><strong>P</strong> - Plan the approach systematically</li>
+                    <li><strong>I</strong> - Implement with clean code</li>
+                    <li><strong>R</strong> - Review the complexity and edge cases</li>
+                    <li><strong>E</strong> - Evaluate optimizations and alternatives</li>
+                </ul>
+            </div>
+
+            <!-- Mental Model 1: Input-Output Transform -->
+            <div class="content-block">
+                <h3>Mental Model 1: The Input-Output Transform - The Black Box Philosophy</h3>
+                
+                <p>Think of every problem as:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>INPUT → [ALGORITHM BLACK BOX] → OUTPUT</code></pre>
+                </div>
+                
+                <p><strong>Your job:</strong> Design the black box efficiently and correctly.</p>
+                
+                <p><strong>Example: Find missing number in array [0, 1, 3, 4, 5] where n=5</strong></p>
+                
+                <p>Method 1: Use math (Gaussian sum formula):</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="keyword">def</span> <span class="function">find_missing_math</span>(<span class="variable">arr</span>, <span class="variable">n</span>):
+    <span class="comment"># Sum of 0 to n = n(n+1)/2</span>
+    <span class="variable">expected_sum</span> <span class="operator">=</span> <span class="variable">n</span> <span class="operator">*</span> (<span class="variable">n</span> <span class="operator">+</span> <span class="number">1</span>) <span class="operator">//</span> <span class="number">2</span>
+    <span class="variable">actual_sum</span> <span class="operator">=</span> <span class="function">sum</span>(<span class="variable">arr</span>)
+    <span class="keyword">return</span> <span class="variable">expected_sum</span> <span class="operator">-</span> <span class="variable">actual_sum</span>
+<span class="comment"># Time: O(n), Space: O(1) - Perfect efficiency!</span></code></pre>
+                </div>
+                
+                <p>Method 2: Use XOR (bit manipulation):</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="keyword">def</span> <span class="function">find_missing_xor</span>(<span class="variable">arr</span>, <span class="variable">n</span>):
+    <span class="comment"># XOR all numbers 0 to n and all array elements</span>
+    <span class="comment"># Duplicates cancel out, leaving only missing</span>
+    <span class="variable">result</span> <span class="operator">=</span> <span class="number">0</span>
+    <span class="keyword">for</span> <span class="variable">i</span> <span class="keyword">in</span> <span class="function">range</span>(<span class="variable">n</span> <span class="operator">+</span> <span class="number">1</span>):
+        <span class="variable">result</span> <span class="operator">^=</span> <span class="variable">i</span>
+    <span class="keyword">for</span> <span class="variable">num</span> <span class="keyword">in</span> <span class="variable">arr</span>:
+        <span class="variable">result</span> <span class="operator">^=</span> <span class="variable">num</span>
+    <span class="keyword">return</span> <span class="variable">result</span>
+<span class="comment"># Time: O(n), Space: O(1) - Elegant bit manipulation!</span></code></pre>
+                </div>
+
+                <p><strong>The deeper insight:</strong> Sometimes math is the best algorithm. XOR property: a ^ a = 0, a ^ 0 = a.</p>
+            </div>
+
+            <!-- Mental Model 2: State Machine -->
+            <div class="content-block">
+                <h3>Mental Model 2: The State Machine - The Transition Philosophy</h3>
+                
+                <p>Many problems involve:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>Current State + Input → Next State</code></pre>
+                </div>
+                
+                <p><strong>Example: Valid parentheses checker</strong></p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="keyword">def</span> <span class="function">is_valid_parentheses</span>(<span class="variable">s</span>):
+    <span class="comment"># State = stack of opening brackets</span>
+    <span class="variable">stack</span> <span class="operator">=</span> []
+    <span class="variable">mapping</span> <span class="operator">=</span> {<span class="string">')'</span>: <span class="string">'('</span>, <span class="string">'}'</span>: <span class="string">'{'</span>, <span class="string">']'</span>: <span class="string">'['</span>}
+    
+    <span class="keyword">for</span> <span class="variable">char</span> <span class="keyword">in</span> <span class="variable">s</span>:
+        <span class="keyword">if</span> <span class="variable">char</span> <span class="keyword">in</span> <span class="variable">mapping</span>:
+            <span class="comment"># Closing bracket - check if matches</span>
+            <span class="keyword">if</span> <span class="keyword">not</span> <span class="variable">stack</span> <span class="keyword">or</span> <span class="variable">stack</span>[<span class="operator">-</span><span class="number">1</span>] <span class="operator">!=</span> <span class="variable">mapping</span>[<span class="variable">char</span>]:
+                <span class="keyword">return</span> <span class="constant">False</span>
+            <span class="variable">stack</span>.<span class="function">pop</span>()   <span class="comment"># Remove matched opening bracket</span>
+        <span class="keyword">else</span>:
+            <span class="comment"># Opening bracket - add to state</span>
+            <span class="variable">stack</span>.<span class="function">append</span>(<span class="variable">char</span>)
+    
+    <span class="keyword">return</span> <span class="function">len</span>(<span class="variable">stack</span>) <span class="operator">==</span> <span class="number">0</span></code></pre>
+                </div>
+                
+                <p>Step-by-step simulation with "([{}])":</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>Input '(': stack = ['('] (opening bracket)
+Input '[': stack = ['(', '['] (opening bracket)
+Input '{': stack = ['(', '[', '{'] (opening bracket)
+Input '}': matches '{', stack = ['(', '['] (closing bracket)
+Input ']': matches '[', stack = ['('] (closing bracket)
+Input ')': matches '(', stack = [] (closing bracket)
+Final: stack is empty → Valid!</code></pre>
+                </div>
+
+                <p><strong>The deeper insight:</strong> The stack maintains the "state" of unmatched opening brackets. Each closing bracket must match the most recent opening bracket.</p>
+            </div>
+
+            <!-- Mental Model 3: The Invariant -->
+            <div class="content-block">
+                <h3>Mental Model 3: The Invariant - The Consistency Principle</h3>
+                
+                <p><strong>Maintain a property that's always true. Use it to guide your algorithm. Invariants help ensure correctness.</strong></p>
+                
+                <p><strong>Example: Dutch National Flag (sort 0s, 1s, 2s)</strong></p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code><span class="keyword">def</span> <span class="function">sort_colors</span>(<span class="variable">nums</span>):
+    <span class="comment"># Invariant:</span> 
+    <span class="comment"># [0, low) = all 0s (red)</span>
+    <span class="comment"># [low, mid) = all 1s (white)</span> 
+    <span class="comment"># [mid, high] = unknown (to be processed)</span>
+    <span class="comment"># (high, n) = all 2s (blue)</span>
+    
+    <span class="variable">low</span> <span class="operator">=</span> <span class="variable">mid</span> <span class="operator">=</span> <span class="number">0</span>
+    <span class="variable">high</span> <span class="operator">=</span> <span class="function">len</span>(<span class="variable">nums</span>) <span class="operator">-</span> <span class="number">1</span>
+    
+    <span class="keyword">while</span> <span class="variable">mid</span> <span class="operator"><=</span> <span class="variable">high</span>:
+        <span class="keyword">if</span> <span class="variable">nums</span>[<span class="variable">mid</span>] <span class="operator">==</span> <span class="number">0</span>:
+            <span class="variable">nums</span>[<span class="variable">low</span>], <span class="variable">nums</span>[<span class="variable">mid</span>] <span class="operator">=</span> <span class="variable">nums</span>[<span class="variable">mid</span>], <span class="variable">nums</span>[<span class="variable">low</span>]
+            <span class="variable">low</span> <span class="operator">+=</span> <span class="number">1</span>     <span class="comment"># Expand red section</span>
+            <span class="variable">mid</span> <span class="operator">+=</span> <span class="number">1</span>     <span class="comment"># Move to next unknown</span>
+        <span class="keyword">elif</span> <span class="variable">nums</span>[<span class="variable">mid</span>] <span class="operator">==</span> <span class="number">1</span>:
+            <span class="variable">mid</span> <span class="operator">+=</span> <span class="number">1</span>     <span class="comment"># Move to next unknown (already in correct place)</span>
+        <span class="keyword">else</span>:   <span class="comment"># nums[mid] == 2</span>
+            <span class="variable">nums</span>[<span class="variable">mid</span>], <span class="variable">nums</span>[<span class="variable">high</span>] <span class="operator">=</span> <span class="variable">nums</span>[<span class="variable">high</span>], <span class="variable">nums</span>[<span class="variable">mid</span>]
+            <span class="variable">high</span> <span class="operator">-=</span> <span class="number">1</span>    <span class="comment"># Expand blue section</span>
+            <span class="comment"># Don't increment mid - need to check swapped element!</span></code></pre>
+                </div>
+
+                <p><strong>The deeper insight:</strong> The invariant is maintained throughout: elements before 'low' are 0s, elements between 'low' and 'mid' are 1s, elements after 'high' are 2s.</p>
+            </div>
+
+        </article>
+
+        <!-- Section 6: FINAL SYNTHESIS -->
+        <article id="synthesis" class="section">
+            <div class="section-header">
+                <h2 class="section-title">FINAL SYNTHESIS - THE MASTERY CHECKLIST</h2>
+            </div>
+
+            <div class="content-block">
+                <h3>Your Logic Building Toolkit - ROVER's Mastery Framework</h3>
+                
+                <div class="feynman-dive">
+                    <h3>From Pattern Recognition to Problem Mastery</h3>
+                    <p class="feynman-intro">
+                        You've learned the patterns. You understand complexity. You can optimize. Now comes the crucial step: synthesis. True mastery isn't knowing 100 patterns - it's recognizing which of the 5 core patterns applies to any problem you face.
+                    </p>
+                    
+                    <h4>Algorithmic Vocabulary</h4>
+                    <p>
+                        Think of these patterns as your algorithmic vocabulary. Just as a writer combines 26 letters into infinite stories, you'll combine these 5 patterns into solutions for thousands of problems. The magic isn't in the patterns themselves - it's in your ability to see them hiding in disguise.
+                    </p>
+                    
+                    <h4>What Separates Good from Great</h4>
+                    <p>
+                        Good engineers memorize solutions. Great engineers recognize patterns. Master engineers see multiple patterns in one problem and choose the optimal combination. That's where you're headed.
+                    </p>
+                </div>
+
+                <p><strong>You now have ROVER's complete logic building foundation:</strong></p>
+                
+                <ol>
+                    <li><strong>Pattern recognition skills</strong> - You can identify the 5 universal patterns</li>
+                    <li><strong>Complexity analysis ability</strong> - You can analyze any algorithm systematically</li>
+                    <li><strong>Optimization mindset</strong> - You know how to improve any solution</li>
+                    <li><strong>Problem decomposition tools</strong> - You can break down complex problems</li>
+                </ol>
+
+                <div class="feynman-dive" style="background: rgba(255, 128, 0, 0.15); border: 2px solid var(--mclaren-orange);">
+                    <h3>ROVER's Master's Mantra</h3>
+                    <p style="font-style: italic; font-size: 1.05rem; line-height: 1.9;">
+                        "In the realm of algorithms, patterns repeat, but solutions evolve. Master the patterns, optimize the approach, and decompose the complexity. Every problem is a puzzle waiting for the right mental model. The algorithmic mind sees through the surface to the underlying structure, transforms complexity into simplicity, and turns problems into solutions."
+                    </p>
+                </div>
+                
+                <p style="margin-top: 1.5rem; font-size: 1.05rem; line-height: 1.8;">
+                    This is not just about solving problems - this is about thinking like a master. Every problem becomes an opportunity to apply these patterns, every algorithm becomes a tool in your mental arsenal, every optimization becomes a step toward mastery.
+                </p>
+                
+                <p style="margin-top: 1rem; font-size: 1.05rem; line-height: 1.8; font-weight: 600; color: var(--mclaren-orange);">
+                    The journey continues. The patterns are now part of your algorithmic DNA. Use them wisely, apply them consistently, and watch as complex problems become simple exercises in pattern recognition and systematic thinking.
+                </p>
+            </div>
+
+            <!-- Pattern Recognition Checklist -->
+            <div class="content-block">
+                <h4>Pattern Recognition Checklist:</h4>
+                <ul>
+                    <li>Can I use a hash map to track seen elements? → Counter/Tracker pattern</li>
+                    <li>Can two pointers solve this more efficiently? → Two Pointers pattern</li>
+                    <li>Is this a divide & conquer problem? → Divide & Conquer pattern</li>
+                    <li>Should I build the solution incrementally? → Builder/Accumulator pattern</li>
+                    <li>Can I make greedy choices? → Optimizer pattern</li>
+                </ul>
+            </div>
+
+            <div class="content-block">
+                <h4>Complexity Analysis Checklist:</h4>
+                <ul>
+                    <li>Count loops and their iterations → Identify dominant terms</li>
+                    <li>Check hidden costs in library functions → Don't assume O(1)</li>
+                    <li>Analyze recursive call trees → Count nodes and depth</li>
+                    <li>Consider best/average/worst cases → Not just worst case</li>
+                    <li>Look for optimization opportunities → Always ask "can this be better?"</li>
+                </ul>
+            </div>
+
+            <div class="content-block">
+                <h4>Problem-Solving Checklist:</h4>
+                <ul>
+                    <li>Understand inputs/outputs completely → Define the transformation</li>
+                    <li>Identify the pattern → Match to known approaches</li>
+                    <li>Consider multiple approaches → Don't settle for first idea</li>
+                    <li>Choose optimal data structures → Right tool for the job</li>
+                    <li>Think about edge cases → Empty, single element, duplicates</li>
+                </ul>
+            </div>
+
+        </article>
+
+        <!-- Cheat Sheet -->
+        <section style="background: var(--glass-white); border: 2px solid var(--mclaren-orange); border-radius: var(--radius-md); padding: var(--spacing-lg); margin: var(--spacing-xl) 0;">
+            <h2 style="color: var(--mclaren-orange); margin-bottom: var(--spacing-md); text-align: center;">Quick Cheat Sheet</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--spacing-md); margin-top: var(--spacing-md);">
+                <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); padding: var(--spacing-sm);">
+                    <strong style="color: var(--mclaren-orange); display: block; margin-bottom: 0.3rem;">Counter/Tracker</strong>
+                    Hash map for O(1) lookups, find duplicates
+                </div>
+                <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); padding: var(--spacing-sm);">
+                    <strong style="color: var(--mclaren-orange); display: block; margin-bottom: 0.3rem;">Two Pointers</strong>
+                    Sorted arrays, eliminate nested loops
+                </div>
+                <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); padding: var(--spacing-sm);">
+                    <strong style="color: var(--mclaren-orange); display: block; margin-bottom: 0.3rem;">Divide & Conquer</strong>
+                    Split problem, solve recursively, combine
+                </div>
+                <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); padding: var(--spacing-sm);">
+                    <strong style="color: var(--mclaren-orange); display: block; margin-bottom: 0.3rem;">Builder/Accumulator</strong>
+                    Incremental construction, state evolution
+                </div>
+                <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); padding: var(--spacing-sm);">
+                    <strong style="color: var(--mclaren-orange); display: block; margin-bottom: 0.3rem;">Optimizer (Greedy/DP)</strong>
+                    Optimal choices, greedy vs dynamic programming
+                </div>
+                <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); padding: var(--spacing-sm);">
+                    <strong style="color: var(--mclaren-orange); display: block; margin-bottom: 0.3rem;">O(n) Complexity</strong>
+                    Single loop through data
+                </div>
+                <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); padding: var(--spacing-sm);">
+                    <strong style="color: var(--mclaren-orange); display: block; margin-bottom: 0.3rem;">O(n²) Complexity</strong>
+                    Nested loops, all pairs
+                </div>
+                <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); padding: var(--spacing-sm);">
+                    <strong style="color: var(--mclaren-orange); display: block; margin-bottom: 0.3rem;">O(log n) Complexity</strong>
+                    Binary search, halving each step
+                </div>
+                <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); padding: var(--spacing-sm);">
+                    <strong style="color: var(--mclaren-orange); display: block; margin-bottom: 0.3rem;">O(n log n) Complexity</strong>
+                    Efficient sorting algorithms
+                </div>
+                <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); padding: var(--spacing-sm);">
+                    <strong style="color: var(--mclaren-orange); display: block; margin-bottom: 0.3rem;">Space-Time Tradeoff</strong>
+                    Use memory to save time (or vice versa)
+                </div>
+                <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); padding: var(--spacing-sm);">
+                    <strong style="color: var(--mclaren-orange); display: block; margin-bottom: 0.3rem;">UMPIRE Method</strong>
+                    Understand, Match, Plan, Implement, Review, Evaluate
+                </div>
+                <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); padding: var(--spacing-sm);">
+                    <strong style="color: var(--mclaren-orange); display: block; margin-bottom: 0.3rem;">Invariants</strong>
+                    Properties that remain true throughout algorithm
+                </div>
+            </div>
+        </section>
+
+        <!-- Further Reading -->
+        <section class="content-block" style="border: 2px solid var(--meta-blue);">
+            <h2 style="color: var(--meta-blue); text-align: center; margin-bottom: var(--spacing-md);">Further Reading & References</h2>
+            <ul>
+                <li><strong>Introduction to Algorithms (CLRS)</strong> - The definitive textbook on algorithms and complexity analysis</li>
+                <li><strong>Algorithm Design Manual</strong> by Skiena - Pattern-based approach to problem solving</li>
+                <li><strong>Cracking the Coding Interview</strong> by McDowell - Pattern recognition for interviews</li>
+                <li><strong>Elements of Programming Interviews</strong> - Problem patterns and solutions</li>
+                <li><strong>LeetCode Patterns</strong> - Online collection of problem-pattern mappings</li>
+                <li><strong>Competitive Programmer's Handbook</strong> - Advanced pattern techniques</li>
+            </ul>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer style="text-align: center; padding: var(--spacing-xl) 0; margin-top: var(--spacing-2xl); border-top: 1px solid var(--glass-border); color: var(--text-dim);">
+        <div class="container">
+            <p>&copy; 2025 ROVER. Master Pattern Recognition from the ground up.</p>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-to-top" id="scrollToTop" aria-label="Scroll to top">
+        ↑
+    </button>
+
+    <!-- JavaScript for Interactivity -->
+    <script>
+        // Reading Progress Bar
+        window.addEventListener('scroll', () => {
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight - windowHeight;
+            const scrolled = window.scrollY;
+            const progress = (scrolled / documentHeight) * 100;
+            document.getElementById('reading-progress').style.width = progress + '%';
+        });
+
+        // Hamburger Menu
+        function initHamburgerMenu() {
+            const hamburger = document.getElementById('hamburger');
+            const navLinks = document.getElementById('navLinks');
+            const mobileOverlay = document.getElementById('mobileOverlay');
+            const navLinkItems = document.querySelectorAll('.nav-link');
+
+            if (!hamburger || !navLinks || !mobileOverlay) return;
+
+            hamburger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                hamburger.classList.toggle('active');
+                navLinks.classList.toggle('active');
+                mobileOverlay.classList.toggle('active');
+                document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
+            });
+
+            mobileOverlay.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+                mobileOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+
+            navLinkItems.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        hamburger.classList.remove('active');
+                        navLinks.classList.remove('active');
+                        mobileOverlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                });
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && navLinks.classList.contains('active')) {
+                    hamburger.classList.remove('active');
+                    navLinks.classList.remove('active');
+                    mobileOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initHamburgerMenu);
+
+
+        // Scroll to Top
+        const scrollToTopBtn = document.getElementById('scrollToTop');
+
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollToTopBtn.classList.add('visible');
+            } else {
+                scrollToTopBtn.classList.remove('visible');
+            }
+        });
+
+        scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Copy Code
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const code = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = 'var(--meta-blue)';
+                button.style.borderColor = 'var(--meta-blue)';
+                button.style.color = 'white';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '';
+                    button.style.borderColor = 'rgba(255, 128, 0, 0.4)';
+                    button.style.color = 'var(--mclaren-orange)';
+                }, 2000);
+            });
+        }
+
+        // Toggle Collapsible
+        function toggleCollapsible(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.classList.toggle('open');
+            }
+        }
+
+        // ==================== INTERACTIVE DEMOS ====================
+
+        // Two Sum Demo
+        const twoSumDemo = {
+            array: [],
+            target: 0,
+            currentIndex: -1,
+            isRunning: false,
+
+            async solve() {
+                if (this.isRunning) return;
+                this.isRunning = true;
+
+                const arrayInput = document.getElementById('twosum-array').value;
+                this.array = arrayInput.split(',').map(s => parseInt(s.trim()));
+                this.target = parseInt(document.getElementById('twosum-target').value) || 0;
+
+                const visual = document.getElementById('twosum-visual');
+                const seen = {};
+                
+                // Render initial array
+                visual.innerHTML = this.array.map((val, i) => `
+                    <div id="twosum-${i}" class="array-element">
+                        <span class="array-index">i=${i}</span>
+                        ${val}
+                    </div>
+                `).join('');
+
+                document.getElementById('twosum-hashmap').textContent = '{}';
+                document.getElementById('twosum-step').textContent = 'Starting...';
+                document.getElementById('twosum-result').textContent = '-';
+
+                await new Promise(resolve => setTimeout(resolve, 800));
+
+                for (let i = 0; i < this.array.length; i++) {
+                    const num = this.array[i];
+                    const complement = this.target - num;
+
+                    // Highlight current element
+                    document.getElementById(`twosum-${i}`).classList.add('highlight');
+                    document.getElementById('twosum-step').textContent = `Checking arr[${i}] = ${num}, complement = ${complement}`;
+
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                    if (complement in seen) {
+                        // Found!
+                        document.getElementById(`twosum-${seen[complement]}`).classList.add('found');
+                        document.getElementById(`twosum-${i}`).classList.add('found');
+                        document.getElementById('twosum-result').textContent = `Found! Indices [${seen[complement]}, ${i}] → [${this.array[seen[complement]]}, ${num}] = ${this.target}`;
+                        this.isRunning = false;
+                        return;
+                    }
+
+                    seen[num] = i;
+                    document.getElementById('twosum-hashmap').textContent = JSON.stringify(seen);
+                    document.getElementById(`twosum-${i}`).classList.remove('highlight');
+
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+
+                document.getElementById('twosum-result').textContent = 'No pair found';
+                this.isRunning = false;
+            },
+
+            reset() {
+                this.isRunning = false;
+                const visual = document.getElementById('twosum-visual');
+                visual.innerHTML = '';
+                document.getElementById('twosum-hashmap').textContent = '{}';
+                document.getElementById('twosum-step').textContent = '-';
+                document.getElementById('twosum-result').textContent = '-';
+            }
+        };
+
+        // Remove Duplicates Demo
+        const dedupDemo = {
+            array: [],
+            isRunning: false,
+
+            async start() {
+                if (this.isRunning) return;
+                this.isRunning = true;
+
+                const arrayInput = document.getElementById('dedup-array').value;
+                this.array = arrayInput.split(',').map(s => parseInt(s.trim()));
+
+                const visual = document.getElementById('dedup-visual');
+                visual.innerHTML = this.array.map((val, i) => `
+                    <div id="dedup-${i}" class="array-element">
+                        <span class="array-index">i=${i}</span>
+                        ${val}
+                    </div>
+                `).join('');
+
+                let writePos = 1;
+                document.getElementById('dedup-write').textContent = writePos;
+                document.getElementById('dedup-read').textContent = '1';
+                document.getElementById('dedup-action').textContent = 'Starting...';
+
+                await new Promise(resolve => setTimeout(resolve, 800));
+
+                for (let readPos = 1; readPos < this.array.length; readPos++) {
+                    // Highlight read pointer
+                    for (let i = 0; i < this.array.length; i++) {
+                        document.getElementById(`dedup-${i}`).classList.remove('highlight');
+                    }
+                    document.getElementById(`dedup-${readPos}`).classList.add('highlight');
+                    document.getElementById('dedup-read').textContent = readPos;
+
+                    await new Promise(resolve => setTimeout(resolve, 800));
+
+                    if (this.array[readPos] !== this.array[readPos - 1]) {
+                        // Write unique element
+                        document.getElementById('dedup-action').textContent = `Found unique: ${this.array[readPos]}. Writing to position ${writePos}`;
+                        
+                        // Show write operation
+                        document.getElementById(`dedup-${writePos}`).classList.add('found');
+                        
+                        this.array[writePos] = this.array[readPos];
+                        document.getElementById(`dedup-${writePos}`).textContent = this.array[readPos];
+                        
+                        writePos++;
+                        document.getElementById('dedup-write').textContent = writePos;
+                        
+                        await new Promise(resolve => setTimeout(resolve, 800));
+                    } else {
+                        document.getElementById('dedup-action').textContent = `Duplicate ${this.array[readPos]}, skipping`;
+                        document.getElementById(`dedup-${readPos}`).classList.add('duplicate');
+                        await new Promise(resolve => setTimeout(resolve, 600));
+                    }
+                }
+
+                document.getElementById('dedup-action').textContent = `Complete! ${writePos} unique elements`;
+                this.isRunning = false;
+            },
+
+            reset() {
+                this.isRunning = false;
+                document.getElementById('dedup-visual').innerHTML = '';
+                document.getElementById('dedup-read').textContent = '-';
+                document.getElementById('dedup-write').textContent = '-';
+                document.getElementById('dedup-action').textContent = '-';
+            }
+        };
+
+        // Complexity Analyzer Demo
+        const complexityDemo = {
+            patterns: {
+                single: {
+                    code: `for i in range(n):
+    print(i)`,
+                    complexity: 'O(n)',
+                    explanation: 'Single loop iterates n times. Each iteration does O(1) work. Total: n × O(1) = O(n)'
+                },
+                nested: {
+                    code: `for i in range(n):
+    for j in range(n):
+        print(i, j)`,
+                    complexity: 'O(n²)',
+                    explanation: 'Outer loop runs n times. For each iteration, inner loop runs n times. Total: n × n = n² operations'
+                },
+                logarithmic: {
+                    code: `left, right = 0, n-1
+while left <= right:
+    mid = (left + right) // 2
+    if arr[mid] == target:
+        return mid
+    elif arr[mid] < target:
+        left = mid + 1
+    else:
+        right = mid - 1`,
+                    complexity: 'O(log n)',
+                    explanation: 'Each iteration halves the search space. After k iterations, size is n/2^k. Reaches 1 when k = log₂(n)'
+                },
+                linearithmic: {
+                    code: `def merge_sort(arr):
+    if len(arr) <= 1:
+        return arr
+    mid = len(arr) // 2
+    left = merge_sort(arr[:mid])
+    right = merge_sort(arr[mid:])
+    return merge(left, right)`,
+                    complexity: 'O(n log n)',
+                    explanation: 'Divides array log(n) times (depth of recursion tree). At each level, merging costs O(n). Total: log(n) levels × O(n) work per level'
+                },
+                exponential: {
+                    code: `def fib(n):
+    if n <= 1:
+        return n
+    return fib(n-1) + fib(n-2)`,
+                    complexity: 'O(2ⁿ)',
+                    explanation: 'Each call spawns 2 recursive calls, creating a binary tree. Tree has 2^n nodes (approximately). Exponential growth!'
+                }
+            },
+
+            analyze() {
+                const pattern = document.getElementById('complexity-pattern').value;
+                const n = parseInt(document.getElementById('complexity-n').value) || 8;
+                const data = this.patterns[pattern];
+
+                document.getElementById('complexity-code').textContent = data.code;
+                
+                const count = this.calculateOps(pattern, n);
+                document.getElementById('complexity-count').textContent = count.toLocaleString();
+                document.getElementById('complexity-class').textContent = data.complexity;
+                document.getElementById('complexity-explanation').textContent = data.explanation;
+            },
+
+            calculateOps(pattern, n) {
+                switch(pattern) {
+                    case 'single': return n;
+                    case 'nested': return n * n;
+                    case 'logarithmic': return Math.ceil(Math.log2(n));
+                    case 'linearithmic': return Math.ceil(n * Math.log2(n));
+                    case 'exponential': return Math.min(Math.pow(2, n), 999999);
+                    default: return 0;
+                }
+            }
+        };
+
+        // Complexity Quiz
+        const complexityQuiz = {
+            questions: [
+                {
+                    code: `for i in range(n):
+    sum += arr[i]`,
+                    answer: 'O(n)',
+                    explanation: 'Single loop with O(1) operations inside. Linear complexity.'
+                },
+                {
+                    code: `for i in range(n):
+    for j in range(i):
+        print(i, j)`,
+                    answer: 'O(n²)',
+                    explanation: 'Triangular nested loop: 0+1+2+...+(n-1) = n(n-1)/2 = O(n²)'
+                },
+                {
+                    code: `i = n
+while i > 0:
+    i = i // 2
+    print(i)`,
+                    answer: 'O(log n)',
+                    explanation: 'Each iteration halves i. Reaches 0 in log₂(n) steps.'
+                },
+                {
+                    code: `arr.sort()
+for i in range(n):
+    print(arr[i])`,
+                    answer: 'O(n log n)',
+                    explanation: 'sort() is O(n log n), loop is O(n). Dominant term: O(n log n)'
+                },
+                {
+                    code: `def factorial(n):
+    if n <= 1:
+        return 1
+    return n * factorial(n-1)`,
+                    answer: 'O(n)',
+                    explanation: 'Linear recursion - n recursive calls, each doing O(1) work. Total: O(n)'
+                },
+                {
+                    code: `if val in arr:
+    return True`,
+                    answer: 'O(n)',
+                    explanation: '"in" operator on list searches linearly. O(n) worst case.'
+                }
+            ],
+            currentQuestion: null,
+
+            newQuestion() {
+                this.currentQuestion = this.questions[Math.floor(Math.random() * this.questions.length)];
+                document.getElementById('quiz-code').textContent = this.currentQuestion.code;
+                document.getElementById('quiz-feedback').style.display = 'none';
+            },
+
+            guess(answer) {
+                if (!this.currentQuestion) return;
+
+                const feedback = document.getElementById('quiz-feedback');
+                const isCorrect = answer === this.currentQuestion.answer;
+
+                feedback.innerHTML = `
+                    <div style="padding: 15px; background: ${isCorrect ? 'rgba(59, 185, 80, 0.1)' : 'rgba(220, 0, 0, 0.1)'}; border: 1px solid ${isCorrect ? '#3fb950' : 'var(--redbull-red)'}; border-radius: 6px; margin-bottom: 10px;">
+                        <strong style="color: ${isCorrect ? '#3fb950' : 'var(--redbull-red)'};">${isCorrect ? 'Correct!' : 'Not quite...'}</strong>
+                    </div>
+                    <div style="color: var(--text-muted);">
+                        <strong>Correct Answer:</strong> ${this.currentQuestion.answer}<br>
+                        <strong>Explanation:</strong> ${this.currentQuestion.explanation}
+                    </div>
+                `;
+                feedback.style.display = 'block';
+            },
+
+            showAnswer() {
+                if (!this.currentQuestion) return;
+
+                const feedback = document.getElementById('quiz-feedback');
+                feedback.innerHTML = `
+                    <div style="color: var(--text-muted);">
+                        <strong style="color: var(--mclaren-orange);">Answer:</strong> ${this.currentQuestion.answer}<br>
+                        <strong style="color: var(--meta-blue);">Explanation:</strong> ${this.currentQuestion.explanation}
+                    </div>
+                `;
+                feedback.style.display = 'block';
+            }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                complexityQuiz.newQuestion();
+            }, 500);
+        });
+    </script>
+</body>
+</html>
+

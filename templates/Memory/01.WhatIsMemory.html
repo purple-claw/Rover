@@ -79,6 +79,11 @@
             box-sizing: border-box;
         }
 
+        html {
+            overflow-x: hidden;
+            width: 100%;
+        }
+
         body {
             font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
             background: #000000;
@@ -90,6 +95,8 @@
             font-weight: 400;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            width: 100%;
+            max-width: 100vw;
         }
 
         h1, h2, h3, h4 {
@@ -1427,14 +1434,22 @@
         }
 
         @media (max-width: 768px) {
+            body {
+                overflow-x: hidden;
+                width: 100%;
+                max-width: 100vw;
+            }
+
             nav {
                 padding: 0.75rem 0;
+                width: 100%;
             }
 
             .nav-container {
                 position: relative;
                 justify-content: center;
                 padding: 0 var(--spacing-md);
+                width: 100%;
             }
 
             .nav-logo {
@@ -1520,6 +1535,8 @@
 
             .hero {
                 padding: var(--spacing-xl) 0;
+                width: 100%;
+                max-width: 100%;
             }
 
             .hero h1 {
@@ -1534,10 +1551,20 @@
 
             .container {
                 padding: 0 var(--spacing-md);
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+
+            .section {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
             }
 
             .section-title {
                 font-size: 1.5rem;
+                word-wrap: break-word;
             }
 
             .section-subtitle {
@@ -1546,6 +1573,9 @@
 
             .content-block {
                 padding: var(--spacing-md);
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
             }
 
             .content-block h3 {
@@ -1563,6 +1593,9 @@
             .interactive-demo {
                 padding: var(--spacing-md);
                 margin: var(--spacing-md) 0;
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
             }
 
             .interactive-demo h3 {
@@ -1574,6 +1607,7 @@
                 align-items: stretch;
                 gap: 0.5rem;
                 padding: 0.75rem;
+                width: 100%;
             }
 
             .btn {
@@ -1585,6 +1619,10 @@
             .playground-canvas {
                 padding: var(--spacing-sm);
                 min-height: 250px;
+                width: 100%;
+                max-width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
             }
 
             .playground-stats {
@@ -1637,7 +1675,15 @@
             .code-block {
                 font-size: 12px;
                 padding: var(--spacing-sm);
+                max-width: 100%;
                 overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .code-block pre {
+                max-width: 100%;
+                overflow-x: auto;
+                white-space: pre;
             }
 
             .copy-btn {
@@ -1649,6 +1695,7 @@
                 font-size: 0.875rem;
                 overflow-x: auto;
                 display: block;
+                max-width: 100%;
             }
 
             table th, table td {
@@ -1660,6 +1707,8 @@
                 padding: var(--spacing-sm);
                 padding-left: 35px;
                 font-size: 0.875rem;
+                width: 100%;
+                max-width: 100%;
             }
 
             .info-box::before, .warning-box::before {
@@ -1669,6 +1718,25 @@
 
             .practical-approach, .theoretical-dive {
                 padding: var(--spacing-sm);
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+
+            .feynman-dive {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+
+            .toc {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .collapsible-section {
+                width: 100%;
+                max-width: 100%;
             }
 
             .hierarchy-pyramid {

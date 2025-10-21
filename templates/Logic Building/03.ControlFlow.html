@@ -1,0 +1,750 @@
+## ** CONTROL FLOW - BREAK & CONTINUE**
+
+### **Understanding `break` - Early Exit**
+
+**What `break` does:**
+```
+Immediately EXITS the innermost loop
+Execution continues AFTER the loop
+```
+
+**Visual:**
+```python
+for i in range(5):
+    print(i)
+    if i == 2:
+        break
+    print("After if")
+print("After loop")
+
+Execution:
+i=0 → print 0 → if False → print "After if"
+i=1 → print 1 → if False → print "After if"
+i=2 → print 2 → if True → BREAK → jump to "After loop"
+
+Output:
+0
+After if
+1
+After if
+2
+After loop
+```
+
+---
+
+### **When to Use `break`**
+
+#### **Use Case 1: Early Termination (Found What We Need)**
+
+```python
+# Problem: Find if element exists
+def contains(arr, target):
+    for i in range(len(arr)):
+        if arr[i] == target:
+            return True  # Or break if not returning
+    return False
+
+# Without break: O(n) always
+# With break: O(1) best case, O(n) worst case
+```
+
+**Real example:**
+```python
+arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+target = 3
+
+# Without break
+found = False
+for num in arr:
+    if num == target:
+        found = True
+    # Continues checking all 10 elements!
+
+# With break
+found = False
+for num in arr:
+    if num == target:
+        found = True
+        break  # Stops at element 3, saves 7 iterations!
+```
+
+---
+
+#### **Use Case 2: Error Condition**
+
+```python
+# Problem: Validate array has no duplicates
+def has_duplicates(arr):
+    for i in range(len(arr)):
+        for j in range(i+1, len(arr)):
+            if arr[i] == arr[j]:
+                return True  # Found duplicate, stop!
+    return False
+
+# As soon as we find ONE duplicate, we know answer
+# No need to check remaining pairs
+```
+
+---
+
+#### **Use Case 3: Threshold Reached**
+
+```python
+# Problem: Sum until threshold
+def sum_until_threshold(arr, threshold):
+    total = 0
+    for num in arr:
+        total += num
+        if total >= threshold:
+            break  # Stop when threshold reached
+    return total
+
+arr = [5, 10, 15, 20, 25]
+result = sum_until_threshold(arr, 30)
+# Processes: 5, 10, 15 → total=30, breaks
+# Doesn't process: 20, 25
+```
+
+---
+
+### **`break` in Nested Loops - CRITICAL Understanding**
+
+**Important:** `break` only exits the INNERMOST loop!
+
+```python
+for i in range(3):
+    print(f"Outer: i={i}")
+    for j in range(3):
+        print(f"  Inner: j={j}")
+        if j == 1:
+            break  # Exits INNER loop only!
+    print("Back in outer loop")
+print("After all loops")
+
+Output:
+Outer: i=0
+  Inner: j=0
+  Inner: j=1
+Back in outer loop
+Outer: i=1
+  Inner: j=0
+  Inner: j=1
+Back in outer loop
+Outer: i=2
+  Inner: j=0
+  Inner: j=1
+Back in outer loop
+After all loops
+```
+
+**To break out of BOTH loops, use flag:**
+
+```python
+found = False
+for i in range(3):
+    for j in range(3):
+        if condition:
+            found = True
+            break  # Exit inner
+    if found:
+        break  # Exit outer
+```
+
+---
+
+### **Understanding `continue` - Skip Rest**
+
+**What `continue` does:**
+```
+Skip rest of current iteration
+Jump to next iteration of loop
+```
+
+**Visual:**
+```python
+for i in range(5):
+    print(f"Start {i}")
+    if i == 2:
+        continue
+    print(f"End {i}")
+
+Execution:
+i=0 → print "Start 0" → if False → print "End 0"
+i=1 → print "Start 1" → if False → print "End 1"
+i=2 → print "Start 2" → if True → CONTINUE → skip to i=3
+i=3 → print "Start 3" → if False → print "End 3"
+i=4 → print "Start 4" → if False → print "End 4"
+
+Output:
+Start 0
+End 0
+Start 1
+End 1
+Start 2
+Start 3
+End 3
+Start 4
+End 4
+```
+
+---
+
+### **When to Use `continue`**
+
+#### **Use Case 1: Skip Invalid Elements**
+
+```python
+# Problem: Process only positive numbers
+arr = [1, -2, 3, -4, 5, -6, 7]
+total = 0
+for num in arr:
+    if num < 0:
+        continue  # Skip negative numbers
+    total += num
+# Processes: 1, 3, 5, 7
+# Skips: -2, -4, -6
+```
+
+**Alternative without `continue`:**
+```python
+for num in arr:
+    if num >= 0:  # Only process if positive
+        total += num
+```
+
+**When to prefer `continue`:**
+- Multiple conditions to skip
+- Complex validation logic
+- Makes code more readable
+
+---
+
+#### **Use Case 2: Multiple Skip Conditions**
+
+```python
+# Problem: Process elements matching multiple conditions
+arr = [10, -5, 0, 15, -20, 25, 30]
+for num in arr:
+    if num < 0:
+        continue  # Skip negatives
+    if num == 0:
+        continue  # Skip zeros
+    if num > 100:
+        continue  # Skip too large
+    
+    # Process valid number
+    print(f"Processing: {num}")
+
+# Much cleaner than nested if-else!
+```
+
+---
+
+#### **Use Case 3: Filter in Loop**
+
+```python
+# Problem: Print only even numbers
+for i in range(10):
+    if i % 2 != 0:
+        continue  # Skip odd numbers
+    print(i)  # Only evens reach here
+# Output: 0, 2, 4, 6, 8
+```
+
+---
+
+### **`break` vs `continue` - Quick Reference**
+
+```
+BREAK:
+- Exits loop completely
+- Use when: Found answer, error occurred, threshold reached
+- Optimization: Avoid unnecessary iterations
+
+CONTINUE:
+- Skips to next iteration
+- Use when: Skip invalid data, filter elements, multiple skip conditions
+- Code clarity: Avoid deep nesting
+```
+
+---
+
+## **[MINUTE 75-90] PART 5: PROBLEM → LOOP LOGIC**
+
+### **The Translation Framework**
+
+**STEP 1: Identify What to Process**
+```
+Question: What am I iterating over?
+- Array elements? → for i in range(len(arr))
+- Range of numbers? → for i in range(start, end)
+- Until condition? → while condition
+```
+
+**STEP 2: Identify How Many Times**
+```
+Question: How many iterations?
+- Fixed count? → for loop
+- Unknown count? → while loop
+- For each element? → len(arr) iterations
+```
+
+**STEP 3: Identify Dependencies**
+```
+Question: Does current iteration depend on previous?
+- Need previous value? → Track variable outside loop
+- Need previous index? → Start from index 1
+- Independent? → Any order works
+```
+
+**STEP 4: Identify Optimization Opportunities**
+```
+Question: Can I stop early?
+- Yes → Use break
+Question: Can I skip elements?
+- Yes → Use continue or if condition
+```
+
+---
+
+### **The 15 Problem → Loop Patterns**
+
+#### **Pattern 1: "Find/Search" Problems**
+
+**Problem statement contains:**
+- "Find the first..."
+- "Search for..."
+- "Check if exists..."
+
+**Loop pattern:**
+```python
+for i in range(len(arr)):
+    if arr[i] meets condition:
+        return i  # or break
+return -1  # Not found
+```
+
+**Example:** "Find first element greater than 10"
+```python
+def find_first_greater(arr, threshold):
+    for i in range(len(arr)):
+        if arr[i] > threshold:
+            return i
+    return -1
+```
+
+---
+
+#### **Pattern 2: "Count" Problems**
+
+**Problem statement contains:**
+- "Count how many..."
+- "Number of elements that..."
+- "Frequency of..."
+
+**Loop pattern:**
+```python
+count = 0
+for element in arr:
+    if condition(element):
+        count += 1
+return count
+```
+
+**Example:** "Count negative numbers"
+```python
+def count_negatives(arr):
+    count = 0
+    for num in arr:
+        if num < 0:
+            count += 1
+    return count
+```
+
+---
+
+#### **Pattern 3: "Sum/Product" Problems**
+
+**Problem statement contains:**
+- "Sum of..."
+- "Total of..."
+- "Product of..."
+
+**Loop pattern:**
+```python
+result = initial_value  # 0 for sum, 1 for product
+for element in arr:
+    if condition(element):
+        result = operation(result, element)
+return result
+```---
+
+
+**Example:** "Sum of even numbers"
+```python
+def sum_evens(arr):
+    total = 0
+    for num in arr:
+        if num % 2 == 0:
+            total += num
+    return total
+```
+
+---
+
+#### **Pattern 4: "Max/Min" Problems**
+
+**Problem statement contains:**
+- "Maximum..."
+- "Minimum..."
+- "Largest..."
+- "Smallest..."
+
+**Loop pattern:**
+```python
+extreme = arr[0]  # or float('inf') / float('-inf')
+for i in range(1, len(arr)):
+    if comparison(arr[i], extreme):
+        extreme = arr[i]
+return extreme
+```
+
+**Example:** "Find maximum element"
+```python
+def find_max(arr):
+    if not arr:
+        return None
+    max_val = arr[0]
+    for i in range(1, len(arr)):
+        if arr[i] > max_val:
+            max_val = arr[i]
+    return max_val
+```
+
+---
+
+#### **Pattern 5: "Compare Adjacent" Problems**
+
+**Problem statement contains:**
+- "Compare consecutive..."
+- "Difference between adjacent..."
+- "Increasing/Decreasing sequence..."
+
+**Loop pattern:**
+```python
+for i in range(len(arr) - 1):
+    # Compare arr[i] with arr[i+1]
+    if condition(arr[i], arr[i+1]):
+        # Process
+```
+
+**Example:** "Check if array is sorted"
+```python
+def is_sorted(arr):
+    for i in range(len(arr) - 1):
+        if arr[i] > arr[i+1]:
+            return False
+    return True
+```
+
+---
+
+#### **Pattern 6: "All Pairs" Problems**
+
+**Problem statement contains:**
+- "For every pair..."
+- "All combinations of two elements..."
+- "Compare each element with others..."
+
+**Loop pattern:**
+```python
+for i in range(len(arr)):
+    for j in range(i+1, len(arr)):
+        # Process pair (arr[i], arr[j])
+```
+
+**Example:** "Find pair with sum = target"
+```python
+def find_pair_sum(arr, target):
+    for i in range(len(arr)):
+        for j in range(i+1, len(arr)):
+            if arr[i] + arr[j] == target:
+                return (i, j)
+    return None
+```
+
+---
+
+#### **Pattern 7: "Subarray/Substring" Problems**
+
+**Problem statement contains:**
+- "Consecutive elements..."
+- "Contiguous subarray..."
+- "Window of size..."
+
+**Loop pattern:**
+```python
+for i in range(len(arr)):
+    for j in range(i, len(arr)):
+        # Process subarray arr[i:j+1]
+```
+
+**Example:** "Find all subarrays"
+```python
+def all_subarrays(arr):
+    result = []
+    for i in range(len(arr)):
+        for j in range(i, len(arr)):
+            result.append(arr[i:j+1])
+    return result
+```
+
+---
+
+#### **Pattern 8: "Partition/Rearrange" Problems**
+
+**Problem statement contains:**
+- "Move all X to end..."
+- "Separate even and odd..."
+- "Partition array..."
+
+**Loop pattern:**
+```python
+write_pos = 0
+for read_pos in range(len(arr)):
+    if condition(arr[read_pos]):
+        arr[write_pos] = arr[read_pos]
+        write_pos += 1
+```
+
+**Example:** "Move zeros to end"
+```python
+def move_zeros(arr):
+    write = 0
+    for read in range(len(arr)):
+        if arr[read] != 0:
+            arr[write], arr[read] = arr[read], arr[write]
+            write += 1
+```
+
+---
+
+#### **Pattern 9: "Build/Transform" Problems**
+
+**Problem statement contains:**
+- "Create array of..."
+- "Transform each element..."
+- "Map elements to..."
+
+**Loop pattern:**
+```python
+result = []
+for element in arr:
+    transformed = transform(element)
+    result.append(transformed)
+return result
+```
+
+**Example:** "Square each element"
+```python
+def square_array(arr):
+    result = []
+    for num in arr:
+        result.append(num ** 2)
+    return result
+```
+
+---
+
+#### **Pattern 10: "Prefix/Suffix" Problems**
+
+**Problem statement contains:**
+- "Sum of elements up to index..."
+- "Product of elements from index..."
+- "Running total..."
+
+**Loop pattern:**
+```python
+# Prefix
+prefix = [initial]
+for element in arr:
+    prefix.append(prefix[-1] operation element)
+
+# Suffix (backward)
+suffix = [initial]
+for i in range(len(arr)-1, -1, -1):
+    suffix.append(suffix[-1] operation arr[i])
+suffix.reverse()
+```
+
+**Example:** "Build prefix sum array"
+```python
+def prefix_sum(arr):
+    prefix = [0]
+    for num in arr:
+        prefix.append(prefix[-1] + num)
+    return prefix
+```
+
+---
+
+#### **Pattern 11: "Matrix/2D" Problems**
+
+**Problem statement contains:**
+- "For each row..."
+- "For each cell..."
+- "Grid traversal..."
+
+**Loop pattern:**
+```python
+for i in range(rows):
+    for j in range(cols):
+        # Process matrix[i][j]
+```
+
+**Example:** "Sum all matrix elements"
+```python
+def matrix_sum(matrix):
+    total = 0
+    for i in range(len(matrix)):
+        for j in range(len(matrix[0])):
+            total += matrix[i][j]
+    return total
+```
+
+---
+
+#### **Pattern 12: "Simulation" Problems**
+
+**Problem statement contains:**
+- "After k steps..."
+- "Repeat until..."
+- "Simulate process..."
+
+**Loop pattern:**
+```python
+state = initial_state
+for step in range(k):
+    state = update(state)
+return state
+```
+
+**Example:** "Rotate array k times"
+```python
+def rotate_k_times(arr, k):
+    for _ in range(k):
+        last = arr[-1]
+        for i in range(len(arr)-1, 0, -1):
+            arr[i] = arr[i-1]
+        arr[0] = last
+```
+
+---
+
+#### **Pattern 13: "Frequency/Histogram" Problems**
+
+**Problem statement contains:**
+- "How many times each element..."
+- "Distribution of..."
+- "Count occurrences..."
+
+**Loop pattern:**
+```python
+freq = {}
+for element in arr:
+    freq[element] = freq.get(element, 0) + 1
+return freq
+```
+
+**Example:** "Find element with max frequency"
+```python
+def max_frequency_element(arr):
+    freq = {}
+    for num in arr:
+        freq[num] = freq.get(num, 0) + 1
+    return max(freq, key=freq.get)
+```
+
+---
+
+#### **Pattern 14: "Two Pointers" Problems**
+
+**Problem statement contains:**
+- "From both ends..."
+- "Palindrome check..."
+- "Remove duplicates from sorted..."
+
+**Loop pattern:**
+```python
+left = 0
+right = len(arr) - 1
+while left < right:
+    # Process arr[left] and arr[right]
+    # Move pointers based on condition
+```
+
+**Example:** "Check palindrome"
+```python
+def is_palindrome(arr):
+    left = 0
+    right = len(arr) - 1
+    while left < right:
+        if arr[left] != arr[right]:
+            return False
+        left += 1
+        right -= 1
+    return True
+```
+
+---
+
+#### **Pattern 15: "Sliding Window" Problems**
+
+**Problem statement contains:**
+- "Maximum sum of k consecutive..."
+- "Longest subarray with..."
+- "Minimum window with..."
+
+**Loop pattern:**
+```python
+# Fixed window
+window_sum = sum(arr[:k])
+max_sum = window_sum
+for i in range(k, len(arr)):
+    window_sum = window_sum - arr[i-k] + arr[i]
+    max_sum = max(max_sum, window_sum)
+
+# Variable window
+left = 0
+for right in range(len(arr)):
+    # Expand window
+    while condition_violated:
+        # Shrink window
+        left += 1
+```
+
+---
+
+
+### **Your New Superpower: Loop Thinking**
+
+You can now:
+- ✅ **Visualize** how every iteration executes
+- ✅ **Design** the perfect range for any problem
+- ✅ **Recognize** which pattern to apply instantly
+- ✅ **Optimize** through smart loop design
+- ✅ **Translate** problem statements to loop logic
+- ✅ **Debug** loop issues by tracing execution
+
+---
+
+## **PRACTICE EXERCISES**
+
+Translate these problem statements to loop code:
+
+1. "Find the sum of all elements between indices 5 and 10"
+2. "Count how many times each digit appears in a number"
+3. "Print all pairs of elements that are equal"
+4. "Find the longest sequence of increasing consecutive elements"
+5. "Reverse every k elements in an array"
