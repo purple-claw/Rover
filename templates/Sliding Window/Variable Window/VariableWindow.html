@@ -848,13 +848,18 @@
             <div class="nav-logo">
                 <span>Rio</span>DS Series | Variable Window Algorithm
             </div>
-            <ul class="nav-links">
+            <ul class="nav-links" id="navLinks">
                 <li><a href="#fundamentals" class="active">Fundamentals</a></li>
                 <li><a href="#templates">Templates</a></li>
                 <li><a href="#framework">Framework</a></li>
                 <li><a href="#simulation">Simulation</a></li>
                 <li><a href="#mastery">Mastery</a></li>
             </ul>
+                    <button class="hamburger-menu" id="hamburgerMenu" aria-label="Toggle navigation menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
         </div>
     </nav>
     
@@ -1589,7 +1594,42 @@ Total: 3 + 3 = 6</div>
         });
 
         // Add smooth scrolling for all internal links
-        document.addEventListener('DOMContentLoaded', function() {
+
+        // Hamburger Menu Toggle
+        const hamburgerMenu = document.getElementById('hamburgerMenu');
+        const navElement = document.getElementById('navLinks') || document.getElementById('navActions');
+        
+        if (hamburgerMenu && navElement) {
+            hamburgerMenu.addEventListener('click', function() {
+                hamburgerMenu.classList.toggle('active');
+                navElement.classList.toggle('active');
+            });
+            
+            // Close menu when clicking on a nav link (mobile)
+            if (document.getElementById('navLinks')) {
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', function() {
+                        if (window.innerWidth <= 768) {
+                            hamburgerMenu.classList.remove('active');
+                            navElement.classList.remove('active');
+                        }
+                    });
+                });
+            }
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (window.innerWidth <= 768) {
+                    if (!hamburgerMenu.contains(event.target) && !navElement.contains(event.target)) {
+                        hamburgerMenu.classList.remove('active');
+                        navElement.classList.remove('active');
+                    }
+                }
+            });
+        }
+
+
+                document.addEventListener('DOMContentLoaded', function() {
             // Add animation delays to template sections
             const templateSections = document.querySelectorAll('.template-section');
             templateSections.forEach((section, index) => {

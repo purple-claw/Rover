@@ -1170,6 +1170,81 @@
         *::before, *::after {
             pointer-events: none;
         }
+
+        /* Hamburger Menu Styles */
+        .hamburger-menu {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            z-index: 1002;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-line {
+            display: block;
+            width: 25px;
+            height: 2px;
+            background: #FF8000;
+            margin: 3px 0;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(1) {
+            transform: translateY(8px) rotate(45deg);
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(3) {
+            transform: translateY(-8px) rotate(-45deg);
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .hamburger-menu {
+                display: flex;
+            }
+
+            .nav-actions {
+                display: none;
+                position: fixed;
+                top: 60px;
+                left: 0;
+                right: 0;
+                background: rgba(0, 0, 0, 0.98);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 1rem;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                gap: 0.5rem;
+                z-index: 1001;
+            }
+
+            .nav-actions.active {
+                display: flex;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1177,10 +1252,15 @@
     <nav>
         <div class="nav-container">
             <div class="nav-logo">ROVER</div>
-            <div class="nav-actions">
+            <div class="nav-actions" id="navActions">
                 <button class="btn" onclick="collapseAll()">Collapse All</button>
                 <button class="btn" onclick="expandAll()">Expand All</button>
             </div>
+            <button class="hamburger-menu" id="hamburgerMenu" aria-label="Toggle navigation menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
         </div>
     </nav>
 
@@ -2879,6 +2959,27 @@ What dominates? The 3,000,000 from 3n²!
             output.innerHTML += `<strong>log₂(${n}):</strong> ${Math.log2(n).toFixed(2)}<br>`;
             output.innerHTML += `<strong>Time Complexity:</strong> O(log n) - Logarithmic growth<br>`;
             output.innerHTML += `<strong>Key Insight:</strong> Each iteration eliminates half the remaining search space</div>`;
+        }
+
+        // Hamburger Menu Toggle
+        const hamburgerMenu = document.getElementById('hamburgerMenu');
+        const navActions = document.getElementById('navActions');
+        
+        if (hamburgerMenu && navActions) {
+            hamburgerMenu.addEventListener('click', function() {
+                hamburgerMenu.classList.toggle('active');
+                navActions.classList.toggle('active');
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (window.innerWidth <= 768) {
+                    if (!hamburgerMenu.contains(event.target) && !navActions.contains(event.target)) {
+                        hamburgerMenu.classList.remove('active');
+                        navActions.classList.remove('active');
+                    }
+                }
+            });
         }
 
         // Initialize

@@ -605,13 +605,18 @@
     <nav>
         <div class="nav-container">
             <a href="#" class="nav-logo">ROVER</a>
-            <ul class="nav-links">
+            <ul class="nav-links" id="navLinks">
                 <li><a href="#intro" class="nav-link active">Introduction</a></li>
                 <li><a href="#stack-heap" class="nav-link">Stack vs Heap</a></li>
                 <li><a href="#cache" class="nav-link">Cache Patterns</a></li>
                 <li><a href="#allocation" class="nav-link">Allocation</a></li>
                 <li><a href="#optimization" class="nav-link">Optimization</a></li>
             </ul>
+                    <button class="hamburger-menu" id="hamburgerMenu" aria-label="Toggle navigation menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
         </div>
     </nav>
     
@@ -1320,7 +1325,42 @@
         };
 
         // Initialize demos
-        document.addEventListener('DOMContentLoaded', () => {
+
+        // Hamburger Menu Toggle
+        const hamburgerMenu = document.getElementById('hamburgerMenu');
+        const navElement = document.getElementById('navLinks') || document.getElementById('navActions');
+        
+        if (hamburgerMenu && navElement) {
+            hamburgerMenu.addEventListener('click', function() {
+                hamburgerMenu.classList.toggle('active');
+                navElement.classList.toggle('active');
+            });
+            
+            // Close menu when clicking on a nav link (mobile)
+            if (document.getElementById('navLinks')) {
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', function() {
+                        if (window.innerWidth <= 768) {
+                            hamburgerMenu.classList.remove('active');
+                            navElement.classList.remove('active');
+                        }
+                    });
+                });
+            }
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (window.innerWidth <= 768) {
+                    if (!hamburgerMenu.contains(event.target) && !navElement.contains(event.target)) {
+                        hamburgerMenu.classList.remove('active');
+                        navElement.classList.remove('active');
+                    }
+                }
+            });
+        }
+
+
+                document.addEventListener('DOMContentLoaded', () => {
             stackHeapDemo.init();
             cacheDemo.init();
         });

@@ -1284,6 +1284,11 @@
                 <span></span>
                 <span></span>
             </button>
+                    <button class="hamburger-menu" id="hamburgerMenu" aria-label="Toggle navigation menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
         </div>
     </nav>
 
@@ -3605,7 +3610,42 @@ def find_in_nested_v2(matrix, target):
         }
 
         // Initialize hamburger menu separately
-        document.addEventListener('DOMContentLoaded', initHamburgerMenu);
+
+        // Hamburger Menu Toggle
+        const hamburgerMenu = document.getElementById('hamburgerMenu');
+        const navElement = document.getElementById('navLinks') || document.getElementById('navActions');
+        
+        if (hamburgerMenu && navElement) {
+            hamburgerMenu.addEventListener('click', function() {
+                hamburgerMenu.classList.toggle('active');
+                navElement.classList.toggle('active');
+            });
+            
+            // Close menu when clicking on a nav link (mobile)
+            if (document.getElementById('navLinks')) {
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', function() {
+                        if (window.innerWidth <= 768) {
+                            hamburgerMenu.classList.remove('active');
+                            navElement.classList.remove('active');
+                        }
+                    });
+                });
+            }
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (window.innerWidth <= 768) {
+                    if (!hamburgerMenu.contains(event.target) && !navElement.contains(event.target)) {
+                        hamburgerMenu.classList.remove('active');
+                        navElement.classList.remove('active');
+                    }
+                }
+            });
+        }
+
+
+                document.addEventListener('DOMContentLoaded', initHamburgerMenu);
 
         // Active Navigation
         window.addEventListener('scroll', () => {
