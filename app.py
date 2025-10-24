@@ -62,17 +62,17 @@ async def view_content(path: str):
         </html>
         """)
     
-    # Add navigation back button
-    nav_back = '''
-    <div style="position:fixed; top:10px; left:10px; z-index:1000; background:#ff8c00; padding:10px 15px; border-radius:5px;">
-        <a href="/" style="color:white; text-decoration:none; font-weight:bold;">← Back to Navigation</a>
-    </div>
-    '''
+    # Navigation back button removed
+    # nav_back = '''
+    # <div style="position:fixed; top:10px; left:10px; z-index:1000; background:#ff8c00; padding:10px 15px; border-radius:5px;">
+    #     <a href="/" style="color:white; text-decoration:none; font-weight:bold;">← Back to Navigation</a>
+    # </div>
+    # '''
     
-    # Insert navigation back button after <body> tag
-    content_with_nav = content.replace('<body>', f'<body>{nav_back}')
+    # Return content without navigation back button
+    # content_with_nav = content.replace('<body>', f'<body>{nav_back}')
     
-    return HTMLResponse(content=content_with_nav)
+    return HTMLResponse(content=content)
 
 # API endpoint to get navigation (for future automation)
 @app.get("/api/navigation")

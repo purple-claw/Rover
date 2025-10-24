@@ -2001,64 +2001,130 @@
                 <h2 class="section-title"> WHAT IS MEMORY? - BUILDING FROM ZERO</h2>
             </div>
 
-            <!-- Feynman-Style Sarcastic Deep Dive -->
+            <!-- Feynman-Style Technical Deep Dive -->
             <div class="feynman-dive">
-                <h3>The "I'm Explaining This to My Rubber Duck" Deep Dive</h3>
+                <h3>The Feynman Approach: Understanding Memory from First Principles</h3>
                 <div class="feynman-content">
                     <p class="feynman-intro">
-                        Okay, look. If you can't explain memory to a six-year-old, you don't understand it yourself. So let's pretend I'm that six-year-old—except this six-year-old has seen some things and isn't impressed by your buzzwords.
+                        If you can't explain something simply, you don't understand it well enough. Let's build up memory from the absolute fundamentals, adding complexity only when necessary to understand the complete picture.
                     </p>
                     
-                    <h4>What Memory REALLY Is (Spoiler: It's Numbingly Simple)</h4>
+                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(0, 129, 251, 0.05); border-left: 3px solid var(--meta-blue);">
+                        <p><strong>Technical Foundation:</strong></p>
+                        <p>Memory is fundamentally a linear array of addressable storage units. Each unit (byte) consists of 8 bits, capable of storing values from 0 to 255 (2^8 - 1). The addressing scheme provides unique identification for each byte, enabling random access in O(1) time complexity.</p>
+                        <p style="margin-top: 0.5rem;"><strong>Mathematical Model:</strong></p>
+                        <p style="font-family: monospace;">Memory M = {m₀, m₁, m₂, ..., mₙ₋₁} where mᵢ ∈ [0, 255] and i is the address</p>
+                    </div>
+                    
+                    <h4>The Fundamental Model of Memory</h4>
                     <p>
-                        Memory is a <strong>giant numbered array</strong>. That's it. I'm serious. Every computer scientist overcomplicate this, but at its core, it's literally just:
+                        At its core, computer memory is a <strong>linear address space</strong> - an indexed collection of storage locations. This simple abstraction underlies all computing:
                     </p>
                     <ul class="animated-list">
-                        <li class="animated-list-item"><strong>A bunch of boxes</strong> (bytes, each 8 bits)</li>
-                        <li class="animated-list-item"><strong>Each box has a number</strong> (address, like 0x7FFF...)</li>
-                        <li class="animated-list-item"><strong>You can put stuff in boxes</strong> (write data)</li>
-                        <li class="animated-list-item"><strong>You can read stuff from boxes</strong> (read data)</li>
-                        <li class="animated-list-item"><strong>That's literally it.</strong> Don't let anyone tell you otherwise.</li>
+                        <li class="animated-list-item"><strong>Storage Units:</strong> Bytes (8 bits), the atomic unit of addressable memory</li>
+                        <li class="animated-list-item"><strong>Addressing:</strong> Each byte has a unique numerical address (0x00000000 to 0xFFFFFFFF on 32-bit systems)</li>
+                        <li class="animated-list-item"><strong>Write Operations:</strong> Store data at a specific address: M[addr] = value</li>
+                        <li class="animated-list-item"><strong>Read Operations:</strong> Retrieve data from an address: value = M[addr]</li>
+                        <li class="animated-list-item"><strong>Random Access:</strong> Any location accessible in constant time O(1)</li>
                     </ul>
                     
+                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(255, 128, 0, 0.05); border-left: 3px solid var(--mclaren-orange);">
+                        <p><strong>Virtual Memory Abstraction:</strong></p>
+                        <p>Virtual memory creates an illusion where each process believes it owns the entire address space. This abstraction provides:</p>
+                        <ul style="margin: 0.5rem 0 0 1.5rem;">
+                            <li><strong>Isolation:</strong> Processes cannot access each other's memory</li>
+                            <li><strong>Abstraction:</strong> Programs use virtual addresses, hardware translates to physical</li>
+                            <li><strong>Protection:</strong> Memory access violations detected at hardware level</li>
+                            <li><strong>Efficiency:</strong> Physical memory allocated only when needed (demand paging)</li>
+                        </ul>
+                    </div>
+                    
+                    <h4>The Von Neumann Architecture: A Unified Memory Model</h4>
                     <p>
-                        "But wait," you say, "what about virtual memory? Page tables? The MMU?" Yeah, we'll get there. But here's the secret: <strong>those are all just fancy lies</strong> the operating system tells your program so multiple programs can pretend they each own all the memory. It's like Disneyland telling every kid they're the special birthday child.
+                        The Von Neumann architecture introduces a profound concept: <strong>instructions and data share the same memory space</strong>. This unified memory model has far-reaching implications:
                     </p>
                     
-                    <h4>The Von Neumann Plot Twist Nobody Talks About</h4>
+                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(220, 0, 0, 0.05); border-left: 3px solid var(--redbull-red);">
+                        <p><strong>Technical Analysis:</strong></p>
+                        <p>In Von Neumann architecture, both program instructions and data reside in the same address space. An instruction like "ADD R1, R2" might be encoded as 0x014A at address 0x1000, while the integer value 330 (also 0x014A) might exist at address 0x2000.</p>
+                        <p style="margin-top: 0.5rem;"><strong>Security Implications:</strong></p>
+                        <ul style="margin: 0.5rem 0 0 1.5rem;">
+                            <li><strong>Buffer Overflows:</strong> Data can overwrite instructions, leading to arbitrary code execution</li>
+                            <li><strong>Self-Modifying Code:</strong> Programs can alter their own instructions during execution</li>
+                            <li><strong>Return-Oriented Programming:</strong> Attackers chain existing code fragments</li>
+                        </ul>
+                        <p style="margin-top: 0.5rem;"><strong>The Fetch-Decode-Execute Cycle:</strong></p>
+                        <p style="font-family: monospace;">1. Fetch: IR = Memory[PC]<br>2. Decode: Operation = Decode(IR)<br>3. Execute: Result = ALU(Operation)<br>4. PC = PC + InstructionLength</p>
+                    </div>
+                    
+                    <h4>The Memory Management Unit: Hardware-Accelerated Address Translation</h4>
                     <p>
-                        Here's where it gets wild. In your computer, <strong>programs ARE data</strong>. Mind = blown? The instruction "ADD 5, 10" is just bytes sitting in memory, same as your cat photo. The CPU reads these instruction-bytes and goes "oh, they want me to add numbers." This is why you can have programs that modify themselves (terrifying) or why buffer overflows can make your program execute your cat photo as code (even more terrifying).
+                        The MMU performs <strong>virtual-to-physical address translation</strong> at hardware speed. When your program accesses virtual address 0x1000, the MMU translates this to physical address 0x8A3F2000 in nanoseconds.
                     </p>
                     
+                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(0, 129, 251, 0.05); border-left: 3px solid var(--meta-blue);">
+                        <p><strong>Page Table Structure:</strong></p>
+                        <p>Modern systems use multi-level page tables for efficiency:</p>
+                        <p style="font-family: monospace; margin: 0.5rem 0;">Virtual Address (48-bit) = | PML4 (9 bits) | PDP (9 bits) | PD (9 bits) | PT (9 bits) | Offset (12 bits) |</p>
+                        <p><strong>Translation Process:</strong></p>
+                        <ol style="margin: 0.5rem 0 0 1.5rem;">
+                            <li>Extract page number from virtual address (upper bits)</li>
+                            <li>Index into page table: PTE = PageTable[PageNumber]</li>
+                            <li>Extract frame number from PTE</li>
+                            <li>Combine frame number with offset: PhysAddr = (FrameNumber << 12) | Offset</li>
+                        </ol>
+                        <p style="margin-top: 0.5rem;"><strong>TLB (Translation Lookaside Buffer):</strong></p>
+                        <p>Caches recent translations to avoid repeated page table walks. Hit rate typically >99% for well-behaved programs.</p>
+                    </div>
+                    
+                    <h4>Memory Alignment: Optimizing for Hardware Architecture</h4>
                     <p>
-                        The CPU doesn't care. It's a mindless automaton that goes: <em>"Read byte at address. Is it instruction? Execute. Is it data? Process. Repeat until heat death of universe or segfault, whichever comes first."</em>
+                        Modern CPUs access memory in <strong>word-sized chunks</strong> (typically 4 or 8 bytes). Alignment ensures data structures start at addresses divisible by their natural alignment, maximizing performance.
                     </p>
                     
-                    <h4>The Memory Management Unit: A Magician's Assistant</h4>
+                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(255, 128, 0, 0.05); border-left: 3px solid var(--mclaren-orange);">
+                        <p><strong>Alignment Rules:</strong></p>
+                        <ul style="margin: 0.5rem 0 0 1.5rem;">
+                            <li>char (1 byte): Any address</li>
+                            <li>short (2 bytes): Address divisible by 2</li>
+                            <li>int/float (4 bytes): Address divisible by 4</li>
+                            <li>long/double/pointer (8 bytes): Address divisible by 8</li>
+                        </ul>
+                        <p style="margin-top: 0.5rem;"><strong>Performance Impact of Misalignment:</strong></p>
+                        <p>Reading a misaligned 4-byte integer at address 0x1001 requires:</p>
+                        <ol style="margin: 0.5rem 0 0 1.5rem;">
+                            <li>Read bytes 0x1000-0x1003 (first word)</li>
+                            <li>Read bytes 0x1004-0x1007 (second word)</li>
+                            <li>Extract and combine relevant bytes</li>
+                        </ol>
+                        <p>Result: 2x memory accesses + bit shifting = ~3x slower</p>
+                        <p style="margin-top: 0.5rem;"><strong>Structure Padding Example:</strong></p>
+                        <p style="font-family: monospace;">struct Example {<br>  char a;    // 1 byte<br>  // 3 bytes padding<br>  int b;     // 4 bytes<br>  char c;    // 1 byte<br>  // 7 bytes padding<br>}; // Total: 16 bytes</p>
+                    </div>
+                    
+                    <h4>Endianness: Byte Ordering in Multi-Byte Values</h4>
                     <p>
-                        The MMU is like a shady translator at a tourist trap. Your program says "Give me data at address 0x1000" and the MMU quietly swaps that with the REAL address 0x8A3F2000 in physical RAM. Why? Because your program is running in a <strong>fantasy land</strong> where it thinks it owns all 16 exabytes of address space.
+                        Endianness determines how multi-byte values are stored in memory. This architectural decision affects data portability and network protocols.
                     </p>
                     
-                    <p>
-                        This happens through <strong>page tables</strong>—basically a massive lookup table that maps your fantasy addresses to reality. Each "page" is usually 4KB. Think of it like this: you ask for apartment 0x1000 in "Virtual City" and the MMU checks its phonebook and says "ah yes, that's actually apartment 0x8A3F2000 in Physical RAM Town."
-                    </p>
-                    
-                    <h4>Why Alignment Isn't Just OCD</h4>
-                    <p>
-                        Your CPU is lazy. It wants to read memory in nice, even chunks—4 bytes or 8 bytes at a time. If you tell it to read a 4-byte integer starting at address 0x1001 (odd address), it has to do TWO reads: grab bytes from 0x1000-0x1003, then bytes from 0x1004-0x1007, then mash them together like a sandwich. <strong>This is slow and the CPU hates you for it.</strong>
-                    </p>
-                    
-                    <p>
-                        So compilers secretly add padding bytes (wasted space) to make sure everything starts at "nice" addresses. This is why your 3-byte struct might actually take 4 or 8 bytes. It's not a bug—it's the compiler protecting you from your CPU's passive-aggressive performance penalties.
-                    </p>
-                    
-                    <h4>Endianness: The Dumbest Religious War in Computer Science</h4>
-                    <p>
-                        Should multi-byte numbers be stored with the big end first or little end first? <strong>WHO CARES?</strong> But oh boy, do computer architectures care. x86 decided "little-endian" (least significant byte first). Networks use "big-endian." ARM does whatever it wants. The result? You have to byteswap when sending data over networks. We've been doing this for 50 years and nobody's fixed it because everyone's too invested in their choice.
-                    </p>
+                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(220, 0, 0, 0.05); border-left: 3px solid var(--redbull-red);">
+                        <p><strong>Byte Ordering Systems:</strong></p>
+                        <p>For the value 0x12345678 stored at address 0x1000:</p>
+                        <table style="margin: 0.5rem 0; font-family: monospace;">
+                            <tr><td style="padding: 0.25rem 1rem;"><strong>Little-Endian (x86):</strong></td><td>[0x1000]=78, [0x1001]=56, [0x1002]=34, [0x1003]=12</td></tr>
+                            <tr><td style="padding: 0.25rem 1rem;"><strong>Big-Endian (Network):</strong></td><td>[0x1000]=12, [0x1001]=34, [0x1002]=56, [0x1003]=78</td></tr>
+                        </table>
+                        <p style="margin-top: 0.5rem;"><strong>Practical Implications:</strong></p>
+                        <ul style="margin: 0.5rem 0 0 1.5rem;">
+                            <li><strong>Network Protocols:</strong> Use network byte order (big-endian) - functions htons(), htonl()</li>
+                            <li><strong>File Formats:</strong> Must specify endianness for portability</li>
+                            <li><strong>Type Punning:</strong> Casting between types affected by endianness</li>
+                            <li><strong>Debugging:</strong> Memory dumps appear "reversed" on little-endian systems</li>
+                        </ul>
+                    </div>
                     
                     <p class="feynman-conclusion">
-                        <strong>The Feynman Test:</strong> If you can't draw memory as a simple array of numbered boxes and explain why your code works using just that model, you're overcomplicating it. Everything else—virtual memory, caching, alignment—is just performance tricks and safety rails built on top of that stupid-simple array.
+                        <strong>The Feynman Test:</strong> Can you draw memory as a simple array of numbered boxes and trace through your program's execution? If yes, you understand memory. All other concepts - virtual memory, caching, alignment - are optimizations and abstractions built upon this fundamental model.
                     </p>
                 </div>
             </div>
@@ -2177,6 +2243,10 @@ Value = 1+4+16+32+64+128 = 245</code></pre>
                 
                 <div class="playground-canvas" id="byte-canvas" style="min-height: 250px;">
                     <!-- Populated by JavaScript -->
+                </div>
+                
+                <div id="byte-trace" style="margin: 1rem 0; padding: 1rem; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); min-height: 150px; max-height: 300px; overflow-y: auto;">
+                    <!-- Step trace will appear here -->
                 </div>
                 
                 <div class="playground-stats">
@@ -2450,24 +2520,33 @@ value = arr[3]  # Getting the 4th element</code></pre>
                 <h2 class="section-title">[MINUTE 12-24] MEMORY HIERARCHY - THE SPEED PYRAMID</h2>
             </div>
 
-            <!-- Feynman-Style Sarcastic Deep Dive for Memory Hierarchy -->
+            <!-- Feynman-Style Technical Deep Dive for Memory Hierarchy -->
             <div class="feynman-dive">
-                <h3>The "Why Your Computer Has Trust Issues" Deep Dive</h3>
+                <h3>Understanding Memory Hierarchy: The Economics of Speed</h3>
                 <div class="feynman-content">
                     <p class="feynman-intro">
-                        Your computer is basically a paranoid hoarder with severe attachment issues. It keeps multiple copies of the same data in different places, just in case. Let me explain why this neurotic behavior is actually genius.
+                        The memory hierarchy exists because of a fundamental engineering trade-off: we cannot build memory that is simultaneously fast, large, and cheap. This hierarchy exploits the principle of locality to create the illusion of large, fast memory.
                     </p>
                     
-                    <h4>The Speed-vs-Money Drama</h4>
+                    <h4>The Memory Hierarchy: Engineering Around Physical Constraints</h4>
                     <p>
-                        Here's the tragic love triangle: You want memory that's FAST, BIG, and CHEAP. Physics says: <strong>"Pick two, buddy."</strong> It's like the old joke about project management—fast, good, cheap: choose two.
+                        Each level in the hierarchy represents a different point in the <strong>speed-capacity-cost</strong> trade-off space, optimized for different access patterns:
                     </p>
-                    <ul class="animated-list">
-                        <li class="animated-list-item"><strong>SRAM (registers/cache)</strong>: Fast & reliable, but costs more than your kidney per gigabyte. Uses 6 transistors per bit like it's made of money.</li>
-                        <li class="animated-list-item"><strong>DRAM (RAM)</strong>: Cheaper & bigger, but slower and has amnesia (forgets data without constant refresh). Uses 1 transistor + 1 leaky capacitor.</li>
-                        <li class="animated-list-item"><strong>Flash (SSD)</strong>: Even cheaper & bigger, but slower still. Also dies a little every time you write to it (limited write cycles).</li>
-                        <li class="animated-list-item"><strong>Hard disks</strong>: Dirt cheap per gigabyte, massive storage, but slower than a snail doing taxes. Literally uses spinning metal platters like it's 1956.</li>
-                    </ul>
+                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(0, 129, 251, 0.05); border-left: 3px solid var(--meta-blue);">
+                        <p><strong>Memory Technologies and Trade-offs:</strong></p>
+                        <ul style="margin: 0.5rem 0 0 1.5rem;">
+                            <li><strong>SRAM (Static RAM):</strong> 6 transistors/bit, no refresh needed, <1ns access, ~$10,000/GB
+                                <br>Physics: Cross-coupled inverters maintain state, fast but area-intensive</li>
+                            <li><strong>DRAM (Dynamic RAM):</strong> 1 transistor + 1 capacitor/bit, needs refresh every 64ms, 50-100ns, ~$5/GB
+                                <br>Physics: Charge stored in capacitor leaks, requiring periodic refresh</li>
+                            <li><strong>NAND Flash (SSD):</strong> Floating-gate transistors, block-erase required, 10-100μs, ~$0.10/GB
+                                <br>Physics: Electrons trapped in floating gate, limited P/E cycles due to oxide wear</li>
+                            <li><strong>Magnetic (HDD):</strong> Magnetic domains on platters, mechanical seeking, 5-10ms, ~$0.02/GB
+                                <br>Physics: Magnetic orientation represents bits, limited by mechanical movement</li>
+                        </ul>
+                        <p style="margin-top: 0.5rem;"><strong>Latency Hierarchy (scaled to human time):</strong></p>
+                        <p>If a CPU cycle = 1 second: L1 cache = 4s, L2 = 20s, L3 = 90s, RAM = 6 minutes, SSD = 3 days, HDD = 3 months</p>
+                    </div>
                     
                     <h4>The Cache: Your Computer's Predictive Anxiety</h4>
                     <p>
@@ -2569,6 +2648,10 @@ value = arr[3]  # Getting the 4th element</code></pre>
                         <span class="stat-label">Cost/GB</span>
                         <span class="stat-value" id="hierarchy-cost">-</span>
                     </div>
+                </div>
+                
+                <div id="hierarchy-trace" style="margin: 1rem 0; padding: 1rem; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); min-height: 150px; max-height: 300px; overflow-y: auto;">
+                    <!-- Memory access trace will appear here -->
                 </div>
                 
                 <div id="hierarchy-info" class="info-box" style="display: none; margin-top: 20px;">
@@ -3247,13 +3330,35 @@ def search_bst(root, target):
 
         // ==================== INTERACTIVE DEMOS ====================
 
-        // Byte Demo - Interactive Bit Flipper
+        // Byte Demo - Interactive Bit Flipper with Enhanced Step Trace
         const byteDemo = {
             bits: [0, 0, 0, 0, 0, 0, 0, 0],
             animationFrame: null,
+            traceLog: [],
             
             init() {
+                this.addTrace('Byte Demo Initialized', 'Starting with 8 bits, all set to 0');
                 this.render();
+            },
+            
+            addTrace(operation, detail) {
+                const timestamp = new Date().toLocaleTimeString();
+                this.traceLog.unshift({operation, detail, timestamp});
+                if (this.traceLog.length > 10) this.traceLog.pop();
+                this.updateTraceDisplay();
+            },
+            
+            updateTraceDisplay() {
+                const traceElement = document.getElementById('byte-trace');
+                if (traceElement) {
+                    traceElement.innerHTML = '<div style="font-weight: 600; color: var(--mclaren-orange); margin-bottom: 0.5rem;">STEP TRACE LOG:</div>' +
+                        this.traceLog.map(entry => `
+                            <div style="padding: 0.25rem; margin: 0.25rem 0; background: rgba(255, 255, 255, 0.02); border-left: 2px solid var(--meta-blue); font-size: 0.85rem;">
+                                <span style="color: var(--text-dim);">[${entry.timestamp}]</span> 
+                                <strong>${entry.operation}:</strong> ${entry.detail}
+                            </div>
+                        `).join('');
+                }
             },
             
             render() {
@@ -3279,7 +3384,20 @@ def search_bst(root, target):
             },
             
             flipBit(index) {
-                this.bits[index] = this.bits[index] ? 0 : 1;
+                const oldValue = this.bits[index];
+                const newValue = oldValue ? 0 : 1;
+                this.bits[index] = newValue;
+                
+                const position = 7 - index; // Display position (MSB to LSB)
+                const weight = Math.pow(2, index);
+                const oldDecimal = this.bits.reduce((sum, bit, i) => sum + (bit * Math.pow(2, i)), 0) - (newValue - oldValue) * weight;
+                const newDecimal = this.bits.reduce((sum, bit, i) => sum + (bit * Math.pow(2, i)), 0);
+                
+                this.addTrace(
+                    `Bit ${position} Flipped`,
+                    `Changed from ${oldValue} to ${newValue} (weight: 2^${index}=${weight}). Decimal: ${oldDecimal} → ${newDecimal}`
+                );
+                
                 this.render();
             },
             
@@ -3296,17 +3414,24 @@ def search_bst(root, target):
             },
             
             reset() {
+                const oldDecimal = this.bits.reduce((sum, bit, i) => sum + (bit * Math.pow(2, i)), 0);
                 this.bits = [0, 0, 0, 0, 0, 0, 0, 0];
+                this.addTrace('Reset All Bits', `Cleared all bits. Decimal: ${oldDecimal} → 0`);
                 this.render();
             },
             
             setMax() {
+                const oldDecimal = this.bits.reduce((sum, bit, i) => sum + (bit * Math.pow(2, i)), 0);
                 this.bits = [1, 1, 1, 1, 1, 1, 1, 1];
+                this.addTrace('Set Maximum', `All bits set to 1. Decimal: ${oldDecimal} → 255 (0xFF)`);
                 this.render();
             },
             
             randomize() {
+                const oldDecimal = this.bits.reduce((sum, bit, i) => sum + (bit * Math.pow(2, i)), 0);
                 this.bits = Array.from({length: 8}, () => Math.random() > 0.5 ? 1 : 0);
+                const newDecimal = this.bits.reduce((sum, bit, i) => sum + (bit * Math.pow(2, i)), 0);
+                this.addTrace('Randomize', `Generated random byte. Decimal: ${oldDecimal} → ${newDecimal} (0x${newDecimal.toString(16).toUpperCase()})`);
                 this.render();
             },
             
@@ -3314,17 +3439,23 @@ def search_bst(root, target):
                 if (this.animationFrame) {
                     cancelAnimationFrame(this.animationFrame);
                     this.animationFrame = null;
+                    this.addTrace('Animation Stopped', 'Counting sequence halted');
                     return;
                 }
                 
+                this.addTrace('Animation Started', 'Counting from 0 to 255 in binary');
                 let count = 0;
                 const animateCount = () => {
                     if (count > 255) {
                         this.animationFrame = null;
+                        this.addTrace('Animation Complete', 'Counted all 256 possible byte values');
                         return;
                     }
                     
                     this.bits = count.toString(2).padStart(8, '0').split('').reverse().map(Number);
+                    if (count % 16 === 0) { // Log every 16th value to avoid spam
+                        this.addTrace(`Counting: ${count}`, `Binary: ${this.bits.slice().reverse().join('')}`);
+                    }
                     this.render();
                     count++;
                     
@@ -3336,8 +3467,9 @@ def search_bst(root, target):
             }
         };
 
-        // Memory Hierarchy Demo
+        // Memory Hierarchy Demo with Step Trace
         const hierarchyDemo = {
+            traceLog: [],
             levels: [
                 { name: 'Registers', size: '~1 KB', time: '<1 ns', cost: '$10,000/GB', details: 'Fastest memory, built into CPU. Holds immediate operands and results.' },
                 { name: 'L1 Cache', size: '~64 KB', time: '1-2 ns', cost: '$5,000/GB', details: 'Split into instruction cache (L1i) and data cache (L1d). Per-core.' },
@@ -3349,9 +3481,31 @@ def search_bst(root, target):
             ],
             selectedLevel: null,
             
+            addTrace(operation, detail) {
+                const timestamp = new Date().toLocaleTimeString();
+                this.traceLog.unshift({operation, detail, timestamp});
+                if (this.traceLog.length > 10) this.traceLog.pop();
+                this.updateTraceDisplay();
+            },
+            
+            updateTraceDisplay() {
+                const traceElement = document.getElementById('hierarchy-trace');
+                if (traceElement) {
+                    traceElement.innerHTML = '<div style="font-weight: 600; color: var(--mclaren-orange); margin-bottom: 0.5rem;">MEMORY ACCESS TRACE:</div>' +
+                        this.traceLog.map(entry => `
+                            <div style="padding: 0.25rem; margin: 0.25rem 0; background: rgba(255, 255, 255, 0.02); border-left: 2px solid var(--meta-blue); font-size: 0.85rem;">
+                                <span style="color: var(--text-dim);">[${entry.timestamp}]</span> 
+                                <strong>${entry.operation}:</strong> ${entry.detail}
+                            </div>
+                        `).join('');
+                }
+            },
+            
             selectLevel(level) {
                 this.selectedLevel = level;
                 const info = this.levels[level];
+                
+                this.addTrace(`Selected ${info.name}`, `Access time: ${info.time}, Capacity: ${info.size}, Cost: ${info.cost}`);
                 
                 document.getElementById('hierarchy-level').textContent = info.name;
                 document.getElementById('hierarchy-time').textContent = info.time;
@@ -3375,11 +3529,16 @@ def search_bst(root, target):
             },
             
             simulateAccess() {
+                this.addTrace('Memory Access Simulation Started', 'Simulating data request flowing through hierarchy');
                 const levels = document.querySelectorAll('.pyramid-level');
                 let delay = 0;
                 
                 levels.forEach((level, i) => {
                     setTimeout(() => {
+                        const levelName = this.levels[i].name;
+                        const levelTime = this.levels[i].time;
+                        this.addTrace(`Checking ${levelName}`, `Access time: ${levelTime} - ${i === 0 ? 'MISS - checking next level' : i < 4 ? 'MISS - checking next level' : 'HIT - data found!'}`);
+                        
                         level.style.background = 'linear-gradient(135deg, var(--mclaren-orange), var(--mclaren-dark))';
                         setTimeout(() => {
                             level.style.background = 'linear-gradient(135deg, var(--meta-blue), var(--meta-dark))';
@@ -3387,6 +3546,10 @@ def search_bst(root, target):
                     }, delay);
                     delay += 400;
                 });
+                
+                setTimeout(() => {
+                    this.addTrace('Access Complete', 'Total latency: sum of all levels checked until hit');
+                }, delay);
             },
             
             benchmarkSpeed() {
