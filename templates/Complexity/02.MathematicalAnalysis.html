@@ -1176,7 +1176,7 @@
     <!-- Navigation -->
     <nav>
         <div class="nav-container">
-            <div class="nav-logo">DS-Rover | Complexity Analysis</div>
+            <div class="nav-logo">ROVER</div>
             <div class="nav-actions">
                 <button class="btn" onclick="collapseAll()">Collapse All</button>
                 <button class="btn" onclick="expandAll()">Expand All</button>
@@ -1254,9 +1254,10 @@
                         <h3 class="subsection-title">Starting from Absolute Zero</h3>
                         
                         <div class="feynman-box">
-                            <div class="feynman-title">🎯 Feynman's First Principle:</div>
+                            <div class="feynman-title">Feynman's First Principle:</div>
                             <p>Imagine you have a phone book with 1,000 pages. You need to find "John Smith".</p>
                             <p style="margin-top: 0.5rem;"><strong>The Key Question:</strong> What's the FASTEST way to find him?</p>
+                            <p style="margin-top: 0.5rem; color: var(--meta-blue);"><strong>Deep Dive:</strong> This question encapsulates the entire field of algorithm analysis. We're not just looking for "a" solution - we're looking for the OPTIMAL solution that minimizes resource consumption.</p>
                         </div>
 
                         <div class="content">
@@ -1285,16 +1286,23 @@ Found him in about <span class="number">10</span> tries
                             </div>
 
                             <div class="feynman-box">
-                                <div class="feynman-title">🧠 Feynman's Insight:</div>
+                                <div class="feynman-title">Feynman's Insight:</div>
                                 <p>Binary search is like playing "20 Questions". Each guess eliminates HALF the possibilities!</p>
                                 <p style="margin-top: 0.5rem;">Linear search is like checking every house on a street. Binary search is like starting in the middle and asking "is it to the left or right?"</p>
                                 <p style="margin-top: 0.5rem; color: var(--mclaren-orange); font-weight: 600;">This is what complexity analysis is about - finding the smartest way to solve problems!</p>
+                                <div style="margin-top: 1rem; padding: 1rem; background: rgba(0, 129, 251, 0.05); border-left: 3px solid var(--meta-blue);">
+                                    <p><strong>Mathematical Foundation:</strong></p>
+                                    <p>The power of binary search comes from the mathematical property of logarithmic reduction:</p>
+                                    <p style="font-family: monospace; margin: 0.5rem 0;">n → n/2 → n/4 → n/8 → ... → 1</p>
+                                    <p>This forms a geometric sequence with ratio 1/2, requiring exactly ⌈log₂(n)⌉ steps to reach 1.</p>
+                                    <p style="margin-top: 0.5rem;"><strong>Information Theory Perspective:</strong> Each comparison provides exactly 1 bit of information (yes/no), and we need log₂(n) bits to uniquely identify one item among n possibilities.</p>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Interactive Demo -->
                         <div class="demo-container">
-                            <div class="demo-title">🎮 Interactive: Phone Book Search Comparison</div>
+                            <div class="demo-title">Interactive: Phone Book Search Comparison</div>
                             
                             <div class="tabs">
                                 <button class="tab active" onclick="switchTab('linear', this)">Linear Search</button>
@@ -1338,13 +1346,19 @@ Found him in about <span class="number">10</span> tries
                         <h3 class="subsection-title">The Real Questions We're Answering</h3>
                         
                         <div class="feynman-box">
-                            <div class="feynman-title">🎯 Feynman's Core Questions:</div>
+                            <div class="feynman-title">Feynman's Core Questions:</div>
                             <p>When you write code, you're asking the computer to do work. The questions are:</p>
                             <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
                                 <li>How much work does my code do?</li>
                                 <li>If my data gets bigger, how much MORE work will it do?</li>
                                 <li>Is there a faster way to do the same thing?</li>
                             </ol>
+                            <div style="margin-top: 1rem; padding: 1rem; background: rgba(255, 128, 0, 0.05); border-left: 3px solid var(--mclaren-orange);">
+                                <p><strong>Technical Deep Dive - The Three Pillars of Algorithm Analysis:</strong></p>
+                                <p><strong>1. Work Quantification:</strong> We measure work in terms of primitive operations (comparisons, assignments, arithmetic operations). Each operation is assumed to take constant time O(1) on the underlying hardware.</p>
+                                <p style="margin-top: 0.5rem;"><strong>2. Scalability Analysis:</strong> We examine the growth function f(n) where n is the input size. The key insight is that constants and lower-order terms become negligible as n approaches infinity.</p>
+                                <p style="margin-top: 0.5rem;"><strong>3. Optimization Theory:</strong> Finding faster algorithms often involves exploiting mathematical properties of the problem domain - symmetry, ordering, divisibility, or structural patterns in the data.</p>
+                            </div>
                         </div>
 
                         <div class="content">
@@ -1365,10 +1379,17 @@ numbers = [<span class="number">5</span>, <span class="number">2</span>, <span c
                             </div>
 
                             <div class="feynman-box">
-                                <div class="feynman-title">🧠 Feynman's Explanation:</div>
+                                <div class="feynman-title">Feynman's Explanation:</div>
                                 <p><strong>Think of it like this:</strong> You're looking at a line of people to find the tallest one.</p>
                                 <p style="margin-top: 0.5rem;">You start by remembering the first person's height. Then you walk down the line. Each time you see someone taller, you update your memory.</p>
                                 <p style="margin-top: 0.5rem; color: var(--meta-blue);">You can't skip anyone - you MUST look at every person once. That's why we need n comparisons for n numbers!</p>
+                                <div style="margin-top: 1rem; padding: 1rem; background: rgba(220, 0, 0, 0.05); border-left: 3px solid var(--redbull-red);">
+                                    <p><strong>Proof of Lower Bound:</strong></p>
+                                    <p>We can prove mathematically that finding the maximum requires at least n-1 comparisons:</p>
+                                    <p style="margin: 0.5rem 0;"><strong>Adversary Argument:</strong> An adversary can always arrange the input such that the maximum is the last element examined. Until we've seen all n elements, we cannot be certain we've found the true maximum.</p>
+                                    <p style="margin: 0.5rem 0;"><strong>Tournament Tree Model:</strong> To determine a winner among n competitors, we need at least n-1 matches (comparisons) to eliminate n-1 losers.</p>
+                                    <p style="margin-top: 0.5rem; font-weight: 600;">This proves that O(n) is optimal for the maximum-finding problem - no algorithm can do better in the worst case.</p>
+                                </div>
                             </div>
 
                             <p><strong>Let's trace through step by step:</strong></p>
@@ -1389,7 +1410,7 @@ Total comparisons: <span class="number">6</span> (one for each number)</pre>
                             </div>
 
                             <div class="feynman-box">
-                                <div class="feynman-title">🎯 Key Observation:</div>
+                                <div class="feynman-title">Key Observation:</div>
                                 <p style="font-weight: 600; font-size: 1.1rem;">
                                     6 numbers → 6 comparisons<br>
                                     10 numbers → 10 comparisons<br>
@@ -1397,12 +1418,24 @@ Total comparisons: <span class="number">6</span> (one for each number)</pre>
                                     <span style="color: var(--mclaren-orange);">n numbers → n comparisons</span>
                                 </p>
                                 <p style="margin-top: 1rem;">This is what we call <span class="complexity-badge complexity-n">O(n)</span> complexity - "Order of n" or "Linear complexity"</p>
+                                <div style="margin-top: 1rem; padding: 1rem; background: rgba(0, 129, 251, 0.05); border-left: 3px solid var(--meta-blue);">
+                                    <p><strong>Formal Definition of O(n):</strong></p>
+                                    <p>An algorithm is O(n) if there exist positive constants c and n₀ such that:</p>
+                                    <p style="font-family: monospace; text-align: center; margin: 0.5rem 0; font-size: 1.1rem;">T(n) ≤ c·n for all n ≥ n₀</p>
+                                    <p>Where T(n) is the time complexity function.</p>
+                                    <p style="margin-top: 0.5rem;"><strong>Linear Growth Characteristics:</strong></p>
+                                    <ul style="margin: 0.5rem 0 0 1.5rem;">
+                                        <li>Doubling the input doubles the runtime</li>
+                                        <li>Growth rate is constant: ΔT/Δn = c</li>
+                                        <li>Common in: scanning, searching, summing, copying</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Find Max Demo -->
                         <div class="demo-container">
-                            <div class="demo-title">🎮 Interactive: Finding Maximum</div>
+                            <div class="demo-title">Interactive: Finding Maximum with Step Trace</div>
                             <div class="demo-controls">
                                 <input type="text" id="maxInput" class="demo-input" value="5,2,9,1,7,6" placeholder="Numbers (comma-separated)">
                                 <button class="btn btn-primary" onclick="runFindMax()">Find Maximum</button>
@@ -1418,7 +1451,7 @@ Total comparisons: <span class="number">6</span> (one for each number)</pre>
                         <h3 class="subsection-title">Why Different Data Sizes Matter</h3>
                         
                         <div class="feynman-box">
-                            <div class="feynman-title">🧠 Feynman's Perspective:</div>
+                            <div class="feynman-title">Feynman's Perspective:</div>
                             <p>Let's say each comparison takes 1 microsecond (1/1,000,000 of a second).</p>
                             <p style="margin-top: 0.5rem;">When n is small, everything feels instant. But as n grows, the differences become MASSIVE!</p>
                         </div>
@@ -1458,10 +1491,19 @@ Total comparisons: <span class="number">6</span> (one for each number)</pre>
                             </div>
 
                             <div class="feynman-box">
-                                <div class="feynman-title">🧠 Feynman's Insight:</div>
+                                <div class="feynman-title">Feynman's Insight:</div>
                                 <p><strong>Think of it like handshakes at a party:</strong></p>
                                 <p style="margin-top: 0.5rem;">If 6 people each shake hands with all 6 people (including themselves), that's 6 × 6 = 36 handshakes!</p>
                                 <p style="margin-top: 0.5rem; color: var(--redbull-red); font-weight: 600;">This grows MUCH faster than linear!</p>
+                                <div style="margin-top: 1rem; padding: 1rem; background: rgba(220, 0, 0, 0.05); border-left: 3px solid var(--redbull-red);">
+                                    <p><strong>Mathematical Analysis of Quadratic Growth:</strong></p>
+                                    <p>The nested loop structure creates a Cartesian product of the input with itself:</p>
+                                    <p style="font-family: monospace; margin: 0.5rem 0;">Total operations = Σᵢ₌₁ⁿ Σⱼ₌₁ⁿ 1 = n × n = n²</p>
+                                    <p><strong>Growth Rate Analysis:</strong></p>
+                                    <p>The derivative d(n²)/dn = 2n shows that the growth rate itself increases linearly with n.</p>
+                                    <p style="margin-top: 0.5rem;"><strong>Real-World Impact:</strong></p>
+                                    <p>At n=1,000,000: O(n) takes 1 second, O(n²) takes 11.6 days!</p>
+                                </div>
                             </div>
 
                             <p><strong>How many comparisons now?</strong></p>
@@ -1505,13 +1547,19 @@ This is <span class="complexity-badge complexity-n2">O(n²)</span> complexity - 
                             </table>
 
                             <div class="feynman-box" style="background: rgba(220, 0, 0, 0.08); border-color: var(--redbull-red);">
-                                <div class="feynman-title" style="color: var(--redbull-red);">🎯 THIS is why we study complexity!</div>
+                                <div class="feynman-title" style="color: var(--redbull-red);">THIS is why we study complexity!</div>
                                 <p style="font-weight: 600; font-size: 1.1rem;">The difference between O(n) and O(n²) can mean the difference between:</p>
                                 <ul style="margin: 0.5rem 0 0 1.5rem; font-weight: 600;">
                                     <li>0.01 seconds vs 100 seconds</li>
                                     <li>Instant response vs painful wait</li>
                                     <li>Happy users vs app uninstalled</li>
                                 </ul>
+                                <div style="margin-top: 1rem; padding: 1rem; background: rgba(255, 255, 255, 0.03); border-radius: 8px;">
+                                    <p><strong>Industry Case Study:</strong></p>
+                                    <p>Twitter's timeline algorithm originally used O(n²) friend-of-friend calculations. With millions of users, this became impossible. They redesigned using O(n log n) algorithms with caching, reducing computation by 99.9%.</p>
+                                    <p style="margin-top: 0.5rem;"><strong>The Exponential Wall:</strong></p>
+                                    <p>There's a fundamental barrier at O(n²) where problems become intractable for large datasets. Modern big data systems are specifically designed to avoid quadratic algorithms at all costs.</p>
+                                </div>
                             </div>
                         </div>
 
@@ -1558,8 +1606,15 @@ This is <span class="complexity-badge complexity-n2">O(n²)</span> complexity - 
                         <h3 class="subsection-title">What is a Logarithm? (The Simplest Explanation)</h3>
                         
                         <div class="feynman-box">
-                            <div class="feynman-title">🎯 Feynman's Starting Point:</div>
+                            <div class="feynman-title">Feynman's Starting Point:</div>
                             <p>Let's start with something you ALREADY know - multiplication!</p>
+                            <div style="margin-top: 1rem; padding: 1rem; background: rgba(0, 129, 251, 0.05); border-left: 3px solid var(--meta-blue);">
+                                <p><strong>Historical Context:</strong></p>
+                                <p>John Napier invented logarithms in 1614 to simplify astronomical calculations. Before calculators, logarithms transformed multiplication into addition, making complex calculations feasible.</p>
+                                <p style="margin-top: 0.5rem;"><strong>The Fundamental Property:</strong></p>
+                                <p style="font-family: monospace;">log(a × b) = log(a) + log(b)</p>
+                                <p>This property is why logarithms appear naturally in divide-and-conquer algorithms!</p>
+                            </div>
                         </div>
 
                         <div class="content">
@@ -1575,7 +1630,7 @@ We can write this shorter:
                             </div>
 
                             <div class="feynman-box">
-                                <div class="feynman-title">🧠 Feynman's Key Insight:</div>
+                                <div class="feynman-title">Feynman's Key Insight:</div>
                                 <p><strong>A logarithm asks the OPPOSITE question:</strong></p>
                                 <div class="code-block" style="margin-top: 0.5rem; background: rgba(0, 129, 251, 0.1);">
 <pre>If 2³ = 8, then log₂(8) = 3
@@ -1586,6 +1641,18 @@ Read as: "log base 2 of 8 equals 3"
 Answer: 3 (because 2 × 2 × 2 = 8)</pre>
                                 </div>
                                 <p style="margin-top: 1rem; font-weight: 600; color: var(--mclaren-orange);">Powers and logarithms are OPPOSITES - like multiplication and division!</p>
+                                <div style="margin-top: 1rem; padding: 1rem; background: rgba(255, 128, 0, 0.05); border-left: 3px solid var(--mclaren-orange);">
+                                    <p><strong>Formal Mathematical Definition:</strong></p>
+                                    <p>For b > 0, b ≠ 1, and x > 0:</p>
+                                    <p style="font-family: monospace; text-align: center; margin: 0.5rem 0; font-size: 1.1rem;">logₐ(x) = y ⇔ b^y = x</p>
+                                    <p><strong>Key Properties for Algorithm Analysis:</strong></p>
+                                    <ul style="margin: 0.5rem 0 0 1.5rem;">
+                                        <li>logₐ(1) = 0 (base case in recursion)</li>
+                                        <li>logₐ(b) = 1 (identity element)</li>
+                                        <li>logₐ(x^n) = n·logₐ(x) (power rule)</li>
+                                        <li>logₐ(x) = logₙ(x) / logₙ(b) (change of base)</li>
+                                    </ul>
+                                </div>
                             </div>
 
                             <table class="data-table">
@@ -1607,7 +1674,7 @@ Answer: 3 (because 2 × 2 × 2 = 8)</pre>
 
                         <!-- Log Calculator -->
                         <div class="demo-container">
-                            <div class="demo-title">🧮 Interactive: Logarithm Calculator</div>
+                            <div class="demo-title">Interactive: Logarithm Calculator</div>
                             <div class="demo-controls">
                                 <input type="number" id="logBase" class="demo-input" value="2" min="2" placeholder="Base (b)">
                                 <input type="number" id="logNum" class="demo-input" value="8" min="1" placeholder="Number (n)">
@@ -1621,11 +1688,20 @@ Answer: 3 (because 2 × 2 × 2 = 8)</pre>
                     <div class="subsection glass">
                         <h3 class="subsection-title">Why Logarithms Appear in Algorithms</h3>
                         
-                        <div class="feynman-box">
-                            <div class="feynman-title">🧠 Feynman's Pattern Recognition:</div>
-                            <p>Remember the phone book? Let's understand WHY it takes log₂(n) steps!</p>
-                            <p style="margin-top: 0.5rem; font-weight: 600; color: var(--meta-blue);">Every time you divide something in half, you're doing a logarithmic operation!</p>
-                        </div>
+                            <div class="feynman-box">
+                                <div class="feynman-title">Feynman's Pattern Recognition:</div>
+                                <p>Remember the phone book? Let's understand WHY it takes log₂(n) steps!</p>
+                                <p style="margin-top: 0.5rem; font-weight: 600; color: var(--meta-blue);">Every time you divide something in half, you're doing a logarithmic operation!</p>
+                                <div style="margin-top: 1rem; padding: 1rem; background: rgba(63, 185, 80, 0.05); border-left: 3px solid #3fb950;">
+                                    <p><strong>Mathematical Proof:</strong></p>
+                                    <p>Starting with n elements, after k divisions by 2:</p>
+                                    <p style="font-family: monospace; margin: 0.5rem 0;">n / 2^k = 1</p>
+                                    <p>Solving for k:</p>
+                                    <p style="font-family: monospace; margin: 0.5rem 0;">n = 2^k</p>
+                                    <p style="font-family: monospace; margin: 0.5rem 0;">k = log₂(n)</p>
+                                    <p style="margin-top: 0.5rem;"><strong>This proves that binary search requires exactly ⌈log₂(n)⌉ comparisons in the worst case.</strong></p>
+                                </div>
+                            </div>
 
                         <div class="content">
                             <p><strong>Phone book with 1,024 pages using binary search:</strong></p>
@@ -1651,7 +1727,7 @@ Pattern: 1,024 → 512 → 256 → 128 → 64 → 32 → 16 → 8 → 4 → 2 �
                             </div>
 
                             <div class="feynman-box">
-                                <div class="feynman-title">🎯 The Beautiful Pattern:</div>
+                                <div class="feynman-title">The Beautiful Pattern:</div>
                                 <p style="font-size: 1.1rem; font-weight: 600;">
                                     1,024 pages → log₂(1,024) = 10 steps<br>
                                     1,000,000 pages → log₂(1,000,000) ≈ 20 steps
@@ -1660,12 +1736,22 @@ Pattern: 1,024 → 512 → 256 → 128 → 64 → 32 → 16 → 8 → 4 → 2 �
                                     A MILLION pages in just 20 steps!
                                 </p>
                                 <p style="margin-top: 0.5rem;">This is why logarithmic algorithms are AMAZING!</p>
+                                <div style="margin-top: 1rem; padding: 1rem; background: rgba(0, 129, 251, 0.05); border-left: 3px solid var(--meta-blue);">
+                                    <p><strong>Real-World Applications of O(log n):</strong></p>
+                                    <ul style="margin: 0.5rem 0 0 1.5rem;">
+                                        <li><strong>Database Indexes:</strong> B-trees and B+ trees use logarithmic search to find records among billions</li>
+                                        <li><strong>Git Bisect:</strong> Finds bugs by binary searching through commit history</li>
+                                        <li><strong>Load Balancers:</strong> Consistent hashing uses binary search for server selection</li>
+                                        <li><strong>Memory Allocation:</strong> Buddy systems use logarithmic algorithms for memory management</li>
+                                    </ul>
+                                    <p style="margin-top: 0.5rem;"><strong>The Log Barrier:</strong> Many problems have been proven to require at least O(log n) time, making logarithmic algorithms optimal for comparison-based searching.</p>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Log Growth Chart -->
                         <div class="demo-container">
-                            <div class="demo-title">📊 Log Growth Visualization</div>
+                            <div class="demo-title">Log Growth Visualization</div>
                             <div class="chart-container">
                                 <canvas id="logGrowthChart"></canvas>
                             </div>
@@ -1690,13 +1776,26 @@ Pattern: 1,024 → 512 → 256 → 128 → 64 → 32 → 16 → 8 → 4 → 2 �
                             </tbody>
                         </table>
 
-                        <div class="feynman-box">
-                            <div class="feynman-title">🎯 Key Insight:</div>
-                            <p style="font-weight: 600; font-size: 1.1rem; color: var(--mclaren-orange);">
-                                Every time you DOUBLE your data, you only add ONE more step!
-                            </p>
-                            <p style="margin-top: 0.5rem;">This is why we say logarithmic growth is VERY slow.</p>
-                        </div>
+                            <div class="feynman-box">
+                                <div class="feynman-title">Key Insight:</div>
+                                <p style="font-weight: 600; font-size: 1.1rem; color: var(--mclaren-orange);">
+                                    Every time you DOUBLE your data, you only add ONE more step!
+                                </p>
+                                <p style="margin-top: 0.5rem;">This is why we say logarithmic growth is VERY slow.</p>
+                                <div style="margin-top: 1rem; padding: 1rem; background: rgba(255, 128, 0, 0.05); border-left: 3px solid var(--mclaren-orange);">
+                                    <p><strong>Mathematical Perspective on Logarithmic Growth:</strong></p>
+                                    <p>The derivative of log(n) is 1/n, which approaches 0 as n increases:</p>
+                                    <p style="font-family: monospace; text-align: center; margin: 0.5rem 0;">d/dn[log(n)] = 1/n → 0 as n → ∞</p>
+                                    <p>This means the rate of growth continuously decreases, making logarithmic algorithms incredibly efficient for large datasets.</p>
+                                    <p style="margin-top: 0.5rem;"><strong>Comparison at Scale:</strong></p>
+                                    <p>For n = 10^9 (1 billion):</p>
+                                    <ul style="margin: 0.5rem 0 0 1.5rem;">
+                                        <li>O(n): 1,000,000,000 operations</li>
+                                        <li>O(log n): ~30 operations</li>
+                                        <li>Speedup: 33,333,333x faster!</li>
+                                    </ul>
+                                </div>
+                            </div>
                     </div>
 
                 </div>
@@ -1727,7 +1826,7 @@ Pattern: 1,024 → 512 → 256 → 128 → 64 → 32 → 16 → 8 → 4 → 2 �
                         <h3 class="subsection-title">What is Big-O?</h3>
                         
                         <div class="feynman-box">
-                            <div class="feynman-title">🎯 Feynman's Definition:</div>
+                            <div class="feynman-title">Feynman's Definition:</div>
                             <p>Big-O is a way to describe how fast a function grows when the input gets really big.</p>
                             <p style="margin-top: 0.5rem; font-weight: 600;">Think of it like describing how a plant grows:</p>
                             <ul style="margin: 0.5rem 0 0 1.5rem;">
@@ -1737,6 +1836,19 @@ Pattern: 1,024 → 512 → 256 → 128 → 64 → 32 → 16 → 8 → 4 → 2 �
                                 <li>Some grow REALLY fast (quadratic - O(n²))</li>
                             </ul>
                             <p style="margin-top: 0.5rem; color: var(--mclaren-orange);">Big-O does the same for algorithms!</p>
+                            <div style="margin-top: 1rem; padding: 1rem; background: rgba(0, 129, 251, 0.05); border-left: 3px solid var(--meta-blue);">
+                                <p><strong>Formal Mathematical Definition:</strong></p>
+                                <p>f(n) = O(g(n)) if and only if there exist positive constants c and n₀ such that:</p>
+                                <p style="font-family: monospace; text-align: center; margin: 0.5rem 0; font-size: 1.1rem;">0 ≤ f(n) ≤ c·g(n) for all n ≥ n₀</p>
+                                <p style="margin-top: 0.5rem;">This means g(n) is an <strong>upper bound</strong> on f(n)'s growth rate.</p>
+                                <p style="margin-top: 0.5rem;"><strong>Related Notations:</strong></p>
+                                <ul style="margin: 0.5rem 0 0 1.5rem;">
+                                    <li>Ω (Big-Omega): Lower bound</li>
+                                    <li>Θ (Big-Theta): Tight bound (both upper and lower)</li>
+                                    <li>o (Little-o): Strict upper bound</li>
+                                    <li>ω (Little-omega): Strict lower bound</li>
+                                </ul>
+                            </div>
                         </div>
 
                         <div class="content">
@@ -1801,7 +1913,7 @@ What dominates? The 3,000,000 from 3n²!
 
                         <!-- Big-O Chart -->
                         <div class="demo-container">
-                            <div class="demo-title">📊 Big-O Growth Comparison</div>
+                            <div class="demo-title">Big-O Growth Comparison</div>
                             <div class="chart-container">
                                 <canvas id="bigOChart"></canvas>
                             </div>
@@ -1832,16 +1944,33 @@ What dominates? The 3,000,000 from 3n²!
             <div class="section-content">
                 <div class="section-inner">
                     
-                    <div class="feynman-box" style="background: rgba(255, 128, 0, 0.08);">
-                        <div class="feynman-title">🎯 Feynman's Approach to Code Analysis:</div>
-                        <p>To analyze code complexity, ask these simple questions:</p>
-                        <ol style="margin: 0.5rem 0 0 1.5rem; font-weight: 600;">
-                            <li>How many times do the loops run?</li>
-                            <li>Are the loops nested? (Multiply!)</li>
-                            <li>Does the loop variable multiply/divide? (Logarithmic!)</li>
-                            <li>Any function calls inside loops? (Add their complexity!)</li>
-                        </ol>
-                    </div>
+                        <div class="feynman-box" style="background: rgba(255, 128, 0, 0.08);">
+                            <div class="feynman-title">Feynman's Approach to Code Analysis:</div>
+                            <p>To analyze code complexity, ask these simple questions:</p>
+                            <ol style="margin: 0.5rem 0 0 1.5rem; font-weight: 600;">
+                                <li>How many times do the loops run?</li>
+                                <li>Are the loops nested? (Multiply!)</li>
+                                <li>Does the loop variable multiply/divide? (Logarithmic!)</li>
+                                <li>Any function calls inside loops? (Add their complexity!)</li>
+                            </ol>
+                            <div style="margin-top: 1rem; padding: 1rem; background: rgba(255, 255, 255, 0.03); border-radius: 8px;">
+                                <p><strong>Advanced Analysis Techniques:</strong></p>
+                                <ul style="margin: 0.5rem 0 0 1.5rem;">
+                                    <li><strong>Recurrence Relations:</strong> For recursive algorithms, solve T(n) = aT(n/b) + f(n)</li>
+                                    <li><strong>Master Theorem:</strong> Provides solutions for common divide-and-conquer recurrences</li>
+                                    <li><strong>Amortized Analysis:</strong> Averages cost over a sequence of operations</li>
+                                    <li><strong>Probabilistic Analysis:</strong> Expected runtime for randomized algorithms</li>
+                                </ul>
+                                <p style="margin-top: 0.5rem;"><strong>Code Pattern Recognition:</strong></p>
+                                <ul style="margin: 0.5rem 0 0 1.5rem;">
+                                    <li>Single loop over n elements: O(n)</li>
+                                    <li>Loop halving/doubling: O(log n)</li>
+                                    <li>Nested loops to n: O(n²)</li>
+                                    <li>Recursion with branching: Often O(2^n)</li>
+                                    <li>Sorting algorithms: Typically O(n log n)</li>
+                                </ul>
+                            </div>
+                        </div>
 
                     <!-- Example 1 -->
                     <div class="subsection glass">
@@ -1855,12 +1984,22 @@ What dominates? The 3,000,000 from 3n²!
                         </div>
 
                         <div class="feynman-box">
-                            <div class="feynman-title">🧠 Analysis:</div>
+                            <div class="feynman-title">Analysis:</div>
                             <p>Loop runs n times → Each iteration is O(1) → Total: O(n)</p>
+                            <div style="margin-top: 1rem; padding: 1rem; background: rgba(0, 129, 251, 0.05); border-left: 3px solid var(--meta-blue);">
+                                <p><strong>Detailed Step-by-Step Analysis:</strong></p>
+                                <p>Line 1: total = 0 → O(1) operation</p>
+                                <p>Line 2: for i in range(n) → Loop executes n times</p>
+                                <p>Line 3: total += i → O(1) operation per iteration</p>
+                                <p>Line 4: return total → O(1) operation</p>
+                                <p style="margin-top: 0.5rem;"><strong>Total Time Complexity:</strong></p>
+                                <p style="font-family: monospace;">T(n) = 1 + n × 1 + 1 = n + 2 = O(n)</p>
+                                <p style="margin-top: 0.5rem;"><strong>Space Complexity:</strong> O(1) - only uses constant extra space for variables</p>
+                            </div>
                         </div>
 
                         <div class="demo-container">
-                            <div class="demo-title">🎮 Execute Step-by-Step</div>
+                            <div class="demo-title">Execute Step-by-Step with Trace</div>
                             <div class="demo-controls">
                                 <input type="number" id="ex1N" class="demo-input" value="5" min="1" max="20">
                                 <button class="btn btn-primary" onclick="runEx1()">Run</button>
@@ -1880,12 +2019,21 @@ What dominates? The 3,000,000 from 3n²!
                         </div>
 
                         <div class="feynman-box">
-                            <div class="feynman-title">🧠 Analysis:</div>
+                            <div class="feynman-title">Analysis:</div>
                             <p>Outer: n times × Inner: n times = n × n = n² → O(n²)</p>
+                            <div style="margin-top: 1rem; padding: 1rem; background: rgba(220, 0, 0, 0.05); border-left: 3px solid var(--redbull-red);">
+                                <p><strong>Mathematical Proof of O(n²):</strong></p>
+                                <p>The total number of operations is:</p>
+                                <p style="font-family: monospace; margin: 0.5rem 0;">Σᵢ₌₀ⁿ⁻¹ Σⱼ₌₀ⁿ⁻¹ 1 = Σᵢ₌₀ⁿ⁻¹ n = n × n = n²</p>
+                                <p style="margin-top: 0.5rem;"><strong>Execution Pattern:</strong></p>
+                                <p>For n=4, the execution order is:</p>
+                                <p style="font-family: monospace; font-size: 0.9rem;">(0,0), (0,1), (0,2), (0,3),<br>(1,0), (1,1), (1,2), (1,3),<br>(2,0), (2,1), (2,2), (2,3),<br>(3,0), (3,1), (3,2), (3,3)</p>
+                                <p>Total: 16 iterations = 4²</p>
+                            </div>
                         </div>
 
                         <div class="demo-container">
-                            <div class="demo-title">🎮 Visualize Grid</div>
+                            <div class="demo-title">Visualize Grid Execution</div>
                             <div class="demo-controls">
                                 <input type="number" id="ex2N" class="demo-input" value="4" min="2" max="8">
                                 <button class="btn btn-primary" onclick="runEx2()">Visualize</button>
@@ -1907,14 +2055,30 @@ What dominates? The 3,000,000 from 3n²!
                         </div>
 
                         <div class="feynman-box">
-                            <div class="feynman-title">🧠 Analysis:</div>
+                            <div class="feynman-title">Analysis:</div>
                             <p>i doubles each time: 1 → 2 → 4 → 8 → 16...</p>
                             <p>After k iterations: i = 2^k → Stop when 2^k ≥ n → k = log₂(n)</p>
                             <p style="font-weight: 600; color: var(--meta-blue);">Result: O(log n)</p>
+                            <div style="margin-top: 1rem; padding: 1rem; background: rgba(63, 185, 80, 0.05); border-left: 3px solid #3fb950;">
+                                <p><strong>Rigorous Mathematical Proof:</strong></p>
+                                <p>Let k be the number of iterations. After k iterations:</p>
+                                <p style="font-family: monospace; margin: 0.5rem 0;">i = 2^0 × 2^k = 2^k</p>
+                                <p>The loop terminates when i ≥ n:</p>
+                                <p style="font-family: monospace; margin: 0.5rem 0;">2^k ≥ n</p>
+                                <p style="font-family: monospace; margin: 0.5rem 0;">k ≥ log₂(n)</p>
+                                <p style="font-family: monospace; margin: 0.5rem 0;">k = ⌈log₂(n)⌉</p>
+                                <p style="margin-top: 0.5rem;"><strong>Therefore: T(n) = O(log n)</strong></p>
+                                <p style="margin-top: 0.5rem;"><strong>Common Variations:</strong></p>
+                                <ul style="margin: 0.5rem 0 0 1.5rem;">
+                                    <li>i *= 3: Still O(log n), specifically O(log₃ n)</li>
+                                    <li>i *= 10: Still O(log n), specifically O(log₁₀ n)</li>
+                                    <li>All logarithmic bases differ only by a constant factor</li>
+                                </ul>
+                            </div>
                         </div>
 
                         <div class="demo-container">
-                            <div class="demo-title">🎮 Execute</div>
+                            <div class="demo-title">Execute with Trace</div>
                             <div class="demo-controls">
                                 <input type="number" id="ex4N" class="demo-input" value="16" min="2" max="1024">
                                 <button class="btn btn-primary" onclick="runEx4()">Run</button>
@@ -1965,7 +2129,7 @@ What dominates? The 3,000,000 from 3n²!
 
         <!-- Summary -->
         <div class="subsection glass" style="margin-top: 2rem; background: rgba(63, 185, 80, 0.08);">
-            <h2 style="color: #3fb950; margin-bottom: 1rem;">🎉 Session Complete!</h2>
+            <h2 style="color: #3fb950; margin-bottom: 1rem;">Session Complete!</h2>
             <p><strong>You've Mastered:</strong></p>
             <ul style="margin-left: 2rem; margin-top: 1rem; line-height: 2;">
                 <li>Why complexity matters (847 steps vs 10 steps!)</li>
@@ -1980,12 +2144,12 @@ What dominates? The 3,000,000 from 3n²!
     <!-- JavaScript with Chart.js -->
 
     <script>
-        console.log('%c🚀 JAVASCRIPT LOADING...', 'background: #FF8000; color: #000; padding: 10px; font-size: 20px; font-weight: bold;');
+        console.log('%cJAVASCRIPT LOADING...', 'background: #FF8000; color: #000; padding: 10px; font-size: 20px; font-weight: bold;');
         console.log('Script tag reached - JavaScript IS running!');
         
         // Check if Chart.js loaded
         window.addEventListener('DOMContentLoaded', function() {
-            console.log('%c✅ DOM CONTENT LOADED EVENT FIRED', 'background: #3fb950; color: #000; padding: 10px; font-size: 16px;');
+            console.log('%cDOM CONTENT LOADED EVENT FIRED', 'background: #3fb950; color: #000; padding: 10px; font-size: 16px;');
             if (typeof Chart === 'undefined') {
                 console.error('Chart.js failed to load - creating fallback visualizations');
                 // Create fallback message
@@ -1993,7 +2157,7 @@ What dominates? The 3,000,000 from 3n²!
                 style.textContent = '.chart-fallback { background: rgba(220, 0, 0, 0.1); border: 2px solid var(--redbull-red); padding: 1rem; border-radius: 8px; text-align: center; }';
                 document.head.appendChild(style);
             } else {
-                console.log('✅ Chart.js loaded successfully');
+                console.log('Chart.js loaded successfully');
             }
         });
         
@@ -2015,7 +2179,7 @@ What dominates? The 3,000,000 from 3n²!
         }
         
         // Log that functions are loaded
-        console.log('✅ Section toggle functions loaded');
+        console.log('Section toggle functions loaded');
 
         // Tab Switching
         function switchTab(tabId, btn) {
@@ -2027,18 +2191,23 @@ What dominates? The 3,000,000 from 3n²!
             document.getElementById(tabId).classList.add('active');
         }
         
-        console.log('✅ Tab switching function loaded');
+        console.log('Tab switching function loaded');
 
-        // Linear Search
+        // Linear Search with Enhanced Step Trace
         async function runLinearSearch() {
-            console.log('🎯 runLinearSearch called - BUTTON WORKS!');
+            console.log('runLinearSearch called - Enhanced with step trace');
             const pages = parseInt(document.getElementById('linearPages').value) || 16;
             const target = parseInt(document.getElementById('linearTarget').value) || 11;
             const visual = document.getElementById('linearVisual');
             const output = document.getElementById('linearOutput');
             
             visual.innerHTML = '';
-            output.innerHTML = '<div style="color: var(--mclaren-orange); font-weight: 600;">LINEAR SEARCH</div>';
+            output.innerHTML = '<div style="color: var(--mclaren-orange); font-weight: 600;">LINEAR SEARCH - STEP TRACE</div>';
+            output.innerHTML += '<div style="margin-top: 0.5rem; padding: 0.5rem; background: rgba(255, 128, 0, 0.1); border-radius: 4px;">';
+            output.innerHTML += `<strong>Algorithm:</strong> Check each page sequentially until target found<br>`;
+            output.innerHTML += `<strong>Target:</strong> Page ${target}<br>`;
+            output.innerHTML += `<strong>Total Pages:</strong> ${pages}<br>`;
+            output.innerHTML += `<strong>Time Complexity:</strong> O(n)</div>`;
             
             for (let i = 1; i <= pages; i++) {
                 const item = document.createElement('div');
@@ -2059,7 +2228,12 @@ What dominates? The 3,000,000 from 3n²!
                 if (i === target) {
                     item.classList.remove('active');
                     item.classList.add('found');
-                    output.innerHTML += `<div class="output-line" style="color: #3fb950; font-weight: 600; margin-top: 1rem;">✓ Found in ${steps} steps!</div>`;
+                    output.innerHTML += `<div class="output-line" style="color: #3fb950; font-weight: 600; margin-top: 1rem;">Found at page ${target} in ${steps} steps!</div>`;
+                    output.innerHTML += `<div style="margin-top: 0.5rem; padding: 0.5rem; background: rgba(63, 185, 80, 0.1); border-radius: 4px;">`;
+                    output.innerHTML += `<strong>Performance Analysis:</strong><br>`;
+                    output.innerHTML += `Steps taken: ${steps}<br>`;
+                    output.innerHTML += `Worst case would be: ${pages} steps<br>`;
+                    output.innerHTML += `Efficiency: ${((steps/pages) * 100).toFixed(1)}% of worst case</div>`;
                     break;
                 }
                 item.classList.remove('active');
@@ -2067,18 +2241,24 @@ What dominates? The 3,000,000 from 3n²!
             }
         }
 
-        console.log('✅ runLinearSearch function loaded');
+        console.log('runLinearSearch function loaded');
 
-        // Binary Search
+        // Binary Search with Enhanced Step Trace
         async function runBinarySearch() {
-            console.log('🎯 runBinarySearch called - BUTTON WORKS!');
+            console.log('runBinarySearch called - Enhanced with step trace');
             const pages = parseInt(document.getElementById('binaryPages').value) || 16;
             const target = parseInt(document.getElementById('binaryTarget').value) || 11;
             const visual = document.getElementById('binaryVisual');
             const output = document.getElementById('binaryOutput');
             
             visual.innerHTML = '';
-            output.innerHTML = '<div style="color: var(--meta-blue); font-weight: 600;">BINARY SEARCH</div>';
+            output.innerHTML = '<div style="color: var(--meta-blue); font-weight: 600;">BINARY SEARCH - STEP TRACE</div>';
+            output.innerHTML += '<div style="margin-top: 0.5rem; padding: 0.5rem; background: rgba(0, 129, 251, 0.1); border-radius: 4px;">';
+            output.innerHTML += `<strong>Algorithm:</strong> Divide search space in half each iteration<br>`;
+            output.innerHTML += `<strong>Target:</strong> Page ${target}<br>`;
+            output.innerHTML += `<strong>Total Pages:</strong> ${pages}<br>`;
+            output.innerHTML += `<strong>Max Steps:</strong> ${Math.ceil(Math.log2(pages))}<br>`;
+            output.innerHTML += `<strong>Time Complexity:</strong> O(log n)</div>`;
             
             for (let i = 1; i <= pages; i++) {
                 const item = document.createElement('div');
@@ -2100,7 +2280,13 @@ What dominates? The 3,000,000 from 3n²!
                 if (mid === target) {
                     item.classList.remove('active');
                     item.classList.add('found');
-                    output.innerHTML += `<div class="output-line" style="color: #3fb950; font-weight: 600; margin-top: 1rem;">✓ Found in ${steps} steps!</div>`;
+                    output.innerHTML += `<div class="output-line" style="color: #3fb950; font-weight: 600; margin-top: 1rem;">Found at page ${target} in ${steps} steps!</div>`;
+                    output.innerHTML += `<div style="margin-top: 0.5rem; padding: 0.5rem; background: rgba(63, 185, 80, 0.1); border-radius: 4px;">`;
+                    output.innerHTML += `<strong>Performance Analysis:</strong><br>`;
+                    output.innerHTML += `Steps taken: ${steps}<br>`;
+                    output.innerHTML += `Theoretical maximum: ${Math.ceil(Math.log2(pages))} steps<br>`;
+                    output.innerHTML += `Linear search would take: up to ${pages} steps<br>`;
+                    output.innerHTML += `<strong>Speedup:</strong> ${Math.floor(pages/steps)}x faster than linear!</div>`;
                     break;
                 } else if (mid < target) {
                     for (let i = left; i <= mid; i++) {
@@ -2181,18 +2367,23 @@ What dominates? The 3,000,000 from 3n²!
             }
         }
 
-        console.log('✅ runBinarySearch function loaded');
+        console.log('runBinarySearch function loaded');
 
-        // Find Max
+        // Find Max with Enhanced Step Trace
         async function runFindMax() {
-            console.log('🎯 runFindMax called - BUTTON WORKS!');
+            console.log('runFindMax called - Enhanced with step trace');
             const input = document.getElementById('maxInput').value;
             const nums = input.split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n));
             const visual = document.getElementById('maxVisual');
             const output = document.getElementById('maxOutput');
             
             visual.innerHTML = '';
-            output.innerHTML = '<div style="color: var(--mclaren-orange); font-weight: 600;">FINDING MAXIMUM</div>';
+            output.innerHTML = '<div style="color: var(--mclaren-orange); font-weight: 600;">FINDING MAXIMUM - STEP TRACE</div>';
+            output.innerHTML += '<div style="margin-top: 0.5rem; padding: 0.5rem; background: rgba(255, 128, 0, 0.1); border-radius: 4px;">';
+            output.innerHTML += `<strong>Algorithm:</strong> Linear scan with running maximum<br>`;
+            output.innerHTML += `<strong>Array:</strong> [${nums.join(', ')}]<br>`;
+            output.innerHTML += `<strong>Elements:</strong> ${nums.length}<br>`;
+            output.innerHTML += `<strong>Time Complexity:</strong> O(n) - Must check every element</div>`;
             
             nums.forEach((num, i) => {
                 const item = document.createElement('div');
@@ -2236,7 +2427,7 @@ What dominates? The 3,000,000 from 3n²!
 
         // Chart.js: Growth Chart
         function showGrowthChart(scale) {
-            console.log('📊 showGrowthChart called with scale:', scale);
+            console.log('showGrowthChart called with scale:', scale);
             
             // Check if Chart.js is loaded
             if (typeof Chart === 'undefined') {
@@ -2290,7 +2481,7 @@ What dominates? The 3,000,000 from 3n²!
                 ];
             }
             
-            console.log('📊 Creating chart with data:', data);
+            console.log('Creating chart with data:', data);
             
             // Ensure the canvas is visible and has dimensions
             canvas.style.display = 'block';
@@ -2403,7 +2594,7 @@ What dominates? The 3,000,000 from 3n²!
                     }
                 });
                 
-                console.log('✅ Chart created successfully');
+                console.log('Chart created successfully');
                 
                 // Update output with ratio
                 const ratio = Math.floor(data[data.length-1].on2 / data[data.length-1].on);
@@ -2589,19 +2780,30 @@ What dominates? The 3,000,000 from 3n²!
             }
         }
 
-        // Code Examples
+        // Code Examples with Enhanced Trace
         async function runEx1() {
             const n = parseInt(document.getElementById('ex1N').value) || 5;
             const output = document.getElementById('ex1Output');
-            output.innerHTML = '';
+            output.innerHTML = '<div style="color: var(--mclaren-orange); font-weight: 600;">EXECUTION TRACE - O(n) Algorithm</div>';
+            output.innerHTML += '<div style="margin-top: 0.5rem; padding: 0.5rem; background: rgba(255, 128, 0, 0.05); border-radius: 4px;">';
+            output.innerHTML += `<strong>Code:</strong> for i in range(${n}): total += i<br>`;
+            output.innerHTML += `<strong>Operations per iteration:</strong> 1 addition + 1 assignment = 2</div>`;
+            output.innerHTML += '<div style="margin-top: 0.5rem; font-weight: 600;">Step-by-Step Execution:</div>';
             
             let total = 0;
+            let operations = 0;
             for (let i = 0; i < n; i++) {
                 await new Promise(r => setTimeout(r, 400));
+                const prevTotal = total;
                 total += i;
-                output.innerHTML += `<div class="output-line">i=${i}, total=${total}</div>`;
+                operations += 2; // addition + assignment
+                output.innerHTML += `<div class="output-line">Step ${i+1}: i=${i}, prev_total=${prevTotal}, total=${prevTotal}+${i}=${total} | Ops: ${operations}</div>`;
             }
-            output.innerHTML += `<div class="output-line" style="color: #3fb950; margin-top: 1rem;">Result: ${total} | Complexity: O(n)</div>`;
+            output.innerHTML += `<div class="output-line" style="color: #3fb950; margin-top: 1rem; padding: 0.5rem; background: rgba(63, 185, 80, 0.1); border-radius: 4px;">`;
+            output.innerHTML += `<strong>Final Result:</strong> ${total}<br>`;
+            output.innerHTML += `<strong>Total Operations:</strong> ${operations}<br>`;
+            output.innerHTML += `<strong>Time Complexity:</strong> O(n) - Linear with input size<br>`;
+            output.innerHTML += `<strong>Space Complexity:</strong> O(1) - Constant extra space</div>`;
         }
 
         async function runEx2() {
@@ -2611,7 +2813,11 @@ What dominates? The 3,000,000 from 3n²!
             
             grid.style.gridTemplateColumns = `repeat(${n}, 1fr)`;
             grid.innerHTML = '';
-            output.innerHTML = '';
+            output.innerHTML = '<div style="color: var(--redbull-red); font-weight: 600;">EXECUTION TRACE - O(n²) Algorithm</div>';
+            output.innerHTML += '<div style="margin-top: 0.5rem; padding: 0.5rem; background: rgba(220, 0, 0, 0.05); border-radius: 4px;">';
+            output.innerHTML += `<strong>Nested Loops:</strong> for i in range(${n}): for j in range(${n})<br>`;
+            output.innerHTML += `<strong>Total iterations:</strong> ${n} × ${n} = ${n*n}</div>`;
+            output.innerHTML += '<div style="margin-top: 0.5rem; font-weight: 600;">Execution Order:</div>';
             
             for (let i = 0; i < n; i++) {
                 for (let j = 0; j < n; j++) {
@@ -2638,23 +2844,42 @@ What dominates? The 3,000,000 from 3n²!
                 }
             }
             
-            output.innerHTML = `<div class="output-line" style="color: #3fb950;">Total: ${n}×${n} = ${n*n} operations | O(n²)</div>`;
+            output.innerHTML += `<div class="output-line" style="color: #3fb950; margin-top: 1rem; padding: 0.5rem; background: rgba(63, 185, 80, 0.1); border-radius: 4px;">`;
+            output.innerHTML += `<strong>Performance Analysis:</strong><br>`;
+            output.innerHTML += `Total operations: ${n}×${n} = ${n*n}<br>`;
+            output.innerHTML += `Time Complexity: O(n²) - Quadratic growth<br>`;
+            output.innerHTML += `If n doubles to ${n*2}, operations become ${(n*2)*(n*2)} (4x increase!)<br>`;
+            output.innerHTML += `<strong>Warning:</strong> Quadratic algorithms become very slow for large n</div>`;
         }
 
         async function runEx4() {
             const n = parseInt(document.getElementById('ex4N').value) || 16;
             const output = document.getElementById('ex4Output');
-            output.innerHTML = '';
+            output.innerHTML = '<div style="color: var(--meta-blue); font-weight: 600;">EXECUTION TRACE - O(log n) Algorithm</div>';
+            output.innerHTML += '<div style="margin-top: 0.5rem; padding: 0.5rem; background: rgba(0, 129, 251, 0.05); border-radius: 4px;">';
+            output.innerHTML += `<strong>Algorithm:</strong> while i < ${n}: i = i * 2<br>`;
+            output.innerHTML += `<strong>Growth pattern:</strong> Exponential doubling<br>`;
+            output.innerHTML += `<strong>Expected steps:</strong> ⌈log₂(${n})⌉ = ${Math.ceil(Math.log2(n))}</div>`;
+            output.innerHTML += '<div style="margin-top: 0.5rem; font-weight: 600;">Execution Trace:</div>';
             
             let i = 1, steps = 0;
+            const sequence = [];
             while (i < n) {
                 steps++;
-                output.innerHTML += `<div class="output-line">Step ${steps}: i=${i}</div>`;
-                await new Promise(r => setTimeout(r, 500));
+                sequence.push(i);
+                output.innerHTML += `<div class="output-line">Step ${steps}: i = ${i} → `;
+                const prevI = i;
                 i *= 2;
+                output.innerHTML += `${prevI} × 2 = ${i} | Check: ${i} < ${n}? ${i < n ? 'Yes, continue' : 'No, stop'}</div>`;
+                await new Promise(r => setTimeout(r, 500));
             }
             
-            output.innerHTML += `<div class="output-line" style="color: #3fb950; margin-top: 1rem;">Steps: ${steps} ≈ log₂(${n}) | O(log n)</div>`;
+            output.innerHTML += `<div class="output-line" style="color: #3fb950; margin-top: 1rem; padding: 0.5rem; background: rgba(63, 185, 80, 0.1); border-radius: 4px;">`;
+            output.innerHTML += `<strong>Sequence:</strong> ${sequence.join(' → ')} → ${i}<br>`;
+            output.innerHTML += `<strong>Total Steps:</strong> ${steps}<br>`;
+            output.innerHTML += `<strong>log₂(${n}):</strong> ${Math.log2(n).toFixed(2)}<br>`;
+            output.innerHTML += `<strong>Time Complexity:</strong> O(log n) - Logarithmic growth<br>`;
+            output.innerHTML += `<strong>Key Insight:</strong> Each iteration eliminates half the remaining search space</div>`;
         }
 
         // Initialize
@@ -2670,7 +2895,7 @@ What dominates? The 3,000,000 from 3n²!
                     attempts++;
                     if (typeof Chart !== 'undefined') {
                         clearInterval(checkChart);
-                        console.log('✅ Chart.js loaded after ' + (attempts * 100) + 'ms');
+                        console.log('Chart.js loaded after ' + (attempts * 100) + 'ms');
                         initializeCharts();
                     } else if (attempts > 50) {
                         clearInterval(checkChart);
@@ -2684,11 +2909,11 @@ What dominates? The 3,000,000 from 3n²!
         });
         
         function initializeCharts() {
-            console.log('📊 Initializing all charts...');
+            console.log('Initializing all charts...');
             drawLogGrowthChart();
             drawBigOChart();
             showGrowthChart('small');
-            console.log('✅ All charts initialized');
+            console.log('All charts initialized');
             verifyFunctions();
         }
         
@@ -2715,7 +2940,7 @@ What dominates? The 3,000,000 from 3n²!
             console.log('\n🔍 Checking interactive functions:');
             functions.forEach(fn => {
                 if (typeof window[fn] === 'function') {
-                    console.log(`  ✅ ${fn} - Available`);
+                    console.log(`  ${fn} - Available`);
                 } else {
                     console.error(`  ❌ ${fn} - NOT FOUND`);
                 }
